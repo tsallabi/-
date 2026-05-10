@@ -147,8 +147,7 @@
 
     function initThemeToggle() {
         const stored = localStorage.getItem('taybaa-theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const theme = stored || (prefersDark ? 'dark' : 'light');
+        const theme = stored || 'dark';
         document.documentElement.setAttribute('data-theme', theme);
         const btn = document.getElementById('themeToggle');
         if (!btn) return;

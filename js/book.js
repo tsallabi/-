@@ -86,7 +86,7 @@
     function showNotFound() { els.loading.hidden = true; els.notFound.hidden = false; }
 
     function initThemeToggle() {
-        const theme = localStorage.getItem('taybaa-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        const theme = localStorage.getItem('taybaa-theme') || 'dark';
         document.documentElement.setAttribute('data-theme', theme);
         const btn = document.getElementById('themeToggle');
         if (!btn) return;
