@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0f766e">
+    <title>لوحة الإدارة — المكتبة الطيبة</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="site-header" id="siteHeader">
+        <div class="container header-inner">
+            <a href="index.html" class="logo" aria-label="الصفحة الرئيسية">
+                <span class="logo-mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24">
+                        <path d="M4 19.5A2.5 2.5 0 016.5 17H20V3H6.5A2.5 2.5 0 004 5.5v14z"/>
+                        <path d="M4 19.5A2.5 2.5 0 016.5 22H20v-5"/>
+                    </svg>
+                </span>
+                <span class="logo-text">
+                    <span class="logo-title">المكتبة الطيبة</span>
+                    <span class="logo-tag">لوحة الإدارة</span>
+                </span>
+            </a>
+
+            <div class="admin-header-actions">
+                <a href="index.html" class="link-btn">عرض الموقع ↗</a>
+                <button class="theme-toggle" id="themeToggle" aria-label="تبديل الوضع الليلي" type="button">
+                    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+                    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </button>
+                <button class="link-btn" id="logoutBtn" type="button" hidden>خروج ↗</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container admin-login" id="loginScreen">
+        <div class="login-card">
+            <span class="login-icon" aria-hidden="true">🔐</span>
+            <h1>لوحة إدارة المكتبة</h1>
+            <p>أدخل كلمة المرور للوصول إلى أدوات إدارة الكتب.</p>
+            <form id="loginForm" autocomplete="off">
+                <div class="field">
+                    <label for="pwd">كلمة المرور</label>
+                    <input type="password" id="pwd" required autofocus>
+                </div>
+                <p class="login-error" id="loginError" hidden>كلمة المرور غير صحيحة.</p>
+                <button type="submit" class="btn btn-primary btn-full">دخول</button>
+            </form>
+            <p class="login-hint">💡 تأكد من ضبط <code>admin.password</code> في <code>js/config.js</code></p>
+        </div>
+    </main>
+
+    <main class="container admin-dashboard" id="dashboard" hidden>
+        <section class="admin-stats">
+            <div class="admin-stat-card"><span class="stat-icon">📚</span><div><b id="totalBooks">0</b><span>كتاب</span></div></div>
+            <div class="admin-stat-card"><span class="stat-icon">👁️</span><div><b id="totalViews">0</b><span>مشاهدة</span></div></div>
+            <div class="admin-stat-card"><span class="stat-icon">⬇️</span><div><b id="totalDownloads">0</b><span>تحميل</span></div></div>
+            <div class="admin-stat-card"><span class="stat-icon">📂</span><div><b id="totalCategories">0</b><span>قسم</span></div></div>
+        </section>
+
+        <section class="admin-toolbar">
+            <div>
+                <h2>📚 إدارة الكتب</h2>
+                <p class="section-sub">أضف، عدّل، أو احذف الكتب.</p>
+            </div>
+            <div class="toolbar-actions">
+                <input type="search" id="adminSearch" placeholder="🔍 بحث في الكتب..." class="admin-search">
+                <button class="btn btn-primary" id="addBookBtn" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M12 5v14M5 12h14"/></svg>
+                    أضف كتاباً
+                </button>
+            </div>
+        </section>
+
+        <div class="admin-notice" id="firebaseNotice" hidden>
+            <strong>⚠️ Firebase غير مفعّل.</strong>
+            للحفظ الدائم للكتب، اضبط <code>firebase.enabled = true</code> في <code>config.js</code> بعد إعداد المشروع.
+            <a href="SETUP.md" target="_blank">دليل الإعداد →</a>
+        </div>
+
+        <section class="admin-books-table">
+            <table>
+                <thead><tr><th>الغلاف</th><th>العنوان</th><th>المؤلف</th><th>القسم</th><th>إحصائيات</th><th>إجراءات</th></tr></thead>
+                <tbody id="booksTableBody"><tr><td colspan="6" class="empty-state"><span class="spinner"></span> جارٍ التحميل...</td></tr></tbody>
+            </table>
+        </section>
+    </main>
+
+    <div class="admin-modal" id="bookModal" hidden>
+        <div class="admin-modal-backdrop" data-close></div>
+        <div class="admin-modal-card">
+            <header class="admin-modal-head">
+                <h2 id="modalTitle">إضافة كتاب جديد</h2>
+                <button class="modal-close" data-close aria-label="إغلاق" type="button">✕</button>
+            </header>
+            <div class="admin-modal-body">
+                <form id="bookForm" autocomplete="off">
+                    <input type="hidden" id="bookId">
+                    <ol class="admin-stepper">
+                        <li class="step active" data-step="1"><span>1</span> المعلومات</li>
+                        <li class="step" data-step="2"><span>2</span> المحتوى</li>
+                        <li class="step" data-step="3"><span>3</span> النصوص</li>
+                    </ol>
+                    <section class="step-panel active" data-panel="1">
+                        <div class="field-grid">
+                            <div class="field"><label for="bookTitle">عنوان الكتاب *</label><input type="text" id="bookTitle" required></div>
+                            <div class="field"><label for="bookAuthor">المؤلف *</label><input type="text" id="bookAuthor" required></div>
+                            <div class="field">
+                                <label for="bookCategory">القسم *</label>
+                                <input type="text" id="bookCategory" list="categoriesList" required>
+                                <datalist id="categoriesList">
+                                    <option value="الأدب والروايات"><option value="الدين والإسلاميات">
+                                    <option value="التاريخ والتراث"><option value="العلوم والمعرفة">
+                                    <option value="التطوير الذاتي"><option value="كتب الأطفال">
+                                    <option value="التعليم والدراسة"><option value="الفلسفة والفكر">
+                                    <option value="الشعر"><option value="السير والتراجم">
+                                </datalist>
+                            </div>
+                            <div class="field"><label for="bookPages">عدد الصفحات</label><input type="number" id="bookPages" min="0"></div>
+                            <div class="field field-full"><label class="checkbox"><input type="checkbox" id="bookRecommended"><span>⭐ موصى به (يظهر في القسم المميز)</span></label></div>
+                        </div>
+                    </section>
+                    <section class="step-panel" data-panel="2">
+                        <div class="field">
+                            <label>🖼️ صورة الغلاف</label>
+                            <div class="upload-zone" id="coverUpload">
+                                <img id="coverPreview" alt="معاينة الغلاف" hidden>
+                                <div class="upload-placeholder">
+                                    <span class="upload-icon">🖼️</span>
+                                    <p><strong>اسحب صورة هنا</strong> أو اضغط للاختيار</p>
+                                    <small>JPG, PNG · يفضل 400×600 بكسل</small>
+                                </div>
+                                <input type="file" id="coverFile" accept="image/*" hidden>
+                            </div>
+                            <p class="field-hint">أو الصق رابط الصورة:</p>
+                            <input type="url" id="coverUrl" placeholder="https://...cover.jpg">
+                        </div>
+                        <div class="field">
+                            <label>📄 ملف الكتاب</label>
+                            <div class="upload-tabs">
+                                <button type="button" class="tab-btn active" data-tab="pdf">PDF</button>
+                                <button type="button" class="tab-btn" data-tab="docx">Word (.docx)</button>
+                                <button type="button" class="tab-btn" data-tab="url">رابط مباشر</button>
+                            </div>
+                            <div class="tab-panel active" data-tab-panel="pdf">
+                                <div class="upload-zone" id="pdfUpload">
+                                    <div class="upload-placeholder">
+                                        <span class="upload-icon">📄</span>
+                                        <p><strong>اسحب ملف PDF هنا</strong> أو اضغط للاختيار</p>
+                                        <small id="pdfFileName">لم يتم اختيار ملف</small>
+                                    </div>
+                                    <input type="file" id="pdfFile" accept="application/pdf,.pdf" hidden>
+                                </div>
+                            </div>
+                            <div class="tab-panel" data-tab-panel="docx">
+                                <div class="upload-zone" id="docxUpload">
+                                    <div class="upload-placeholder">
+                                        <span class="upload-icon">📝</span>
+                                        <p><strong>اسحب ملف Word (.docx)</strong> أو اضغط للاختيار</p>
+                                        <small id="docxFileName">لم يتم اختيار ملف</small>
+                                    </div>
+                                    <input type="file" id="docxFile" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
+                                </div>
+                                <div class="docx-preview-wrap" id="docxPreviewWrap" hidden>
+                                    <p class="field-hint">📖 معاينة الكتاب بعد التنسيق:</p>
+                                    <div class="docx-preview book-preview" id="docxPreview"></div>
+                                    <div class="preview-actions">
+                                        <button type="button" class="link-btn" id="downloadHtmlBtn">⬇️ تحميل HTML</button>
+                                        <button type="button" class="link-btn" id="downloadPdfBtn">⬇️ تحميل PDF</button>
+                                    </div>
+                                </div>
+                                <p class="field-hint">💡 من Google Docs: <strong>File → Download → Microsoft Word (.docx)</strong></p>
+                            </div>
+                            <div class="tab-panel" data-tab-panel="url">
+                                <input type="url" id="pdfUrl" placeholder="https://...book.pdf">
+                                <p class="field-hint">رابط مباشر لملف PDF (مثلاً من Google Drive أو archive.org)</p>
+                            </div>
+                        </div>
+                    </section>
+                    <section class="step-panel" data-panel="3">
+                        <div class="field"><label for="bookDescription">📌 نبذة مختصرة *</label><textarea id="bookDescription" rows="3" placeholder="نبذة موجزة عن الكتاب وموضوعه..."></textarea></div>
+                        <div class="field"><label for="bookIntro">📝 المقدمة</label><textarea id="bookIntro" rows="6" placeholder="مقدمة الكتاب..."></textarea><p class="field-hint">💡 إذا رفعت ملف Word سيتم استخراج المقدمة تلقائياً.</p></div>
+                    </section>
+                </form>
+            </div>
+            <footer class="admin-modal-foot">
+                <button type="button" class="link-btn" id="prevStepBtn">→ السابق</button>
+                <div class="modal-foot-spacer"></div>
+                <button type="button" class="link-btn" data-close>إلغاء</button>
+                <button type="button" class="btn btn-primary" id="nextStepBtn">التالي ←</button>
+                <button type="button" class="btn btn-primary" id="saveBookBtn" hidden>💾 حفظ الكتاب</button>
+            </footer>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>
