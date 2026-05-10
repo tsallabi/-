@@ -1,12 +1,12 @@
-# 🛠️ دليل الإعداد — مكتبة طيبة
+# 🛠️ دليل الإعداد — المكتبة الطيبة
 
-هذا المشروع موقع ثابت (Static) يعمل بدون أي خادم. الإعداد كله يتم في ملف واحد: `js/config.js`.
+موقع مكتبة إلكتروني حديث، يعمل بدون خادم. الإعداد كله في ملف واحد: `js/config.js`.
 
 ---
 
-## 1️⃣ التشغيل المحلي (للتجربة)
+## 🚀 البدء السريع
 
-### على الكمبيوتر (Python):
+### على الكمبيوتر:
 ```bash
 python3 -m http.server 8080
 ```
@@ -14,61 +14,102 @@ python3 -m http.server 8080
 
 ### على Android (Termux):
 ```bash
-pkg install python -y
-termux-setup-storage
-cd /sdcard/Download/TAYBAA-LIBRARY
+pkg install python git -y
+git clone https://github.com/tsallabi/TAYBAA-LIBRARY.git
+cd TAYBAA-LIBRARY
 python -m http.server 8080
 ```
-ثم افتح في متصفح الجوال: http://localhost:8080
-
-سيظهر الموقع مع 8 كتب تجريبية فوراً (بدون أي إعداد).
+ثم في متصفح الجوال: **http://localhost:8080**
 
 ---
 
-## 2️⃣ ربط Google Sheets كقاعدة بيانات
+## 🔐 لوحة الإدارة (الأدمن)
 
-### الخطوة 1: أنشئ جدولاً جديداً
-اذهب إلى <https://sheets.new>
+### كيف يدخل الأدمن؟
+1. افتح: **https://your-site/admin.html**
+   - مثلاً: `https://tsallabi.github.io/TAYBAA-LIBRARY/admin.html`
+2. أدخل كلمة المرور (الافتراضية: `taybaa2026`)
 
-### الخطوة 2: أضف الأعمدة في الصف الأول في ورقة اسمها `books`:
-
-| id | title | author | category | pages | cover | pdf | description | introduction | views | downloads | addedDate | recommended |
-|----|-------|--------|----------|-------|-------|-----|-------------|--------------|-------|-----------|-----------|-------------|
-
-> 💡 يمكنك أيضاً استخدام أسماء عربية: العنوان، المؤلف، القسم، الصفحات، الغلاف، رابط_pdf، النبذة، المقدمة، إلخ.
-
-### الخطوة 3: أضف كتبك (سطر لكل كتاب)
-
-### الخطوة 4: اجعل الجدول عاماً
-- اضغط **مشاركة (Share)** → **أي شخص لديه الرابط — مشاهد**
-
-### الخطوة 5: انسخ معرّف الجدول
-من الرابط: `docs.google.com/spreadsheets/d/<SHEET_ID>/edit`
-
-### الخطوة 6: ضعه في `js/config.js`:
+### تغيير كلمة مرور الأدمن:
+في `js/config.js`:
 ```js
-useSheets: true,
-sheetId: 'SHEET_ID_HERE',
-sheetName: 'books',
+admin: {
+    password: 'كلمة_مرور_قوية_هنا'
+}
 ```
 
-🎉 جاهز!
+### ⚠️ ملاحظة أمنية:
+- كلمة المرور في `config.js` ظاهرة في كود الموقع — مناسبة للمكتبات الخاصة فقط
+- **للحماية الكاملة**: استخدم Firebase Authentication
 
 ---
 
-## 3️⃣ إعداد Firebase للعدّاد
+## 📚 إضافة الكتب من لوحة الإدارة
 
-### الخطوة 1: أنشئ مشروع
+### 1️⃣ اضغط **➕ أضف كتاباً**
+تظهر نافذة بـ **3 خطوات**:
+
+### 2️⃣ الخطوة 1: المعلومات
+- العنوان، المؤلف، القسم
+- عدد الصفحات
+- ⭐ موصى به (اختياري)
+
+### 3️⃣ الخطوة 2: المحتوى
+- 🖼️ **صورة الغلاف**: اسحب الصورة أو الصق رابطها
+- 📄 **ملف الكتاب** (3 خيارات):
+  - **PDF**: ارفع ملف PDF مباشرة
+  - **📝 Word (.docx)**: ارفع ملف Word — يتم تحويله تلقائياً لكتاب منسّق
+  - **🔗 رابط**: الصق رابط PDF خارجي
+
+### 4️⃣ الخطوة 3: النصوص
+- نبذة مختصرة
+- المقدمة
+
+> 💡 **عند رفع ملف Word**: يستخرج النظام العنوان والنبذة والمقدمة تلقائياً.
+
+### اضغط 💾 حفظ — الكتاب يصبح متاحاً للجميع فوراً!
+
+---
+
+## 📝 محرّر الكتب من Word
+
+### كيف يحوّل الملف لكتاب؟
+1. اختر تبويب **Word (.docx)**
+2. اسحب ملف `.docx`
+3. النظام يقوم تلقائياً بـ:
+   - استخراج النص + العناوين + الصور
+   - تنسيقها بشكل كتاب (خط Amiri، تباعد مناسب، RTL)
+   - عرض **معاينة مباشرة**
+   - استخراج العنوان والنبذة والمقدمة
+
+### من Google Docs:
+1. افتح المستند في Google Docs
+2. **File → Download → Microsoft Word (.docx)**
+3. ارفع الملف في لوحة الإدارة
+
+---
+
+## 🔥 إعداد Firebase (للحفظ الدائم + العداد)
+
+بدون Firebase، الكتب التي تضيفها لن تُحفظ.
+
+### الخطوة 1: أنشئ مشروع Firebase
 <https://console.firebase.google.com> → **Add project**
 
 ### الخطوة 2: فعّل Firestore Database
-**Build > Firestore Database > Start in test mode**
+- **Build > Firestore Database** → Start in test mode
+- اختر منطقة قريبة
 
-### الخطوة 3: أضف تطبيق ويب
-⚙️ Project Settings → **Add App** → **Web** → انسخ كائن `firebaseConfig`
+### الخطوة 3: فعّل Storage
+- **Build > Storage** → ابدأ في وضع التجربة
 
-### الخطوة 4: ضعه في `js/config.js`:
+### الخطوة 4: أضف تطبيق ويب
+- ⚙️ Project Settings → Your apps → أيقونة `</>`
+- انسخ كائن `firebaseConfig`
+
+### الخطوة 5: ضعه في `js/config.js`
 ```js
+dataSource: 'firestore',
 firebase: {
     enabled: true,
     config: {
@@ -82,11 +123,15 @@ firebase: {
 }
 ```
 
-### الخطوة 5: قواعد الأمان (Firestore Rules):
+### الخطوة 6: قواعد Firestore
 ```
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    match /books/{bookId} {
+      allow read: if true;
+      allow write: if true;
+    }
     match /bookStats/{bookId} {
       allow read: if true;
       allow write: if request.resource.data.keys().hasOnly(['views','downloads']);
@@ -95,31 +140,30 @@ service cloud.firestore {
 }
 ```
 
+### الخطوة 7: قواعد Storage
+```
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read: if true;
+      allow write: if true;
+    }
+  }
+}
+```
+
+🎉 جاهز!
+
 ---
 
-## 4️⃣ النشر على الإنترنت (مجاناً)
+## 🌐 النشر مجاناً
 
-### Netlify (الأسهل) ⭐
-1. اذهب إلى <https://app.netlify.com/drop>
-2. اسحب مجلد المشروع إلى الصفحة
-3. جاهز! ستحصل على رابط `https://your-site.netlify.app`
+### GitHub Pages:
+**Settings → Pages → Source: branch `main` / root**
 
-### GitHub Pages
-1. **Settings > Pages**
-2. Source: branch `main` → `/root`
-3. جاهز خلال دقائق
-
----
-
-## 5️⃣ إضافة كتبك
-
-### للأغلفة:
-- ارفعها على [imgur.com](https://imgur.com) أو [Cloudinary](https://cloudinary.com)
-
-### لملفات PDF:
-- **Google Drive**: `https://drive.google.com/uc?export=download&id=FILE_ID`
-- **archive.org**: روابط مباشرة
-- أو في مجلد `books/` داخل المشروع
+### Netlify:
+<https://app.netlify.com> → New site from Git → GitHub → TAYBAA-LIBRARY
 
 ---
 
@@ -127,6 +171,7 @@ service cloud.firestore {
 
 | المشكلة | الحل |
 |---------|------|
-| لا تظهر الكتب | تأكد أن `useSheets: false` أو Sheet ID صحيح |
-| الكتاب لا يفتح | تأكد أن رابط PDF مباشر (ليس صفحة Drive) |
-| العدّاد لا يعمل | راجع قواعد Firestore + `firebase.enabled: true` |
+| لا أستطيع الدخول للأدمن | تأكد من `admin.password` في config.js |
+| الكتب التي أضفتها اختفت | فعّل Firebase — بدونه لا تُحفظ |
+| ملف Word لا يتحوّل | تأكد أنه `.docx` (ليس `.doc`) |
+| الصور لا تظهر | تأكد من تفعيل Firebase Storage |
