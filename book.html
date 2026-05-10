@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تفاصيل الكتاب — المكتبة</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="index.html" class="logo" aria-label="الصفحة الرئيسية">
+                <span class="logo-icon">📚</span>
+                <span class="logo-text">المكتبة</span>
+            </a>
+            <a href="index.html" class="link-btn">→ العودة للرئيسية</a>
+        </div>
+    </header>
+
+    <main class="container">
+        <article class="book-detail" id="bookDetail" hidden>
+            <div class="book-detail-cover">
+                <img id="bookCover" alt="" loading="lazy">
+            </div>
+            <div class="book-detail-info">
+                <p class="book-detail-category" id="bookCategory"></p>
+                <h1 id="bookTitle"></h1>
+                <p class="book-detail-author">للمؤلف: <strong id="bookAuthor"></strong></p>
+
+                <ul class="book-meta-list">
+                    <li>📄 <span id="bookPages"></span> صفحة</li>
+                    <li>👁️ <span id="bookViews">0</span> مشاهدة</li>
+                    <li>⬇️ <span id="bookDownloads">0</span> تحميل</li>
+                </ul>
+
+                <div class="book-actions">
+                    <a href="#" id="readBtn" class="btn btn-primary">📖 اقرأ الآن</a>
+                    <a href="#" id="downloadBtn" class="btn btn-secondary" download>⬇️ حمّل على جهازك</a>
+                </div>
+            </div>
+        </article>
+
+        <section class="book-text" id="descriptionSection" hidden>
+            <h2>📌 نبذة عن الكتاب</h2>
+            <p id="bookDescription"></p>
+        </section>
+
+        <section class="book-text" id="introSection" hidden>
+            <h2>📝 المقدمة</h2>
+            <p id="bookIntro"></p>
+        </section>
+
+        <p class="empty-state" id="loadingState">جارٍ تحميل بيانات الكتاب...</p>
+        <p class="empty-state" id="notFoundState" hidden>عذراً، لم يتم العثور على هذا الكتاب. <a href="index.html">عُد للرئيسية</a></p>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>© <span id="year"></span> المكتبة — مشروع مفتوح للقراء.</p>
+        </div>
+    </footer>
+
+    <script src="js/config.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/firebase-counter.js"></script>
+    <script src="js/book.js"></script>
+</body>
+</html>

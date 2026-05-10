@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المكتبة — اقرأ بحرية</title>
+    <meta name="description" content="مكتبة إلكترونية مجانية: تصفح الكتب أونلاين أو حمّلها على جهازك.">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="index.html" class="logo" aria-label="الصفحة الرئيسية">
+                <span class="logo-icon">📚</span>
+                <span class="logo-text">المكتبة</span>
+            </a>
+            <form class="search-box" id="searchForm" role="search">
+                <input type="search" id="searchInput" placeholder="ابحث عن كتاب أو مؤلف أو موضوع..." aria-label="بحث">
+                <button type="submit" id="searchBtn" aria-label="ابحث">🔍</button>
+            </form>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>اقرأ ما يعجبك. حمّل ما تريد.</h1>
+                <p>مكتبة بسيطة وسهلة لجميع القراء — بدون تسجيل، بدون تعقيد.</p>
+            </div>
+        </section>
+
+        <section class="section" aria-labelledby="categoriesTitle">
+            <div class="container">
+                <h2 id="categoriesTitle">الأقسام</h2>
+                <div class="categories-grid" id="categoriesGrid"></div>
+            </div>
+        </section>
+
+        <section class="section" id="filteredSection" hidden>
+            <div class="container">
+                <div class="section-head">
+                    <h2 id="filteredTitle">النتائج</h2>
+                    <button class="link-btn" id="clearFilter">إلغاء الفلتر ✕</button>
+                </div>
+                <div class="books-grid" id="filteredBooks"></div>
+                <p class="empty-state" id="emptyState" hidden>لم يتم العثور على كتب مطابقة.</p>
+            </div>
+        </section>
+
+        <section class="section" id="popularSection">
+            <div class="container">
+                <h2>📈 الأكثر قراءة</h2>
+                <div class="books-grid" id="popularBooks"></div>
+            </div>
+        </section>
+
+        <section class="section" id="newSection">
+            <div class="container">
+                <h2>✨ الأحدث</h2>
+                <div class="books-grid" id="newBooks"></div>
+            </div>
+        </section>
+
+        <section class="section" id="recommendedSection">
+            <div class="container">
+                <h2>⭐ موصى به</h2>
+                <div class="books-grid" id="recommendedBooks"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>© <span id="year"></span> المكتبة — مشروع مفتوح للقراء.</p>
+        </div>
+    </footer>
+
+    <script src="js/config.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

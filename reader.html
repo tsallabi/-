@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قارئ الكتاب — المكتبة</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; background: #1a1a1a; }
+        .reader-bar {
+            position: sticky; top: 0; z-index: 10;
+            background: var(--color-primary);
+            color: #fff;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: .75rem 1rem;
+        }
+        .reader-bar a, .reader-bar button {
+            color: #fff; background: transparent; border: 1px solid rgba(255,255,255,.5);
+            padding: .4rem .9rem; border-radius: 6px; text-decoration: none;
+            font-family: inherit; font-size: 1rem; cursor: pointer;
+        }
+        .reader-bar a:hover, .reader-bar button:hover { background: rgba(255,255,255,.15); }
+        .reader-title { font-weight: 700; flex: 1; text-align: center; padding: 0 1rem; }
+        .reader-frame {
+            width: 100%; height: calc(100vh - 56px);
+            border: 0; display: block;
+        }
+        .reader-error { color: #fff; padding: 2rem; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="reader-bar">
+        <a href="javascript:history.back()" aria-label="عودة">← عودة</a>
+        <span class="reader-title" id="readerTitle">جارٍ التحميل...</span>
+        <button id="fullscreenBtn" aria-label="ملء الشاشة">⛶ ملء الشاشة</button>
+    </div>
+
+    <iframe id="pdfFrame" class="reader-frame" title="قارئ الكتاب" src="about:blank"></iframe>
+
+    <p id="readerError" class="reader-error" hidden>
+        تعذّر تحميل الكتاب. <a href="index.html" style="color:#fff;text-decoration:underline">عُد للرئيسية</a>
+    </p>
+
+    <script>
+        (function() {
+            const params = new URLSearchParams(location.search);
+            const pdfUrl = params.get('pdf');
+            const title = params.get('title') || 'قراءة';
+            document.getElementById('readerTitle').textContent = title;
+            document.title = title + ' — المكتبة';
+
+            const frame = document.getElementById('pdfFrame');
+            const errorEl = document.getElementById('readerError');
+
+            if (!pdfUrl) {
+                frame.hidden = true;
+                errorEl.hidden = false;
+                return;
+            }
+
+            const useGoogleViewer = params.get('viewer') === 'google';
+            frame.src = useGoogleViewer
+                ? 'https://docs.google.com/gview?embedded=true&url=' + encodeURIComponent(pdfUrl)
+                : pdfUrl;
+
+            document.getElementById('fullscreenBtn').addEventListener('click', () => {
+                const el = document.documentElement;
+                if (!document.fullscreenElement) el.requestFullscreen?.();
+                else document.exitFullscreen?.();
+            });
+        })();
+    </script>
+</body>
+</html>
