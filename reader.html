@@ -3,43 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>قارئ الكتاب — المكتبة</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#0f172a">
+    <title>القارئ — المكتبة الطيبة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; background: #1a1a1a; }
+        :root {
+            --rdr-bg: #0f172a;
+            --rdr-bar: rgba(15,23,42,.85);
+            --rdr-text: #f8fafc;
+            --rdr-accent: #14b8a6;
+            --rdr-border: rgba(255,255,255,.12);
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: var(--rdr-bg); font-family: 'Cairo', system-ui, sans-serif; color: var(--rdr-text); }
         .reader-bar {
             position: sticky; top: 0; z-index: 10;
-            background: var(--color-primary);
-            color: #fff;
-            display: flex; align-items: center; justify-content: space-between;
-            padding: .75rem 1rem;
+            backdrop-filter: blur(14px) saturate(180%);
+            -webkit-backdrop-filter: blur(14px) saturate(180%);
+            background: var(--rdr-bar);
+            border-bottom: 1px solid var(--rdr-border);
+            display: flex; align-items: center; gap: .5rem;
+            padding: .65rem .85rem;
         }
         .reader-bar a, .reader-bar button {
-            color: #fff; background: transparent; border: 1px solid rgba(255,255,255,.5);
-            padding: .4rem .9rem; border-radius: 6px; text-decoration: none;
-            font-family: inherit; font-size: 1rem; cursor: pointer;
+            color: var(--rdr-text);
+            background: rgba(255,255,255,.06);
+            border: 1px solid var(--rdr-border);
+            padding: .5rem .9rem;
+            border-radius: 10px;
+            text-decoration: none;
+            font-family: inherit; font-size: .95rem; font-weight: 600;
+            cursor: pointer;
+            display: inline-flex; align-items: center; gap: .35rem;
+            transition: background .15s, border-color .15s;
         }
-        .reader-bar a:hover, .reader-bar button:hover { background: rgba(255,255,255,.15); }
-        .reader-title { font-weight: 700; flex: 1; text-align: center; padding: 0 1rem; }
+        .reader-bar a:hover, .reader-bar button:hover {
+            background: rgba(255,255,255,.12);
+            border-color: var(--rdr-accent);
+        }
+        .reader-title {
+            font-weight: 700; flex: 1;
+            text-align: center;
+            padding: 0 .5rem;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            font-size: 1rem;
+        }
         .reader-frame {
             width: 100%; height: calc(100vh - 56px);
-            border: 0; display: block;
+            border: 0; display: block; background: #fff;
         }
-        .reader-error { color: #fff; padding: 2rem; text-align: center; }
+        .reader-error {
+            color: var(--rdr-text); padding: 3rem 1.5rem;
+            text-align: center; font-size: 1.05rem;
+        }
+        .reader-error a { color: var(--rdr-accent); }
+        @media (max-width: 600px) {
+            .reader-title { font-size: .85rem; }
+            .reader-bar a, .reader-bar button { padding: .45rem .7rem; font-size: .85rem; }
+        }
     </style>
 </head>
 <body>
     <div class="reader-bar">
         <a href="javascript:history.back()" aria-label="عودة">← عودة</a>
         <span class="reader-title" id="readerTitle">جارٍ التحميل...</span>
-        <button id="fullscreenBtn" aria-label="ملء الشاشة">⛶ ملء الشاشة</button>
+        <button id="fullscreenBtn" aria-label="ملء الشاشة" type="button">⛶ ملء الشاشة</button>
     </div>
 
     <iframe id="pdfFrame" class="reader-frame" title="قارئ الكتاب" src="about:blank"></iframe>
 
     <p id="readerError" class="reader-error" hidden>
-        تعذّر تحميل الكتاب. <a href="index.html" style="color:#fff;text-decoration:underline">عُد للرئيسية</a>
+        تعذّر تحميل الكتاب. <a href="index.html">عُد للرئيسية</a>
     </p>
 
     <script>
@@ -48,7 +82,7 @@
             const pdfUrl = params.get('pdf');
             const title = params.get('title') || 'قراءة';
             document.getElementById('readerTitle').textContent = title;
-            document.title = title + ' — المكتبة';
+            document.title = title + ' — المكتبة الطيبة';
 
             const frame = document.getElementById('pdfFrame');
             const errorEl = document.getElementById('readerError');
@@ -65,8 +99,7 @@
                 : pdfUrl;
 
             document.getElementById('fullscreenBtn').addEventListener('click', () => {
-                const el = document.documentElement;
-                if (!document.fullscreenElement) el.requestFullscreen?.();
+                if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
                 else document.exitFullscreen?.();
             });
         })();
