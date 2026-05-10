@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#0f766e">
+    <meta name="theme-color" content="#0a0e1a">
     <title>لوحة الإدارة — المكتبة الطيبة</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/admin.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:wght@700&display=swap" rel="stylesheet">
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('taybaa-theme') || 'dark');</script>
 </head>
 <body>
     <header class="site-header" id="siteHeader">
@@ -26,7 +27,6 @@
                     <span class="logo-tag">لوحة الإدارة</span>
                 </span>
             </a>
-
             <div class="admin-header-actions">
                 <a href="index.html" class="link-btn">عرض الموقع ↗</a>
                 <button class="theme-toggle" id="themeToggle" aria-label="تبديل الوضع الليلي" type="button">
@@ -44,10 +44,7 @@
             <h1>لوحة إدارة المكتبة</h1>
             <p>أدخل كلمة المرور للوصول إلى أدوات إدارة الكتب.</p>
             <form id="loginForm" autocomplete="off">
-                <div class="field">
-                    <label for="pwd">كلمة المرور</label>
-                    <input type="password" id="pwd" required autofocus>
-                </div>
+                <div class="field"><label for="pwd">كلمة المرور</label><input type="password" id="pwd" required autofocus></div>
                 <p class="login-error" id="loginError" hidden>كلمة المرور غير صحيحة.</p>
                 <button type="submit" class="btn btn-primary btn-full">دخول</button>
             </form>
@@ -62,12 +59,8 @@
             <div class="admin-stat-card"><span class="stat-icon">⬇️</span><div><b id="totalDownloads">0</b><span>تحميل</span></div></div>
             <div class="admin-stat-card"><span class="stat-icon">📂</span><div><b id="totalCategories">0</b><span>قسم</span></div></div>
         </section>
-
         <section class="admin-toolbar">
-            <div>
-                <h2>📚 إدارة الكتب</h2>
-                <p class="section-sub">أضف، عدّل، أو احذف الكتب.</p>
-            </div>
+            <div><h2>📚 إدارة الكتب</h2><p class="section-sub">أضف، عدّل، أو احذف الكتب.</p></div>
             <div class="toolbar-actions">
                 <input type="search" id="adminSearch" placeholder="🔍 بحث في الكتب..." class="admin-search">
                 <button class="btn btn-primary" id="addBookBtn" type="button">
@@ -76,13 +69,11 @@
                 </button>
             </div>
         </section>
-
         <div class="admin-notice" id="firebaseNotice" hidden>
             <strong>⚠️ Firebase غير مفعّل.</strong>
             للحفظ الدائم للكتب، اضبط <code>firebase.enabled = true</code> في <code>config.js</code> بعد إعداد المشروع.
             <a href="SETUP.md" target="_blank">دليل الإعداد →</a>
         </div>
-
         <section class="admin-books-table">
             <table>
                 <thead><tr><th>الغلاف</th><th>العنوان</th><th>المؤلف</th><th>القسم</th><th>إحصائيات</th><th>إجراءات</th></tr></thead>
@@ -178,12 +169,12 @@
                             </div>
                             <div class="tab-panel" data-tab-panel="url">
                                 <input type="url" id="pdfUrl" placeholder="https://...book.pdf">
-                                <p class="field-hint">رابط مباشر لملف PDF (مثلاً من Google Drive أو archive.org)</p>
+                                <p class="field-hint">رابط مباشر لملف PDF</p>
                             </div>
                         </div>
                     </section>
                     <section class="step-panel" data-panel="3">
-                        <div class="field"><label for="bookDescription">📌 نبذة مختصرة *</label><textarea id="bookDescription" rows="3" placeholder="نبذة موجزة عن الكتاب وموضوعه..."></textarea></div>
+                        <div class="field"><label for="bookDescription">📌 نبذة مختصرة *</label><textarea id="bookDescription" rows="3" placeholder="نبذة موجزة..."></textarea></div>
                         <div class="field"><label for="bookIntro">📝 المقدمة</label><textarea id="bookIntro" rows="6" placeholder="مقدمة الكتاب..."></textarea><p class="field-hint">💡 إذا رفعت ملف Word سيتم استخراج المقدمة تلقائياً.</p></div>
                     </section>
                 </form>

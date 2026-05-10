@@ -3,9 +3,9 @@
 (function() {
     'use strict';
 
+    /* الوضع الداكن هو الافتراضي */
     const stored = localStorage.getItem('taybaa-theme');
-    const prefersDark = matchMedia('(prefers-color-scheme: dark)').matches;
-    document.documentElement.setAttribute('data-theme', stored || (prefersDark ? 'dark' : 'light'));
+    document.documentElement.setAttribute('data-theme', stored || 'dark');
     document.getElementById('themeToggle').addEventListener('click', () => {
         const cur = document.documentElement.getAttribute('data-theme');
         const next = cur === 'dark' ? 'light' : 'dark';
@@ -211,10 +211,10 @@
             document.getElementById('docxPreviewWrap').hidden = false;
             document.getElementById('docxFileName').textContent = `✓ تم تحويل: ${file.name}`;
             autoFillFromDocx(html);
-            toast('✨ تم تحويل الكتاب بنجاح. راجع المعاينة في الأسفل.', 'success');
+            toast('✨ تم تحويل الكتاب بنجاح', 'success');
         } catch (err) {
             console.error(err);
-            toast('❌ تعذّر تحويل الملف. تأكد أنه .docx صحيح.', 'error');
+            toast('❌ تعذّر تحويل الملف', 'error');
             document.getElementById('docxFileName').textContent = `❌ فشل التحويل`;
         }
     });
@@ -241,16 +241,13 @@
         tmp.innerHTML = html;
         const headings = tmp.querySelectorAll('h1');
         const paragraphs = tmp.querySelectorAll('p');
-
         const titleInput = document.getElementById('bookTitle');
         if (!titleInput.value && headings.length) titleInput.value = headings[0].textContent.trim();
-
         const descInput = document.getElementById('bookDescription');
         if (!descInput.value && paragraphs.length) {
             const firstShort = Array.from(paragraphs).find(p => p.textContent.trim().length > 30);
             if (firstShort) descInput.value = firstShort.textContent.trim().slice(0, 300);
         }
-
         const introInput = document.getElementById('bookIntro');
         if (!introInput.value) {
             let intro = '';
@@ -291,20 +288,16 @@
         try {
             let coverUrl = document.getElementById('coverUrl').value.trim();
             let pdfUrl = document.getElementById('pdfUrl').value.trim();
-
             const coverFileEl = document.getElementById('coverFile');
             if (coverFileEl.files[0]) coverUrl = await DATA.uploadFile(coverFileEl.files[0], 'covers');
-
             const pdfFileEl = document.getElementById('pdfFile');
             if (pdfFileEl.files[0]) pdfUrl = await DATA.uploadFile(pdfFileEl.files[0], 'books');
-
             let htmlContent = '';
             if (convertedDocxHtml) {
                 const htmlBlob = new Blob([wrapBookHtml(convertedDocxHtml, title)], { type: 'text/html;charset=utf-8' });
                 const htmlFile = new File([htmlBlob], `${title}.html`, { type: 'text/html' });
                 htmlContent = await DATA.uploadFile(htmlFile, 'books');
             }
-
             const data = {
                 id: document.getElementById('bookId').value || undefined,
                 title,
@@ -319,7 +312,6 @@
                 recommended: document.getElementById('bookRecommended').checked,
                 addedDate: new Date().toISOString().slice(0, 10)
             };
-
             await DATA.saveBook(data);
             toast('✅ تم حفظ الكتاب بنجاح', 'success');
             closeModal();
