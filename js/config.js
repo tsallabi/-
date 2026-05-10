@@ -1,18 +1,15 @@
-/* ============================================================
-   ⚙️  ملف الإعدادات الرئيسي للمكتبة
-   عدّل القيم هنا لربط المشروع بـ Google Sheets و Firebase.
-   كل شيء يعمل بدون إعدادات أيضاً (يستخدم بيانات تجريبية).
-   ============================================================ */
+/* المكتبة الطيبة — ملف الإعدادات */
 
 const CONFIG = {
-    siteName: 'المكتبة',
+    siteName: 'المكتبة الطيبة',
+    siteTag: 'TAYBAA · LIBRARY',
 
-    /* ----- مصدر بيانات الكتب ----- */
-    useSheets: false,
+    // 'json' | 'sheets' | 'firestore'
+    dataSource: 'json',
+
     sheetId: '',
     sheetName: 'books',
 
-    /* ----- العدّاد (Firebase) ----- */
     firebase: {
         enabled: false,
         config: {
@@ -25,7 +22,11 @@ const CONFIG = {
         }
     },
 
-    booksPerRow: 12,
+    admin: {
+        password: 'taybaa2026',
+        allowedEmails: []
+    },
+
     enableUniqueViewCount: true,
 
     categoryIcons: {

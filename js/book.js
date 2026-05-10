@@ -1,8 +1,7 @@
-/* ============================================================
-   📕  منطق صفحة تفاصيل الكتاب
-   ============================================================ */
+/* منطق صفحة تفاصيل الكتاب */
 
 (async function() {
+    initThemeToggle();
     document.getElementById('year').textContent = new Date().getFullYear();
 
     const params = new URLSearchParams(location.search);
@@ -30,17 +29,12 @@
     if (!id) return showNotFound();
 
     let books;
-    try {
-        books = await DATA.loadBooks();
-    } catch (err) {
-        console.error(err);
-        return showNotFound();
-    }
+    try { books = await DATA.loadBooks(); } catch (err) { console.error(err); return showNotFound(); }
 
     const book = DATA.findById(books, id);
     if (!book) return showNotFound();
 
-    document.title = `${book.title} — المكتبة`;
+    document.title = `${book.title} — المكتبة الطيبة`;
     els.loading.hidden = true;
     els.detail.hidden = false;
 
@@ -48,10 +42,10 @@
         els.cover.src = book.cover;
         els.cover.alt = book.title;
     } else {
-        els.cover.replaceWith(Object.assign(document.createElement('div'), {
-            className: 'book-cover-placeholder',
-            textContent: book.title.charAt(0) || '📖'
-        }));
+        const ph = document.createElement('div');
+        ph.className = 'book-cover-placeholder';
+        ph.textContent = book.title.charAt(0) || '📖';
+        els.cover.parentNode.replaceChild(ph, els.cover);
     }
     els.category.textContent = book.category || 'غير مصنّف';
     els.title.textContent = book.title;
@@ -60,31 +54,27 @@
     els.views.textContent = book.views || 0;
     els.downloads.textContent = book.downloads || 0;
 
-    if (book.pdf) {
-        els.readBtn.href = `reader.html?pdf=${encodeURIComponent(book.pdf)}` +
-                          `&title=${encodeURIComponent(book.title)}`;
-        els.downloadBtn.href = book.pdf;
-        els.downloadBtn.setAttribute('download', `${book.title}.pdf`);
-
-        els.downloadBtn.addEventListener('click', () => {
-            COUNTER.increment(book.id, 'downloads');
-            els.downloads.textContent = (Number(els.downloads.textContent) + 1);
-        });
+    const source = book.pdf || book.html;
+    if (source) {
+        els.readBtn.href = `reader.html?pdf=${encodeURIComponent(source)}&title=${encodeURIComponent(book.title)}`;
+        if (book.pdf) {
+            els.downloadBtn.href = book.pdf;
+            els.downloadBtn.setAttribute('download', `${book.title}.pdf`);
+            els.downloadBtn.addEventListener('click', () => {
+                COUNTER.increment(book.id, 'downloads');
+                els.downloads.textContent = (Number(els.downloads.textContent) + 1);
+            });
+        } else {
+            els.downloadBtn.style.display = 'none';
+        }
     } else {
-        els.readBtn.classList.add('disabled');
-        els.readBtn.setAttribute('aria-disabled', 'true');
-        els.readBtn.removeAttribute('href');
+        els.readBtn.style.opacity = '.5';
+        els.readBtn.style.pointerEvents = 'none';
         els.downloadBtn.style.display = 'none';
     }
 
-    if (book.description) {
-        els.description.textContent = book.description;
-        els.descSection.hidden = false;
-    }
-    if (book.introduction) {
-        els.intro.textContent = book.introduction;
-        els.introSection.hidden = false;
-    }
+    if (book.description) { els.description.textContent = book.description; els.descSection.hidden = false; }
+    if (book.introduction) { els.intro.textContent = book.introduction; els.introSection.hidden = false; }
 
     COUNTER.increment(book.id, 'views');
     const live = await COUNTER.getCounts(book.id);
@@ -93,8 +83,18 @@
         if (typeof live.downloads === 'number') els.downloads.textContent = live.downloads;
     }
 
-    function showNotFound() {
-        els.loading.hidden = true;
-        els.notFound.hidden = false;
+    function showNotFound() { els.loading.hidden = true; els.notFound.hidden = false; }
+
+    function initThemeToggle() {
+        const theme = localStorage.getItem('taybaa-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+        const btn = document.getElementById('themeToggle');
+        if (!btn) return;
+        btn.addEventListener('click', () => {
+            const cur = document.documentElement.getAttribute('data-theme');
+            const next = cur === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('taybaa-theme', next);
+        });
     }
 })();

@@ -1,21 +1,38 @@
-/* ============================================================
-   📡  طبقة البيانات: تحميل الكتب من Google Sheets أو ملف JSON
-   ============================================================ */
+/* طبقة البيانات — JSON / Sheets / Firestore */
 
 const DATA = (function() {
     let cachedBooks = null;
+    let firebaseApp = null;
+    let firestoreRef = null;
+    let storageRef = null;
 
-    async function loadBooks() {
-        if (cachedBooks) return cachedBooks;
+    async function initFirebase() {
+        if (firebaseApp) return { db: firestoreRef, storage: storageRef };
+        if (!CONFIG.firebase.enabled) throw new Error('Firebase غير مفعّل');
 
+        const [{ initializeApp }, fs, st] = await Promise.all([
+            import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js'),
+            import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js'),
+            import('https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js')
+        ]);
+
+        firebaseApp = initializeApp(CONFIG.firebase.config);
+        firestoreRef = { db: fs.getFirestore(firebaseApp), ...fs };
+        storageRef = { storage: st.getStorage(firebaseApp), ...st };
+        return { db: firestoreRef, storage: storageRef };
+    }
+
+    async function loadBooks(forceReload = false) {
+        if (cachedBooks && !forceReload) return cachedBooks;
+        const source = CONFIG.dataSource || 'json';
         try {
-            if (CONFIG.useSheets && CONFIG.sheetId) {
-                cachedBooks = await loadFromSheets();
-            } else {
-                cachedBooks = await loadFromJSON();
+            switch (source) {
+                case 'firestore': cachedBooks = await loadFromFirestore(); break;
+                case 'sheets':    cachedBooks = await loadFromSheets();    break;
+                default:          cachedBooks = await loadFromJSON();      break;
             }
         } catch (err) {
-            console.warn('فشل تحميل الكتب من المصدر الأساسي، يتم استخدام البيانات التجريبية.', err);
+            console.warn(`فشل تحميل من ${source}، يتم استخدام JSON كاحتياط.`, err);
             cachedBooks = await loadFromJSON();
         }
         return cachedBooks;
@@ -29,28 +46,55 @@ const DATA = (function() {
     }
 
     async function loadFromSheets() {
-        const url =
-            `https://docs.google.com/spreadsheets/d/${CONFIG.sheetId}` +
-            `/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(CONFIG.sheetName)}`;
-
+        if (!CONFIG.sheetId) throw new Error('sheetId غير مضبوط');
+        const url = `https://docs.google.com/spreadsheets/d/${CONFIG.sheetId}` +
+                    `/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(CONFIG.sheetName)}`;
         const res = await fetch(url);
         if (!res.ok) throw new Error('فشل الاتصال بـ Google Sheets');
         const text = await res.text();
-
         const jsonStr = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
         const json = JSON.parse(jsonStr);
-
         const cols = json.table.cols.map(c => (c.label || c.id || '').trim());
         const rows = json.table.rows || [];
-
         return rows.map(row => {
             const cells = row.c || [];
             const obj = {};
-            cols.forEach((col, i) => {
-                obj[col] = cells[i] ? (cells[i].v ?? '') : '';
-            });
+            cols.forEach((col, i) => { obj[col] = cells[i] ? (cells[i].v ?? '') : ''; });
             return normalizeBook(obj);
         }).filter(b => b.id && b.title);
+    }
+
+    async function loadFromFirestore() {
+        const { db } = await initFirebase();
+        const q = db.query(db.collection(db.db, 'books'), db.orderBy('addedDate', 'desc'));
+        const snap = await db.getDocs(q);
+        return snap.docs.map(d => normalizeBook({ id: d.id, ...d.data() }));
+    }
+
+    async function saveBook(bookData) {
+        const { db } = await initFirebase();
+        const id = String(bookData.id || Date.now());
+        const ref = db.doc(db.db, 'books', id);
+        const dataToSave = { ...normalizeBook({ ...bookData, id }), updatedAt: new Date().toISOString() };
+        await db.setDoc(ref, dataToSave, { merge: true });
+        cachedBooks = null;
+        return dataToSave;
+    }
+
+    async function deleteBook(id) {
+        const { db } = await initFirebase();
+        const ref = db.doc(db.db, 'books', String(id));
+        await db.deleteDoc(ref);
+        cachedBooks = null;
+    }
+
+    async function uploadFile(file, folder = 'books') {
+        const { storage } = await initFirebase();
+        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const path = `${folder}/${Date.now()}_${safeName}`;
+        const fileRef = storage.ref(storage.storage, path);
+        await storage.uploadBytes(fileRef, file);
+        return await storage.getDownloadURL(fileRef);
     }
 
     function normalizeBook(raw) {
@@ -60,7 +104,6 @@ const DATA = (function() {
             }
             return '';
         };
-
         return {
             id: String(get('id', 'ID', 'المعرف') || '').trim(),
             title: String(get('title', 'العنوان', 'الاسم')).trim(),
@@ -69,15 +112,15 @@ const DATA = (function() {
             pages: Number(get('pages', 'الصفحات', 'عدد الصفحات')) || 0,
             cover: String(get('cover', 'coverUrl', 'الغلاف', 'صورة الغلاف')).trim(),
             pdf: String(get('pdf', 'pdfUrl', 'رابط_pdf', 'الكتاب', 'ملف')).trim(),
+            html: String(get('html', 'htmlContent', 'محتوى')).trim(),
             description: String(get('description', 'النبذة', 'الوصف', 'نبذة')).trim(),
             introduction: String(get('introduction', 'intro', 'المقدمة')).trim(),
             views: Number(get('views', 'المشاهدات')) || 0,
             downloads: Number(get('downloads', 'التحميلات')) || 0,
-            addedDate: String(get('addedDate', 'date', 'التاريخ')).trim(),
+            addedDate: String(get('addedDate', 'date', 'التاريخ') || new Date().toISOString().slice(0,10)).trim(),
             recommended: toBool(get('recommended', 'موصى به'))
         };
     }
-
     function toBool(v) {
         if (typeof v === 'boolean') return v;
         const s = String(v).trim().toLowerCase();
@@ -94,42 +137,26 @@ const DATA = (function() {
             b.description.toLowerCase().includes(q)
         );
     }
-
-    function byCategory(books, category) {
-        return books.filter(b => b.category === category);
-    }
-
-    function topPopular(books, n = 8) {
-        return [...books].sort((a, b) => b.views - a.views).slice(0, n);
-    }
-
-    function newest(books, n = 8) {
-        return [...books]
-            .sort((a, b) => (b.addedDate || '').localeCompare(a.addedDate || ''))
-            .slice(0, n);
-    }
-
-    function recommended(books, n = 8) {
-        const recs = books.filter(b => b.recommended);
-        return (recs.length ? recs : books).slice(0, n);
-    }
-
-    function findById(books, id) {
-        return books.find(b => b.id === String(id));
-    }
-
+    function byCategory(books, category) { return books.filter(b => b.category === category); }
+    function topPopular(books, n = 8) { return [...books].sort((a, b) => b.views - a.views).slice(0, n); }
+    function newest(books, n = 8) { return [...books].sort((a, b) => (b.addedDate || '').localeCompare(a.addedDate || '')).slice(0, n); }
+    function recommended(books, n = 8) { const recs = books.filter(b => b.recommended); return (recs.length ? recs : books).slice(0, n); }
+    function findById(books, id) { return books.find(b => b.id === String(id)); }
     function categoriesWithCounts(books) {
         const map = new Map();
         for (const b of books) {
             if (!b.category) continue;
             map.set(b.category, (map.get(b.category) || 0) + 1);
         }
-        return Array.from(map, ([name, count]) => ({ name, count }))
-            .sort((a, b) => b.count - a.count);
+        return Array.from(map, ([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count);
+    }
+    function totals(books) {
+        return {
+            books: books.length,
+            views: books.reduce((s, b) => s + (b.views || 0), 0),
+            downloads: books.reduce((s, b) => s + (b.downloads || 0), 0)
+        };
     }
 
-    return {
-        loadBooks, search, byCategory, topPopular, newest,
-        recommended, findById, categoriesWithCounts
-    };
+    return { loadBooks, search, byCategory, topPopular, newest, recommended, findById, categoriesWithCounts, totals, saveBook, deleteBook, uploadFile, initFirebase };
 })();
