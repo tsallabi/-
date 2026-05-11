@@ -93,8 +93,8 @@
     function updateStats(books) {
         const t = DATA.totals(books);
         document.getElementById('totalBooks').textContent = t.books;
-        document.getElementById('totalViews').textContent = t.views.toLocaleString('ar-EG');
-        document.getElementById('totalDownloads').textContent = t.downloads.toLocaleString('ar-EG');
+        document.getElementById('totalViews').textContent = t.views.toLocaleString('en-US');
+        document.getElementById('totalDownloads').textContent = t.downloads.toLocaleString('en-US');
         document.getElementById('totalCategories').textContent = DATA.categoriesWithCounts(books).length;
     }
 
