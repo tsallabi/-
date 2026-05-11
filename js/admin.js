@@ -364,4 +364,138 @@
         document.getElementById('toastContainer').appendChild(el);
         setTimeout(() => el.remove(), 3500);
     }
+
+    /* ============================================================
+       ✨  AI Helpers (via Pollinations.ai — free, no API key)
+       ============================================================ */
+
+    function withButtonLoading(btn, loadingText, fn) {
+        return async function(...args) {
+            const html = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="ai-icon">⏳</span> ' + loadingText;
+            try {
+                await fn.apply(this, args);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = html;
+            }
+        };
+    }
+
+    async function pollinationsText(prompt) {
+        const url = 'https://text.pollinations.ai/' + encodeURIComponent(prompt) +
+                    '?model=openai&private=true';
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('AI text request failed: ' + res.status);
+        const text = await res.text();
+        return text.trim();
+    }
+
+    function pollinationsImageURL(prompt, opts = {}) {
+        const params = new URLSearchParams({
+            width: opts.width || 400,
+            height: opts.height || 600,
+            model: opts.model || 'flux',
+            nologo: 'true',
+            seed: Math.floor(Math.random() * 999999)
+        });
+        return 'https://image.pollinations.ai/prompt/' +
+               encodeURIComponent(prompt) + '?' + params.toString();
+    }
+
+    /* ----- 🎨 توليد غلاف ----- */
+    const aiCoverBtn = document.getElementById('aiGenCoverBtn');
+    if (aiCoverBtn) {
+        aiCoverBtn.addEventListener('click', withButtonLoading(aiCoverBtn, 'جارٍ توليد الغلاف...', async () => {
+            const title = document.getElementById('bookTitle').value.trim();
+            const author = document.getElementById('bookAuthor').value.trim();
+            const category = document.getElementById('bookCategory').value.trim();
+            if (!title) { toast('⚠️ أدخل عنوان الكتاب أولاً', 'warning'); return; }
+
+            const isIslamic = /إسلام|دين|تيمية|قيم|توحيد|عقيدة|فقه|قرآن|حديث|سنة/i.test(title + ' ' + author + ' ' + category);
+            const promptParts = isIslamic
+                ? [`Beautiful traditional Islamic book cover design`,
+                   `title in elegant Arabic calligraphy: "${title}"`,
+                   author && `author: "${author}"`,
+                   `dark green and gold colors, ornamental border, vintage manuscript aesthetic, professional book cover, no people, no faces`].filter(Boolean)
+                : [`Beautiful book cover design for "${title}"`,
+                   author && `by ${author}`,
+                   category && `category: ${category}`,
+                   `elegant typography, professional, high quality, no faces`].filter(Boolean);
+
+            const url = pollinationsImageURL(promptParts.join(', '));
+            await new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = resolve;
+                img.onerror = reject;
+                img.src = url;
+            });
+            document.getElementById('coverPreview').src = url;
+            document.getElementById('coverPreview').hidden = false;
+            document.getElementById('coverUrl').value = url;
+            toast('✅ تم توليد الغلاف بنجاح', 'success');
+        }));
+    }
+
+    /* ----- 📝 كتابة نبذة ----- */
+    const aiDescBtn = document.getElementById('aiGenDescBtn');
+    if (aiDescBtn) {
+        aiDescBtn.addEventListener('click', withButtonLoading(aiDescBtn, 'جارٍ كتابة النبذة...', async () => {
+            const title = document.getElementById('bookTitle').value.trim();
+            const author = document.getElementById('bookAuthor').value.trim();
+            const category = document.getElementById('bookCategory').value.trim();
+            if (!title) { toast('⚠️ أدخل عنوان الكتاب أولاً', 'warning'); return; }
+
+            const prompt = `اكتب نبذة قصيرة احترافية (2-3 جمل فقط) عن كتاب "${title}"` +
+                           (author ? ` للمؤلف ${author}` : '') +
+                           (category ? ` في تصنيف ${category}` : '') +
+                           `. النبذة بالعربية الفصحى البليغة، تذكر موضوع الكتاب وأهميته. ` +
+                           `لا تكتب أي مقدمات أو ترحيب، اكتب النبذة مباشرة فقط.`;
+
+            const text = await pollinationsText(prompt);
+            document.getElementById('bookDescription').value = text;
+            toast('✅ تم كتابة النبذة', 'success');
+        }));
+    }
+
+    /* ----- 📖 كتابة مقدمة ----- */
+    const aiIntroBtn = document.getElementById('aiGenIntroBtn');
+    if (aiIntroBtn) {
+        aiIntroBtn.addEventListener('click', withButtonLoading(aiIntroBtn, 'جارٍ كتابة المقدمة...', async () => {
+            const title = document.getElementById('bookTitle').value.trim();
+            const author = document.getElementById('bookAuthor').value.trim();
+            const desc = document.getElementById('bookDescription').value.trim();
+            if (!title) { toast('⚠️ أدخل عنوان الكتاب أولاً', 'warning'); return; }
+
+            const prompt = `اكتب مقدمة قصيرة (5-8 جمل) لكتاب "${title}"` +
+                           (author ? ` للمؤلف ${author}` : '') +
+                           (desc ? `. النبذة: ${desc}` : '') +
+                           `. المقدمة بالعربية الفصحى البليغة، مناسبة لكتاب علمي، تبدأ بالحمد لله والصلاة على رسوله. ` +
+                           `لا تكتب أي مقدمات أو ترحيب لي، اكتب نص المقدمة مباشرة فقط.`;
+
+            const text = await pollinationsText(prompt);
+            document.getElementById('bookIntro').value = text;
+            toast('✅ تم كتابة المقدمة', 'success');
+        }));
+    }
+
+    /* ----- 🪄 تحسين الصياغة ----- */
+    const aiEnhanceBtn = document.getElementById('aiEnhanceIntroBtn');
+    if (aiEnhanceBtn) {
+        aiEnhanceBtn.addEventListener('click', withButtonLoading(aiEnhanceBtn, 'جارٍ تحسين النص...', async () => {
+            const intro = document.getElementById('bookIntro').value.trim();
+            if (!intro) { toast('⚠️ اكتب المقدمة أولاً ثم اضغط للتحسين', 'warning'); return; }
+            if (intro.length > 2000) { toast('⚠️ النص طويل جداً (الحد 2000 حرف)', 'warning'); return; }
+
+            const prompt = `حرّر النص العربي التالي وصحّح الأخطاء النحوية والإملائية، ` +
+                           `وحسّن الصياغة لتكون أكثر بلاغة وفصاحة، ` +
+                           `مع الحفاظ التام على المعنى الأصلي. ` +
+                           `لا تضف أي شرح أو تعليق، اكتب النص المحرّر فقط:\n\n${intro}`;
+
+            const text = await pollinationsText(prompt);
+            document.getElementById('bookIntro').value = text;
+            toast('✅ تم تحسين الصياغة', 'success');
+        }));
+    }
 })();
