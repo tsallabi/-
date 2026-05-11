@@ -1,5 +1,8 @@
 /* لوحة الإدارة — تصميم خاص */
 
+/* إصلاح: ضمان عمل خاصية hidden لكل العناصر */
+[hidden] { display: none !important; }
+
 .admin-header-actions { display: flex; gap: .5rem; align-items: center; margin-inline-start: auto; }
 
 .admin-login { min-height: calc(100vh - var(--header-height) - 100px); display: grid; place-items: center; padding: 3rem 1rem; }
