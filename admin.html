@@ -130,6 +130,11 @@
                             </div>
                             <p class="field-hint">أو الصق رابط الصورة:</p>
                             <input type="url" id="coverUrl" placeholder="https://...cover.jpg">
+                            <button type="button" class="btn-ai" id="aiGenCoverBtn">
+                                <span class="ai-icon">✨</span>
+                                ولّد غلافاً بالذكاء الاصطناعي
+                            </button>
+                            <p class="field-hint">يستخدم AI لتوليد غلاف من اسم الكتاب والمؤلف (مجاناً عبر Pollinations).</p>
                         </div>
                         <div class="field">
                             <label>📄 ملف الكتاب</label>
@@ -174,8 +179,29 @@
                         </div>
                     </section>
                     <section class="step-panel" data-panel="3">
-                        <div class="field"><label for="bookDescription">📌 نبذة مختصرة *</label><textarea id="bookDescription" rows="3" placeholder="نبذة موجزة..."></textarea></div>
-                        <div class="field"><label for="bookIntro">📝 المقدمة</label><textarea id="bookIntro" rows="6" placeholder="مقدمة الكتاب..."></textarea><p class="field-hint">💡 إذا رفعت ملف Word سيتم استخراج المقدمة تلقائياً.</p></div>
+                        <div class="field">
+                            <label for="bookDescription">📌 نبذة مختصرة *</label>
+                            <textarea id="bookDescription" rows="3" placeholder="نبذة موجزة..."></textarea>
+                            <button type="button" class="btn-ai" id="aiGenDescBtn">
+                                <span class="ai-icon">✨</span>
+                                اكتب نبذة تلقائياً بالذكاء الاصطناعي
+                            </button>
+                        </div>
+                        <div class="field">
+                            <label for="bookIntro">📝 المقدمة</label>
+                            <textarea id="bookIntro" rows="6" placeholder="مقدمة الكتاب..."></textarea>
+                            <div class="ai-buttons-row">
+                                <button type="button" class="btn-ai" id="aiGenIntroBtn">
+                                    <span class="ai-icon">✨</span>
+                                    اكتب مقدمة تلقائياً
+                                </button>
+                                <button type="button" class="btn-ai" id="aiEnhanceIntroBtn">
+                                    <span class="ai-icon">🪄</span>
+                                    حسّن الصياغة وصحّح الأخطاء
+                                </button>
+                            </div>
+                            <p class="field-hint">💡 إذا رفعت ملف Word سيتم استخراج المقدمة تلقائياً.</p>
+                        </div>
                     </section>
                 </form>
             </div>
