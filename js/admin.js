@@ -1,9 +1,15 @@
-/* لوحة الإدارة — منطق التطبيق */
+/* ============================================================
+   🛠️  لوحة الإدارة — منطق التطبيق
+   - تسجيل دخول بكلمة مرور (من CONFIG.admin.password)
+   - عرض/إضافة/تعديل/حذف الكتب (الحفظ على GitHub)
+   - استيراد ملفات Word (.docx) وتحويلها لكتاب
+   - أزرار ذكاء اصطناعي (Pollinations.ai)
+   ============================================================ */
 
 (function() {
     'use strict';
 
-    /* الوضع الداكن هو الافتراضي */
+    /* ----- إدارة الوضع الداكن (الداكن هو الافتراضي) ----- */
     const stored = localStorage.getItem('taybaa-theme');
     document.documentElement.setAttribute('data-theme', stored || 'dark');
     document.getElementById('themeToggle').addEventListener('click', () => {
@@ -13,6 +19,9 @@
         localStorage.setItem('taybaa-theme', next);
     });
 
+    /* ============================================================
+       🔐  تسجيل الدخول
+       ============================================================ */
     const SESSION_KEY = 'taybaa-admin-session';
     const loginScreen = document.getElementById('loginScreen');
     const dashboard = document.getElementById('dashboard');
@@ -21,9 +30,31 @@
     function isLoggedIn() { return sessionStorage.getItem(SESSION_KEY) === 'ok'; }
     function showLogin() { loginScreen.hidden = false; dashboard.hidden = true; logoutBtn.hidden = true; }
     function showDashboard() {
-        loginScreen.hidden = true; dashboard.hidden = false; logoutBtn.hidden = false;
+        loginScreen.hidden = true;
+        dashboard.hidden = false;
+        logoutBtn.hidden = false;
         loadBooksTable();
-        if (!CONFIG.firebase.enabled) document.getElementById('firebaseNotice').hidden = false;
+        updateStorageNotice();
+    }
+
+    function updateStorageNotice() {
+        const notice = document.getElementById('storageNotice');
+        const status = document.getElementById('storageStatus');
+        const btn = document.getElementById('storageNoticeBtn');
+        if (!notice || !status) return;
+        if (typeof GHSAVE !== 'undefined' && GHSAVE.hasToken()) {
+            notice.hidden = false;
+            notice.style.background = 'var(--primary-soft)';
+            notice.style.borderColor = 'var(--primary)';
+            status.textContent = '✅ مفعّل — الكتب تُحفظ على GitHub مباشرة';
+            if (btn) btn.textContent = '⚙️ تعديل';
+        } else {
+            notice.hidden = false;
+            notice.style.background = 'var(--accent-soft)';
+            notice.style.borderColor = 'var(--accent)';
+            status.textContent = '— لم يُضبط GitHub Token بعد. الكتب لن تُحفظ.';
+            if (btn) btn.textContent = '⚙️ اضبط الآن';
+        }
     }
 
     document.getElementById('loginForm').addEventListener('submit', e => {
@@ -46,6 +77,9 @@
 
     if (isLoggedIn()) showDashboard(); else showLogin();
 
+    /* ============================================================
+       📋  جدول الكتب
+       ============================================================ */
     let booksState = [];
     const tableBody = document.getElementById('booksTableBody');
     const adminSearch = document.getElementById('adminSearch');
@@ -107,17 +141,32 @@
         const book = booksState.find(b => b.id === id);
         if (!book) return;
         if (!confirm(`هل تريد حذف كتاب "${book.title}" نهائياً؟`)) return;
-        if (!CONFIG.firebase.enabled) { toast('⚠️ فعّل Firebase أولاً للحفظ الدائم', 'warning'); return; }
+        if (!GHSAVE.hasToken()) {
+            toast('⚠️ اضبط GitHub Token أولاً من زر "إعدادات GitHub"', 'warning');
+            openGitHubModal();
+            return;
+        }
         try {
-            await DATA.deleteBook(id);
-            toast('✅ تم الحذف بنجاح', 'success');
-            await loadBooksTable();
+            await GHSAVE.deleteBook(id);
+            toast('✅ تم الحذف! سيظهر التغيير خلال دقيقة', 'success');
+            booksState = booksState.filter(b => b.id !== id);
+            renderTable(booksState);
+            updateStats(booksState);
         } catch (err) {
             console.error(err);
-            toast('❌ تعذّر الحذف', 'error');
+            if (err.status === 401) {
+                GHSAVE.setToken(null);
+                updateStorageNotice();
+                toast('❌ Token غير صالح. اضبطه مرة أخرى.', 'error');
+            } else {
+                toast('❌ تعذّر الحذف: ' + (err.message || ''), 'error');
+            }
         }
     }
 
+    /* ============================================================
+       ✏️  Modal + Form
+       ============================================================ */
     const modal = document.getElementById('bookModal');
     const form = document.getElementById('bookForm');
     let currentStep = 1;
@@ -221,18 +270,15 @@
 
     async function convertDocxToBook(file) {
         const arrayBuffer = await file.arrayBuffer();
-        const result = await window.mammoth.convertToHtml(
-            { arrayBuffer },
-            {
-                styleMap: [
-                    "p[style-name='Heading 1'] => h1:fresh",
-                    "p[style-name='Heading 2'] => h2:fresh",
-                    "p[style-name='Heading 3'] => h3:fresh",
-                    "p[style-name='Title'] => h1.book-title-h:fresh",
-                    "p[style-name='Subtitle'] => h2.book-subtitle:fresh"
-                ]
-            }
-        );
+        const result = await window.mammoth.convertToHtml({ arrayBuffer }, {
+            styleMap: [
+                "p[style-name='Heading 1'] => h1:fresh",
+                "p[style-name='Heading 2'] => h2:fresh",
+                "p[style-name='Heading 3'] => h3:fresh",
+                "p[style-name='Title'] => h1.book-title-h:fresh",
+                "p[style-name='Subtitle'] => h2.book-subtitle:fresh"
+            ]
+        });
         return `<div dir="rtl" lang="ar">${result.value}</div>`;
     }
 
@@ -276,55 +322,138 @@
         return `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${escapeHTML(title || 'كتاب')}</title><link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet"><style>body { font-family: 'Amiri', serif; max-width: 720px; margin: 3rem auto; padding: 0 2rem; line-height: 1.95; color: #1f2937; background: #fefdf7; font-size: 1.15rem; } h1, h2, h3 { color: #0f766e; font-family: 'Amiri', serif; margin-top: 2rem; } p { text-indent: 2rem; margin: 1rem 0; text-align: justify; } img { max-width: 100%; height: auto; display: block; margin: 1.5rem auto; } @media print { body { font-size: 12pt; } }</style></head><body>${html}</body></html>`;
     }
 
+    /* ============================================================
+       💾  Save to GitHub
+       ============================================================ */
     document.getElementById('saveBookBtn').addEventListener('click', async () => {
         const title = document.getElementById('bookTitle').value.trim();
         if (!title) { toast('⚠️ العنوان مطلوب', 'warning'); goToStep(1); return; }
-        if (!CONFIG.firebase.enabled) { toast('⚠️ فعّل Firebase أولاً لحفظ الكتب', 'warning'); return; }
+
+        if (!GHSAVE.hasToken()) {
+            toast('⚠️ اضبط GitHub Token أولاً لتفعيل الحفظ', 'warning');
+            openGitHubModal();
+            return;
+        }
 
         const saveBtn = document.getElementById('saveBookBtn');
         saveBtn.disabled = true;
-        saveBtn.textContent = '⏳ جارٍ الحفظ...';
+        saveBtn.textContent = '⏳ جارٍ الحفظ على GitHub...';
 
         try {
-            let coverUrl = document.getElementById('coverUrl').value.trim();
-            let pdfUrl = document.getElementById('pdfUrl').value.trim();
-            const coverFileEl = document.getElementById('coverFile');
-            if (coverFileEl.files[0]) coverUrl = await DATA.uploadFile(coverFileEl.files[0], 'covers');
-            const pdfFileEl = document.getElementById('pdfFile');
-            if (pdfFileEl.files[0]) pdfUrl = await DATA.uploadFile(pdfFileEl.files[0], 'books');
-            let htmlContent = '';
-            if (convertedDocxHtml) {
-                const htmlBlob = new Blob([wrapBookHtml(convertedDocxHtml, title)], { type: 'text/html;charset=utf-8' });
-                const htmlFile = new File([htmlBlob], `${title}.html`, { type: 'text/html' });
-                htmlContent = await DATA.uploadFile(htmlFile, 'books');
+            const coverUrl = document.getElementById('coverUrl').value.trim();
+            const pdfUrl = document.getElementById('pdfUrl').value.trim();
+
+            if (!coverUrl) {
+                toast('⚠️ أضف غلافاً (ولّده بالذكاء الاصطناعي أو الصق رابطاً)', 'warning');
+                goToStep(2);
+                return;
             }
+            if (!pdfUrl && !convertedDocxHtml) {
+                toast('⚠️ أضف رابط PDF أو ارفع ملف Word', 'warning');
+                goToStep(2);
+                return;
+            }
+
             const data = {
-                id: document.getElementById('bookId').value || undefined,
+                id: document.getElementById('bookId').value || String(Date.now()),
                 title,
                 author: document.getElementById('bookAuthor').value.trim(),
                 category: document.getElementById('bookCategory').value.trim(),
                 pages: Number(document.getElementById('bookPages').value) || 0,
                 cover: coverUrl,
                 pdf: pdfUrl,
-                html: htmlContent,
                 description: document.getElementById('bookDescription').value.trim(),
                 introduction: document.getElementById('bookIntro').value.trim(),
                 recommended: document.getElementById('bookRecommended').checked,
+                views: 0,
+                downloads: 0,
                 addedDate: new Date().toISOString().slice(0, 10)
             };
-            await DATA.saveBook(data);
-            toast('✅ تم حفظ الكتاب بنجاح', 'success');
+
+            const result = await GHSAVE.upsertBook(data);
+            toast(`✅ تم ${result.action === 'created' ? 'إضافة' : 'تحديث'} الكتاب! سيظهر خلال دقيقة بعد بناء الموقع`, 'success');
             closeModal();
-            await loadBooksTable();
+            const idx = booksState.findIndex(b => b.id === result.id);
+            if (idx >= 0) booksState[idx] = result;
+            else booksState.unshift(result);
+            renderTable(booksState);
+            updateStats(booksState);
         } catch (err) {
             console.error(err);
-            toast('❌ تعذّر الحفظ: ' + (err.message || ''), 'error');
+            if (err.status === 401) {
+                GHSAVE.setToken(null);
+                updateStorageNotice();
+                toast('❌ Token غير صالح. اضبطه مرة أخرى.', 'error');
+                openGitHubModal();
+            } else if (err.status === 409) {
+                toast('⚠️ تم تعديل الملف من مكان آخر. حدّث الصفحة وأعد المحاولة.', 'warning');
+            } else {
+                toast('❌ تعذّر الحفظ: ' + (err.message || ''), 'error');
+            }
         } finally {
             saveBtn.disabled = false;
             saveBtn.textContent = '💾 حفظ الكتاب';
         }
     });
 
+    /* ============================================================
+       ⚙️  GitHub Settings Modal
+       ============================================================ */
+    function openGitHubModal() {
+        const m = document.getElementById('githubModal');
+        const input = document.getElementById('ghTokenInput');
+        const removeBtn = document.getElementById('ghRemoveBtn');
+        const result = document.getElementById('ghTestResult');
+        input.value = GHSAVE.getToken() || '';
+        removeBtn.hidden = !GHSAVE.hasToken();
+        result.textContent = '';
+        m.hidden = false;
+        document.body.style.overflow = 'hidden';
+    }
+    function closeGitHubModal() {
+        document.getElementById('githubModal').hidden = true;
+        document.body.style.overflow = '';
+    }
+
+    const settingsBtn = document.getElementById('settingsBtn');
+    if (settingsBtn) settingsBtn.addEventListener('click', openGitHubModal);
+    const noticeBtn = document.getElementById('storageNoticeBtn');
+    if (noticeBtn) noticeBtn.addEventListener('click', openGitHubModal);
+    document.querySelectorAll('[data-close-gh]').forEach(el => el.addEventListener('click', closeGitHubModal));
+
+    document.getElementById('ghSaveBtn').addEventListener('click', async () => {
+        const token = document.getElementById('ghTokenInput').value.trim();
+        const result = document.getElementById('ghTestResult');
+        if (!token) { result.textContent = '⚠️ الصق Token أولاً'; result.style.color = 'var(--accent)'; return; }
+        result.textContent = '⏳ جارٍ اختبار Token...';
+        result.style.color = 'var(--text-muted)';
+        GHSAVE.setToken(token);
+        const ok = await GHSAVE.testToken();
+        if (ok) {
+            result.textContent = '✅ Token صالح! تم الحفظ بنجاح.';
+            result.style.color = 'var(--primary)';
+            updateStorageNotice();
+            setTimeout(closeGitHubModal, 1200);
+            toast('✅ تم تفعيل الحفظ على GitHub', 'success');
+        } else {
+            GHSAVE.setToken(null);
+            result.textContent = '❌ Token غير صالح أو ليس له صلاحيات على TAYBAA-LIBRARY.';
+            result.style.color = 'var(--rose)';
+        }
+    });
+    document.getElementById('ghRemoveBtn').addEventListener('click', () => {
+        if (!confirm('احذف Token من جهازك؟ ستحتاج إعداده مجدداً لاحقاً.')) return;
+        GHSAVE.setToken(null);
+        document.getElementById('ghTokenInput').value = '';
+        document.getElementById('ghRemoveBtn').hidden = true;
+        document.getElementById('ghTestResult').textContent = '';
+        updateStorageNotice();
+        toast('🗑️ تم حذف Token', 'success');
+    });
+
+    /* ============================================================
+       🧰  مساعدات
+       ============================================================ */
     function setupDropZone(zone, fileInput, onFile) {
         zone.addEventListener('click', () => fileInput.click());
         zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
@@ -368,24 +497,18 @@
     /* ============================================================
        ✨  AI Helpers (via Pollinations.ai — free, no API key)
        ============================================================ */
-
     function withButtonLoading(btn, loadingText, fn) {
         return async function(...args) {
             const html = btn.innerHTML;
             btn.disabled = true;
             btn.innerHTML = '<span class="ai-icon">⏳</span> ' + loadingText;
-            try {
-                await fn.apply(this, args);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = html;
-            }
+            try { await fn.apply(this, args); }
+            finally { btn.disabled = false; btn.innerHTML = html; }
         };
     }
 
     async function pollinationsText(prompt) {
-        const url = 'https://text.pollinations.ai/' + encodeURIComponent(prompt) +
-                    '?model=openai&private=true';
+        const url = 'https://text.pollinations.ai/' + encodeURIComponent(prompt) + '?model=openai&private=true';
         const res = await fetch(url);
         if (!res.ok) throw new Error('AI text request failed: ' + res.status);
         const text = await res.text();
@@ -400,11 +523,9 @@
             nologo: 'true',
             seed: Math.floor(Math.random() * 999999)
         });
-        return 'https://image.pollinations.ai/prompt/' +
-               encodeURIComponent(prompt) + '?' + params.toString();
+        return 'https://image.pollinations.ai/prompt/' + encodeURIComponent(prompt) + '?' + params.toString();
     }
 
-    /* ----- 🎨 توليد غلاف ----- */
     const aiCoverBtn = document.getElementById('aiGenCoverBtn');
     if (aiCoverBtn) {
         aiCoverBtn.addEventListener('click', withButtonLoading(aiCoverBtn, 'جارٍ توليد الغلاف...', async () => {
@@ -412,18 +533,10 @@
             const author = document.getElementById('bookAuthor').value.trim();
             const category = document.getElementById('bookCategory').value.trim();
             if (!title) { toast('⚠️ أدخل عنوان الكتاب أولاً', 'warning'); return; }
-
             const isIslamic = /إسلام|دين|تيمية|قيم|توحيد|عقيدة|فقه|قرآن|حديث|سنة/i.test(title + ' ' + author + ' ' + category);
             const promptParts = isIslamic
-                ? [`Beautiful traditional Islamic book cover design`,
-                   `title in elegant Arabic calligraphy: "${title}"`,
-                   author && `author: "${author}"`,
-                   `dark green and gold colors, ornamental border, vintage manuscript aesthetic, professional book cover, no people, no faces`].filter(Boolean)
-                : [`Beautiful book cover design for "${title}"`,
-                   author && `by ${author}`,
-                   category && `category: ${category}`,
-                   `elegant typography, professional, high quality, no faces`].filter(Boolean);
-
+                ? [`Beautiful traditional Islamic book cover design`, `title in elegant Arabic calligraphy: "${title}"`, author && `author: "${author}"`, `dark green and gold colors, ornamental border, vintage manuscript aesthetic, professional book cover, no people, no faces`].filter(Boolean)
+                : [`Beautiful book cover design for "${title}"`, author && `by ${author}`, category && `category: ${category}`, `elegant typography, professional, high quality, no faces`].filter(Boolean);
             const url = pollinationsImageURL(promptParts.join(', '));
             await new Promise((resolve, reject) => {
                 const img = new Image();
@@ -438,7 +551,6 @@
         }));
     }
 
-    /* ----- 📝 كتابة نبذة ----- */
     const aiDescBtn = document.getElementById('aiGenDescBtn');
     if (aiDescBtn) {
         aiDescBtn.addEventListener('click', withButtonLoading(aiDescBtn, 'جارٍ كتابة النبذة...', async () => {
@@ -446,20 +558,17 @@
             const author = document.getElementById('bookAuthor').value.trim();
             const category = document.getElementById('bookCategory').value.trim();
             if (!title) { toast('⚠️ أدخل عنوان الكتاب أولاً', 'warning'); return; }
-
             const prompt = `اكتب نبذة قصيرة احترافية (2-3 جمل فقط) عن كتاب "${title}"` +
                            (author ? ` للمؤلف ${author}` : '') +
                            (category ? ` في تصنيف ${category}` : '') +
                            `. النبذة بالعربية الفصحى البليغة، تذكر موضوع الكتاب وأهميته. ` +
                            `لا تكتب أي مقدمات أو ترحيب، اكتب النبذة مباشرة فقط.`;
-
             const text = await pollinationsText(prompt);
             document.getElementById('bookDescription').value = text;
             toast('✅ تم كتابة النبذة', 'success');
         }));
     }
 
-    /* ----- 📖 كتابة مقدمة ----- */
     const aiIntroBtn = document.getElementById('aiGenIntroBtn');
     if (aiIntroBtn) {
         aiIntroBtn.addEventListener('click', withButtonLoading(aiIntroBtn, 'جارٍ كتابة المقدمة...', async () => {
@@ -467,32 +576,27 @@
             const author = document.getElementById('bookAuthor').value.trim();
             const desc = document.getElementById('bookDescription').value.trim();
             if (!title) { toast('⚠️ أدخل عنوان الكتاب أولاً', 'warning'); return; }
-
             const prompt = `اكتب مقدمة قصيرة (5-8 جمل) لكتاب "${title}"` +
                            (author ? ` للمؤلف ${author}` : '') +
                            (desc ? `. النبذة: ${desc}` : '') +
                            `. المقدمة بالعربية الفصحى البليغة، مناسبة لكتاب علمي، تبدأ بالحمد لله والصلاة على رسوله. ` +
                            `لا تكتب أي مقدمات أو ترحيب لي، اكتب نص المقدمة مباشرة فقط.`;
-
             const text = await pollinationsText(prompt);
             document.getElementById('bookIntro').value = text;
             toast('✅ تم كتابة المقدمة', 'success');
         }));
     }
 
-    /* ----- 🪄 تحسين الصياغة ----- */
     const aiEnhanceBtn = document.getElementById('aiEnhanceIntroBtn');
     if (aiEnhanceBtn) {
         aiEnhanceBtn.addEventListener('click', withButtonLoading(aiEnhanceBtn, 'جارٍ تحسين النص...', async () => {
             const intro = document.getElementById('bookIntro').value.trim();
             if (!intro) { toast('⚠️ اكتب المقدمة أولاً ثم اضغط للتحسين', 'warning'); return; }
             if (intro.length > 2000) { toast('⚠️ النص طويل جداً (الحد 2000 حرف)', 'warning'); return; }
-
             const prompt = `حرّر النص العربي التالي وصحّح الأخطاء النحوية والإملائية، ` +
                            `وحسّن الصياغة لتكون أكثر بلاغة وفصاحة، ` +
                            `مع الحفاظ التام على المعنى الأصلي. ` +
                            `لا تضف أي شرح أو تعليق، اكتب النص المحرّر فقط:\n\n${intro}`;
-
             const text = await pollinationsText(prompt);
             document.getElementById('bookIntro').value = text;
             toast('✅ تم تحسين الصياغة', 'success');
