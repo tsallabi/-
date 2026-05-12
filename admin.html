@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0a0e1a">
     <title>لوحة الإدارة — المكتبة الطيبة</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/style.css?v=3">
+    <link rel="stylesheet" href="css/admin.css?v=3">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:wght@700&display=swap" rel="stylesheet">
@@ -75,12 +75,6 @@
             <strong>💾 الحفظ:</strong>
             <span id="storageStatus">— لم يُضبط GitHub Token بعد</span>
             <button class="link-btn" id="storageNoticeBtn" type="button">⚙️ اضبط الآن</button>
-        </div>
-
-        <div class="admin-notice" id="firebaseNotice" hidden>
-            <strong>⚠️ Firebase غير مفعّل.</strong>
-            للحفظ الدائم للكتب، اضبط <code>firebase.enabled = true</code> في <code>config.js</code> بعد إعداد المشروع.
-            <a href="SETUP.md" target="_blank">دليل الإعداد →</a>
         </div>
 
         <section class="admin-books-table">
@@ -267,9 +261,9 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
-    <script src="js/config.js"></script>
-    <script src="js/data.js"></script>
-    <script src="js/github-save.js"></script>
-    <script src="js/admin.js"></script>
+    <script src="js/config.js?v=3"></script>
+    <script src="js/data.js?v=3"></script>
+    <script src="js/github-save.js?v=3"></script>
+    <script src="js/admin.js?v=3"></script>
 </body>
 </html>
