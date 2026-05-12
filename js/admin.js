@@ -428,8 +428,8 @@
         result.textContent = '⏳ جارٍ اختبار Token...';
         result.style.color = 'var(--text-muted)';
         GHSAVE.setToken(token);
-        const ok = await GHSAVE.testToken();
-        if (ok) {
+        const test = await GHSAVE.testToken();
+        if (test.ok) {
             result.textContent = '✅ Token صالح! تم الحفظ بنجاح.';
             result.style.color = 'var(--primary)';
             updateStorageNotice();
@@ -437,8 +437,21 @@
             toast('✅ تم تفعيل الحفظ على GitHub', 'success');
         } else {
             GHSAVE.setToken(null);
-            result.textContent = '❌ Token غير صالح أو ليس له صلاحيات على TAYBAA-LIBRARY.';
+            let msg;
+            if (test.status === 401) {
+                msg = '❌ Token غير صالح أو منتهي. تأكد من نسخه كاملاً (~93 حرف) ومن أنه لم ينتهِ.';
+            } else if (test.status === 403) {
+                msg = '❌ Token لا يملك صلاحية الكتابة. عدّل الـ Token وأعطه: Contents = Read and write.';
+            } else if (test.status === 404) {
+                msg = '❌ Token لا يصل إلى TAYBAA-LIBRARY. في Repository access اختر "Only select repositories" واختر TAYBAA-LIBRARY.';
+            } else if (test.status === 0) {
+                msg = '❌ مشكلة في الاتصال بالإنترنت. تأكد من الاتصال وأعد المحاولة.';
+            } else {
+                msg = `❌ خطأ (HTTP ${test.status}): ${(test.body || '').slice(0, 200)}`;
+            }
+            result.textContent = msg;
             result.style.color = 'var(--rose)';
+            console.error('Token test failed:', test);
         }
     });
     document.getElementById('ghRemoveBtn').addEventListener('click', () => {
