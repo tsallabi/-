@@ -26,7 +26,8 @@ const GHSAVE = {
     async _api(path, options = {}) {
         const token = this.getToken();
         if (!token) throw new Error('NO_TOKEN');
-        const url = `https://api.github.com/repos/${this.OWNER}/${this.REPO}/${path}`;
+        const base = `https://api.github.com/repos/${this.OWNER}/${this.REPO}`;
+        const url = path ? `${base}/${path}` : base;
         const res = await fetch(url, {
             ...options,
             headers: {
@@ -49,10 +50,15 @@ const GHSAVE = {
 
     async testToken() {
         try {
-            await this._api('');
-            return true;
+            // نختبر بقراءة الملف الذي سنعدّله — هذا يتحقق من Token + الصلاحيات + الوصول للمستودع
+            await this._api(`contents/${this.FILE}?ref=${this.BRANCH}`);
+            return { ok: true };
         } catch (err) {
-            return false;
+            return {
+                ok: false,
+                status: err.status || 0,
+                body: err.body || err.message || ''
+            };
         }
     },
 
