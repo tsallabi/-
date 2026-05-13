@@ -1,15 +1,10 @@
 /* ============================================================
    🛠️  لوحة الإدارة — منطق التطبيق
-   - تسجيل دخول بكلمة مرور (من CONFIG.admin.password)
-   - عرض/إضافة/تعديل/حذف الكتب (الحفظ على GitHub)
-   - استيراد ملفات Word (.docx) وتحويلها لكتاب
-   - أزرار ذكاء اصطناعي (Pollinations.ai)
    ============================================================ */
 
 (function() {
     'use strict';
 
-    /* ----- إدارة الوضع الداكن (الداكن هو الافتراضي) ----- */
     const stored = localStorage.getItem('taybaa-theme');
     document.documentElement.setAttribute('data-theme', stored || 'dark');
     document.getElementById('themeToggle').addEventListener('click', () => {
@@ -19,9 +14,6 @@
         localStorage.setItem('taybaa-theme', next);
     });
 
-    /* ============================================================
-       🔐  تسجيل الدخول
-       ============================================================ */
     const SESSION_KEY = 'taybaa-admin-session';
     const loginScreen = document.getElementById('loginScreen');
     const dashboard = document.getElementById('dashboard');
@@ -77,9 +69,6 @@
 
     if (isLoggedIn()) showDashboard(); else showLogin();
 
-    /* ============================================================
-       📋  جدول الكتب
-       ============================================================ */
     let booksState = [];
     const tableBody = document.getElementById('booksTableBody');
     const adminSearch = document.getElementById('adminSearch');
@@ -164,9 +153,6 @@
         }
     }
 
-    /* ============================================================
-       ✏️  Modal + Form
-       ============================================================ */
     const modal = document.getElementById('bookModal');
     const form = document.getElementById('bookForm');
     let currentStep = 1;
@@ -341,7 +327,10 @@
 
         try {
             const coverUrl = document.getElementById('coverUrl').value.trim();
-            const pdfUrl = document.getElementById('pdfUrl').value.trim();
+            let pdfUrl = document.getElementById('pdfUrl').value.trim();
+            // تحويل تلقائي لروابط Google Drive من /view إلى /preview (لتعمل في iframe)
+            const driveMatch = pdfUrl.match(/drive\.google\.com\/file\/d\/([^\/]+)/);
+            if (driveMatch) pdfUrl = `https://drive.google.com/file/d/${driveMatch[1]}/preview`;
 
             if (!coverUrl) {
                 toast('⚠️ أضف غلافاً (ولّده بالذكاء الاصطناعي أو الصق رابطاً)', 'warning');
@@ -438,17 +427,11 @@
         } else {
             GHSAVE.setToken(null);
             let msg;
-            if (test.status === 401) {
-                msg = '❌ Token غير صالح أو منتهي. تأكد من نسخه كاملاً (~93 حرف) ومن أنه لم ينتهِ.';
-            } else if (test.status === 403) {
-                msg = '❌ Token لا يملك صلاحية الكتابة. عدّل الـ Token وأعطه: Contents = Read and write.';
-            } else if (test.status === 404) {
-                msg = '❌ Token لا يصل إلى TAYBAA-LIBRARY. في Repository access اختر "Only select repositories" واختر TAYBAA-LIBRARY.';
-            } else if (test.status === 0) {
-                msg = '❌ مشكلة في الاتصال بالإنترنت. تأكد من الاتصال وأعد المحاولة.';
-            } else {
-                msg = `❌ خطأ (HTTP ${test.status}): ${(test.body || '').slice(0, 200)}`;
-            }
+            if (test.status === 401) msg = '❌ Token غير صالح أو منتهي.';
+            else if (test.status === 403) msg = '❌ Token لا يملك صلاحية الكتابة (Contents: Read and write).';
+            else if (test.status === 404) msg = '❌ Token لا يصل إلى TAYBAA-LIBRARY.';
+            else if (test.status === 0) msg = '❌ مشكلة في الاتصال بالإنترنت.';
+            else msg = `❌ خطأ (HTTP ${test.status})`;
             result.textContent = msg;
             result.style.color = 'var(--rose)';
             console.error('Token test failed:', test);
@@ -464,9 +447,6 @@
         toast('🗑️ تم حذف Token', 'success');
     });
 
-    /* ============================================================
-       🧰  مساعدات
-       ============================================================ */
     function setupDropZone(zone, fileInput, onFile) {
         zone.addEventListener('click', () => fileInput.click());
         zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
@@ -521,11 +501,22 @@
     }
 
     async function pollinationsText(prompt) {
-        const url = 'https://text.pollinations.ai/' + encodeURIComponent(prompt) + '?model=openai&private=true';
+        // mistral = نموذج موثوق يعيد نصاً عادياً (لا reasoning)
+        const url = 'https://text.pollinations.ai/' + encodeURIComponent(prompt) +
+                    '?model=mistral&private=true';
         const res = await fetch(url);
         if (!res.ok) throw new Error('AI text request failed: ' + res.status);
-        const text = await res.text();
-        return text.trim();
+        let text = (await res.text()).trim();
+        // أحياناً تعيد الخدمة JSON من نموذج reasoning — استخرج النص الفعلي
+        if (text.startsWith('{') && /"role"|"reasoning"|"choices"/.test(text)) {
+            try {
+                const json = JSON.parse(text);
+                const content = json.content || json.choices?.[0]?.message?.content || json.message?.content || json.text;
+                if (content && typeof content === 'string') return content.trim();
+            } catch (_) {}
+            throw new Error('AI returned unexpected format. حاول مرة أخرى.');
+        }
+        return text;
     }
 
     function pollinationsImageURL(prompt, opts = {}) {
