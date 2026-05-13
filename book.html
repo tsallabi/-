@@ -5,11 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0a0e1a">
     <title>تفاصيل الكتاب — المكتبة الطيبة</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=5">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:wght@700&family=Aref+Ruqaa:wght@700&display=swap" rel="stylesheet">
     <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('taybaa-theme') || 'dark');</script>
+    <style>
+        .book-publisher {
+            display: inline-flex; align-items: center; gap: .5rem;
+            margin: .75rem 0 1rem;
+            padding: .55rem 1.1rem;
+            background: linear-gradient(135deg, rgba(26,77,62,.08), rgba(201,169,110,.08));
+            border: 1px solid rgba(201,169,110,.35);
+            border-radius: 999px;
+            font-family: 'Aref Ruqaa', 'Amiri', serif;
+            font-size: .95rem;
+            color: var(--text);
+        }
+        .book-publisher::before {
+            content: '🏛️';
+            font-size: 1.05rem;
+        }
+        [data-theme="dark"] .book-publisher {
+            background: linear-gradient(135deg, rgba(45,212,191,.08), rgba(251,191,36,.08));
+            border-color: rgba(251,191,36,.3);
+        }
+    </style>
 </head>
 <body>
     <header class="site-header" id="siteHeader">
@@ -47,6 +68,7 @@
                 <p class="book-detail-category" id="bookCategory"></p>
                 <h1 id="bookTitle"></h1>
                 <p class="book-detail-author">للمؤلف: <strong id="bookAuthor"></strong></p>
+                <div class="book-publisher" id="bookPublisher">من إصدارات دار نشر المكتبة الطيبة</div>
 
                 <ul class="book-meta-list">
                     <li><span class="meta-icon">📄</span> <span id="bookPages"></span> صفحة</li>
@@ -87,16 +109,16 @@
     <footer class="site-footer">
         <div class="container footer-inner">
             <div class="footer-brand">
-                <strong>المكتبة الطيبة</strong>
+                <strong>دار نشر المكتبة الطيبة</strong>
                 <span>نشر العلم. مجاناً.</span>
             </div>
             <p class="footer-copy">© <span id="year"></span> TAYBAA-LIBRARY · مشروع مفتوح للقراء</p>
         </div>
     </footer>
 
-    <script src="js/config.js"></script>
-    <script src="js/data.js"></script>
-    <script src="js/firebase-counter.js"></script>
-    <script src="js/book.js"></script>
+    <script src="js/config.js?v=5"></script>
+    <script src="js/data.js?v=5"></script>
+    <script src="js/firebase-counter.js?v=5"></script>
+    <script src="js/book.js?v=5"></script>
 </body>
 </html>
