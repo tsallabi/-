@@ -3,6 +3,8 @@
 const CONFIG = {
     siteName: 'المكتبة الطيبة',
     siteTag: 'TAYBAA · LIBRARY',
+    publisher: 'دار نشر المكتبة الطيبة',
+    publisherShort: 'دار المكتبة الطيبة',
 
     // 'json' | 'sheets' | 'firestore'
     dataSource: 'json',
