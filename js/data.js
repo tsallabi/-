@@ -6,6 +6,14 @@ const DATA = (function() {
     let firestoreRef = null;
     let storageRef = null;
 
+    // ملفات JSON تُجمع كلها عند التحميل. الأدمن يكتب على books-sample.json فقط،
+    // أما الملفات الإضافية (books-extra-*.json) فهي بيانات منسّقة جاهزة.
+    const EXTRA_JSON_FILES = [
+        'data/books-extra-1.json',
+        'data/books-extra-2.json',
+        'data/books-extra-3.json'
+    ];
+
     async function initFirebase() {
         if (firebaseApp) return { db: firestoreRef, storage: storageRef };
         if (!CONFIG.firebase.enabled) throw new Error('Firebase غير مفعّل');
@@ -38,12 +46,32 @@ const DATA = (function() {
         return cachedBooks;
     }
 
+    async function fetchJsonBooks(path) {
+        try {
+            const res = await fetch(`${path}?t=${Date.now()}`);
+            if (!res.ok) return [];
+            const json = await res.json();
+            return json.books || [];
+        } catch (_) {
+            return [];
+        }
+    }
+
     async function loadFromJSON() {
-        // cache-bust كي يجلب المتصفح آخر نسخة دائماً (مهم بعد إضافة كتاب عبر الأدمن)
-        const res = await fetch('data/books-sample.json?t=' + Date.now());
-        if (!res.ok) throw new Error('تعذّر قراءة ملف العينة');
-        const json = await res.json();
-        return (json.books || []).map(normalizeBook);
+        // الملف الأساسي: قابل للتعديل من لوحة الأدمن
+        const mainRes = await fetch('data/books-sample.json?t=' + Date.now());
+        if (!mainRes.ok) throw new Error('تعذّر قراءة ملف العينة');
+        const mainJson = await mainRes.json();
+        const mainBooks = mainJson.books || [];
+
+        // الملفات الإضافية: بيانات منسّقة جاهزة (لا يكتب عليها الأدمن)
+        const extraArrays = await Promise.all(EXTRA_JSON_FILES.map(fetchJsonBooks));
+        const extraBooks = extraArrays.flat();
+
+        // دمج مع إعطاء الأولوية للملف الأساسي عند تكرار المعرّف
+        const seen = new Set(mainBooks.map(b => String(b.id)));
+        const merged = mainBooks.concat(extraBooks.filter(b => !seen.has(String(b.id))));
+        return merged.map(normalizeBook);
     }
 
     async function loadFromSheets() {
@@ -128,7 +156,6 @@ const DATA = (function() {
         return s === 'true' || s === '1' || s === 'نعم' || s === 'yes';
     }
 
-    // تنظيف ركام نموذج الـ AI الذي يُسرّب reasoning في الحقل
     function cleanReasoningLeak(text) {
         if (!text) return '';
         if (text.startsWith('{') && /"role"|"reasoning"|"choices"/.test(text)) {
