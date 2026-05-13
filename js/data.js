@@ -39,7 +39,8 @@ const DATA = (function() {
     }
 
     async function loadFromJSON() {
-        const res = await fetch('data/books-sample.json');
+        // cache-bust كي يجلب المتصفح آخر نسخة دائماً (مهم بعد إضافة كتاب عبر الأدمن)
+        const res = await fetch('data/books-sample.json?t=' + Date.now());
         if (!res.ok) throw new Error('تعذّر قراءة ملف العينة');
         const json = await res.json();
         return (json.books || []).map(normalizeBook);
@@ -113,8 +114,8 @@ const DATA = (function() {
             cover: String(get('cover', 'coverUrl', 'الغلاف', 'صورة الغلاف')).trim(),
             pdf: String(get('pdf', 'pdfUrl', 'رابط_pdf', 'الكتاب', 'ملف')).trim(),
             html: String(get('html', 'htmlContent', 'محتوى')).trim(),
-            description: String(get('description', 'النبذة', 'الوصف', 'نبذة')).trim(),
-            introduction: String(get('introduction', 'intro', 'المقدمة')).trim(),
+            description: cleanReasoningLeak(String(get('description', 'النبذة', 'الوصف', 'نبذة')).trim()),
+            introduction: cleanReasoningLeak(String(get('introduction', 'intro', 'المقدمة')).trim()),
             views: Number(get('views', 'المشاهدات')) || 0,
             downloads: Number(get('downloads', 'التحميلات')) || 0,
             addedDate: String(get('addedDate', 'date', 'التاريخ') || new Date().toISOString().slice(0,10)).trim(),
@@ -125,6 +126,20 @@ const DATA = (function() {
         if (typeof v === 'boolean') return v;
         const s = String(v).trim().toLowerCase();
         return s === 'true' || s === '1' || s === 'نعم' || s === 'yes';
+    }
+
+    // تنظيف ركام نموذج الـ AI الذي يُسرّب reasoning في الحقل
+    function cleanReasoningLeak(text) {
+        if (!text) return '';
+        if (text.startsWith('{') && /"role"|"reasoning"|"choices"/.test(text)) {
+            try {
+                const json = JSON.parse(text);
+                const content = json.content || json.choices?.[0]?.message?.content || json.message?.content || json.text;
+                if (content && typeof content === 'string') return content.trim();
+            } catch (_) {}
+            return '';
+        }
+        return text;
     }
 
     function search(books, query) {
