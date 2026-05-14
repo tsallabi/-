@@ -5,49 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1a0f08">
     <title>تفاصيل الكتاب — المكتبة الطيبة</title>
-    <link rel="stylesheet" href="css/style.css?v=9">
+    <link rel="stylesheet" href="css/style.css?v=10">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:wght@700&family=Aref+Ruqaa:wght@700&display=swap" rel="stylesheet">
     <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('taybaa-theme') || 'dark');</script>
     <style>
-        .book-publisher {
-            display: inline-flex; align-items: center; gap: .5rem;
-            margin: .85rem 0 1.2rem;
-            padding: .55rem 1.15rem;
-            background: linear-gradient(135deg, rgba(107,68,35,.12), rgba(184,148,31,.15));
-            border: 1px solid rgba(184,148,31,.45);
-            border-radius: 999px;
-            font-family: 'Aref Ruqaa', 'Amiri', serif;
-            font-size: .95rem;
-            color: var(--text);
-        }
+        .book-publisher { display: inline-flex; align-items: center; gap: .5rem; margin: .85rem 0 1.2rem; padding: .55rem 1.15rem; background: linear-gradient(135deg, rgba(107,68,35,.12), rgba(184,148,31,.15)); border: 1px solid rgba(184,148,31,.45); border-radius: 999px; font-family: 'Aref Ruqaa', 'Amiri', serif; font-size: .95rem; color: var(--text); }
         .book-publisher::before { content: '🏵️'; font-size: 1.05rem; }
-        .soon-notice {
-            margin-top: 1.25rem;
-            padding: 1rem 1.25rem;
-            background: linear-gradient(135deg, rgba(184,148,31,.10), rgba(107,68,35,.10));
-            border: 1px dashed rgba(184,148,31,.5);
-            border-radius: 14px;
-            color: var(--text);
-            font-size: .95rem;
-            line-height: 1.7;
-        }
+        .soon-notice { margin-top: 1.25rem; padding: 1rem 1.25rem; background: linear-gradient(135deg, rgba(184,148,31,.10), rgba(107,68,35,.10)); border: 1px dashed rgba(184,148,31,.5); border-radius: 14px; color: var(--text); font-size: .95rem; line-height: 1.7; }
         .soon-notice strong { color: var(--gold); font-family: 'Aref Ruqaa', 'Amiri', serif; }
-        /* Profile menu (مكرر لصفحة الكتاب) */
+        .resume-badge { display: inline-block; padding: .55rem 1rem; background: linear-gradient(135deg, rgba(90,122,58,.18), rgba(212,175,55,.18)); border: 1px solid rgba(212,175,55,.4); border-radius: 999px; color: var(--gold); font-family: 'Aref Ruqaa', 'Cairo', serif; font-size: .9rem; margin-bottom: 1rem; }
+        .fav-btn-detail { display: inline-flex; align-items: center; gap: .45rem; padding: .65rem 1.2rem; border-radius: 12px; border: 1px solid var(--border-strong); background: var(--bg-subtle); color: var(--text); font-family: inherit; font-weight: 700; font-size: .95rem; cursor: pointer; transition: all .2s; }
+        .fav-btn-detail:hover { border-color: #ce1126; color: #ce1126; transform: translateY(-1px); }
+        .fav-btn-detail.is-fav { background: linear-gradient(135deg, #ce1126, #8b1a1a); color: #fff; border-color: #ce1126; }
+
+        /* Profile (مكرر) */
         .profile-wrap { position: relative; flex-shrink: 0; }
         .profile-btn { width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-subtle); color: var(--text); display: grid; place-items: center; transition: all .2s; cursor: pointer; }
         .profile-btn:hover { border-color: var(--gold); background: var(--gold-soft); color: var(--gold); transform: translateY(-1px); }
-        .profile-menu { position: absolute; top: calc(100% + .65rem); left: 0; min-width: 290px; max-width: 340px; background: var(--bg-elevated); border: 1px solid var(--border-strong); border-radius: 16px; box-shadow: 0 25px 60px rgba(0,0,0,.4); overflow: hidden; z-index: 100; animation: profileFade .18s ease-out; }
+        .profile-menu { position: absolute; top: calc(100% + .65rem); left: 0; min-width: 300px; max-width: 360px; background: var(--bg-elevated); border: 1px solid var(--border-strong); border-radius: 16px; box-shadow: 0 25px 60px rgba(0,0,0,.4); overflow: hidden; z-index: 100; animation: profileFade .18s ease-out; }
         @keyframes profileFade { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
         .profile-header { padding: 1rem 1.25rem; background: linear-gradient(135deg, #3a2412, #1a0f08); color: #f5d76e; font-family: 'Aref Ruqaa', 'Cairo', serif; font-weight: 700; font-size: 1.05rem; display: flex; align-items: center; gap: .5rem; }
         .profile-body { padding: 1.1rem 1.25rem; }
-        .profile-status { margin: 0 0 .25rem; color: var(--text); font-weight: 600; font-size: .98rem; }
-        .profile-tagline { margin: 0; color: var(--text-muted); font-size: .85rem; font-family: 'Aref Ruqaa', 'Amiri', serif; }
-        .profile-vip hr { border: 0; border-top: 1px solid var(--border); margin: .9rem 0; }
-        .vip-indicator { margin: 0 0 .65rem; padding: .55rem .9rem; background: linear-gradient(135deg, rgba(90,122,58,.18), rgba(212,175,55,.18)); border: 1px solid rgba(212,175,55,.3); border-radius: 10px; text-align: center; color: var(--gold-glow); font-family: 'Aref Ruqaa', serif; font-size: .9rem; }
+        .profile-status { margin: 0 0 .25rem; color: var(--text); font-weight: 600; font-size: 1rem; }
+        .profile-tagline { margin: 0 0 .9rem; color: var(--text-muted); font-size: .85rem; font-family: 'Aref Ruqaa', 'Amiri', serif; }
+        .profile-note { margin: .8rem 0 0; font-size: .8rem; color: var(--text-soft); text-align: center; }
+        .profile-stats { display: grid; grid-template-columns: 1fr 1fr; gap: .65rem; margin: .85rem 0; }
+        .profile-stats div { background: var(--bg-subtle); padding: .7rem; border-radius: 10px; text-align: center; border: 1px solid var(--border); }
+        .profile-stats b { display: block; color: var(--gold); font-size: 1.4rem; font-family: 'Aref Ruqaa', serif; }
+        .profile-stats span { font-size: .75rem; color: var(--text-muted); }
+        .profile-section-title { margin: .9rem 0 .35rem; font-size: .82rem; font-weight: 700; color: var(--text-muted); font-family: 'Aref Ruqaa', 'Cairo', serif; }
+        .profile-last-read { list-style: none; padding: 0; margin: 0 0 .8rem; }
+        .profile-last-read li a { display: block; padding: .45rem .75rem; background: var(--bg-subtle); border-radius: 8px; margin-bottom: .35rem; color: var(--text); text-decoration: none; font-size: .85rem; transition: all .15s; }
+        .profile-last-read li a:hover { background: var(--gold-soft); color: var(--gold); }
+        .profile-body hr { border: 0; border-top: 1px solid var(--border); margin: .85rem 0; }
+        .login-form { display: flex; flex-direction: column; gap: .55rem; }
+        .login-form input { width: 100%; padding: .65rem .85rem; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-subtle); color: var(--text); font-family: inherit; font-size: .9rem; }
+        .login-form input:focus { outline: 0; border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-soft); }
+        .login-form button { padding: .7rem; background: var(--grad-gold); color: #2a1810; border: 0; border-radius: 10px; font-family: inherit; font-weight: 700; font-size: .95rem; cursor: pointer; }
+        .login-error { margin: .25rem 0 0; color: #ce1126; font-size: .82rem; font-weight: 700; text-align: center; }
+        .vip-indicator { margin: .25rem 0 .65rem; padding: .55rem .9rem; background: linear-gradient(135deg, rgba(90,122,58,.18), rgba(212,175,55,.18)); border: 1px solid rgba(212,175,55,.3); border-radius: 10px; text-align: center; color: var(--gold-glow); font-family: 'Aref Ruqaa', serif; font-size: .9rem; }
         .vip-lock-btn { width: 100%; padding: .7rem 1rem; border: 1px solid var(--border-strong); border-radius: 10px; background: var(--bg-subtle); color: var(--text); font-family: inherit; font-weight: 700; cursor: pointer; transition: all .2s; font-size: .95rem; }
         .vip-lock-btn:hover { border-color: #ce1126; color: #ce1126; background: rgba(206,17,38,.05); }
+        .vip-lock-btn.vip-style:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-soft); }
     </style>
 </head>
 <body>
@@ -65,37 +66,23 @@
                         <path d="M31 30 Q23 23 20 18" stroke="#5a7a3a" stroke-width="2.4" fill="none" stroke-linecap="round"/>
                         <path d="M31 30 Q39 23 42 18" stroke="#5a7a3a" stroke-width="2.4" fill="none" stroke-linecap="round"/>
                         <path d="M31 30 Q31 23 31 18" stroke="#3d5a26" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-                        <circle cx="28" cy="30" r="1.2" fill="#3a2412"/>
-                        <circle cx="34" cy="30" r="1.2" fill="#3a2412"/>
+                        <circle cx="28" cy="30" r="1.2" fill="#3a2412"/><circle cx="34" cy="30" r="1.2" fill="#3a2412"/>
                         <path d="M0 52 Q12 47 24 52 T48 52 T64 52 L64 64 L0 64 Z" fill="#8b5a2b"/>
                         <path d="M0 56 Q14 52 28 56 T52 56 T64 56 L64 64 L0 64 Z" fill="#6b4423" opacity=".7"/>
                     </svg>
                 </span>
-                <span class="logo-text">
-                    <span class="logo-title">المكتبة الطيبة</span>
-                    <span class="logo-tag">TAYBAA · LIBRARY</span>
-                </span>
+                <span class="logo-text"><span class="logo-title">المكتبة الطيبة</span><span class="logo-tag">TAYBAA · LIBRARY</span></span>
             </a>
 
             <a href="index.html" class="link-btn">→ الرئيسية</a>
 
             <div class="profile-wrap">
                 <button class="profile-btn" id="profileBtn" aria-label="حسابي" type="button">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
-                        <circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg>
                 </button>
                 <div class="profile-menu" id="profileMenu" hidden>
                     <div class="profile-header"><span>👤</span> <span>حسابي</span></div>
-                    <div class="profile-body">
-                        <p class="profile-status">أهلاً بك في <strong>المكتبة الطيبة</strong></p>
-                        <p class="profile-tagline">واحة المعرفة · مجاناً للجميع</p>
-                        <div class="profile-vip" id="profileVip" hidden>
-                            <hr>
-                            <p class="vip-indicator">✨ القسم الخاص مفتوح</p>
-                            <button id="vipLockBtn" class="vip-lock-btn" type="button">🔒 تسجيل خروج · إغلاق القسم الخاص</button>
-                        </div>
-                    </div>
+                    <div class="profile-body" id="profileMenuBody"></div>
                 </div>
             </div>
 
@@ -117,7 +104,9 @@
                 <p class="book-detail-category" id="bookCategory"></p>
                 <h1 id="bookTitle"></h1>
                 <p class="book-detail-author">للمؤلف: <strong id="bookAuthor"></strong></p>
-                <div class="book-publisher" id="bookPublisher">من إصدارات دار نشر المكتبة الطيبة</div>
+                <div class="book-publisher">من إصدارات دار نشر المكتبة الطيبة</div>
+
+                <div class="resume-badge" id="resumeBadge" hidden></div>
 
                 <ul class="book-meta-list">
                     <li><span class="meta-icon">📄</span> <span id="bookPages"></span> صفحة</li>
@@ -134,6 +123,7 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
                         حمّل PDF
                     </a>
+                    <button id="favBtn" type="button" class="fav-btn-detail">♡ أضف للمفضّلة</button>
                 </div>
 
                 <div class="soon-notice" id="soonNotice" hidden>
@@ -143,20 +133,10 @@
             </div>
         </article>
 
-        <section class="book-text" id="descriptionSection" hidden>
-            <h2>📌 نبذة عن الكتاب</h2>
-            <p id="bookDescription"></p>
-        </section>
+        <section class="book-text" id="descriptionSection" hidden><h2>📌 نبذة عن الكتاب</h2><p id="bookDescription"></p></section>
+        <section class="book-text" id="introSection" hidden><h2>📝 المقدمة</h2><p id="bookIntro"></p></section>
 
-        <section class="book-text" id="introSection" hidden>
-            <h2>📝 المقدمة</h2>
-            <p id="bookIntro"></p>
-        </section>
-
-        <p class="empty-state" id="loadingState">
-            <span class="spinner"></span>
-            جارٍ تحميل بيانات الكتاب...
-        </p>
+        <p class="empty-state" id="loadingState"><span class="spinner"></span> جارٍ تحميل بيانات الكتاب...</p>
         <p class="empty-state" id="notFoundState" hidden>عذراً، لم يتم العثور على هذا الكتاب. <a href="index.html">عُد للرئيسية</a></p>
     </main>
 
@@ -171,11 +151,12 @@
         </div>
     </footer>
 
-    <script src="js/config.js?v=9"></script>
-    <script src="js/cover-resolver.js?v=9"></script>
-    <script src="js/data.js?v=9"></script>
-    <script src="js/firebase-counter.js?v=9"></script>
-    <script src="js/book.js?v=9"></script>
-    <script src="js/profile.js?v=9"></script>
+    <script src="js/config.js?v=10"></script>
+    <script src="js/cover-resolver.js?v=10"></script>
+    <script src="js/data.js?v=10"></script>
+    <script src="js/firebase-counter.js?v=10"></script>
+    <script src="js/user-system.js?v=10"></script>
+    <script src="js/book.js?v=10"></script>
+    <script src="js/profile.js?v=10"></script>
 </body>
 </html>

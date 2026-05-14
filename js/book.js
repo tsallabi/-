@@ -1,4 +1,4 @@
-/* منطق صفحة تفاصيل الكتاب */
+/* منطق صفحة تفاصيل الكتاب + زرّ المفضّلة + تمرير bookId للقارئ */
 
 (async function() {
     initThemeToggle();
@@ -20,12 +20,14 @@
         downloads: document.getElementById('bookDownloads'),
         readBtn: document.getElementById('readBtn'),
         downloadBtn: document.getElementById('downloadBtn'),
+        favBtn: document.getElementById('favBtn'),
         soonNotice: document.getElementById('soonNotice'),
         bookActions: document.getElementById('bookActions'),
         descSection: document.getElementById('descriptionSection'),
         introSection: document.getElementById('introSection'),
         description: document.getElementById('bookDescription'),
-        intro: document.getElementById('bookIntro')
+        intro: document.getElementById('bookIntro'),
+        resumeBadge: document.getElementById('resumeBadge')
     };
 
     if (!id) return showNotFound();
@@ -49,10 +51,33 @@
     els.views.textContent = book.views || 0;
     els.downloads.textContent = book.downloads || 0;
 
+    // زرّ المفضّلة
+    if (els.favBtn && typeof FAVS !== 'undefined') {
+        updateFavBtn();
+        els.favBtn.addEventListener('click', () => {
+            FAVS.toggle(book.id);
+            updateFavBtn();
+        });
+    }
+    function updateFavBtn() {
+        const isFav = FAVS.has(book.id);
+        els.favBtn.classList.toggle('is-fav', isFav);
+        els.favBtn.innerHTML = isFav ? '♥ في المفضّلة' : '♡ أضف للمفضّلة';
+    }
+
+    // موقع آخر صفحة قراءة
+    if (els.resumeBadge && typeof READING !== 'undefined') {
+        const lastPage = READING.getPage(book.id);
+        if (lastPage > 1) {
+            els.resumeBadge.hidden = false;
+            els.resumeBadge.innerHTML = `📖 تركت القراءة عند الصفحة <strong>${lastPage}</strong>`;
+        }
+    }
+
     const source = book.pdf || book.html;
     if (source) {
-        // القارئ الداخلي (لا يفتح موقعاً خارجياً)
-        els.readBtn.href = `reader.html?pdf=${encodeURIComponent(source)}&title=${encodeURIComponent(book.title)}`;
+        // تمرير bookId ليتمكّن القارئ من حفظ واستئناف موقع القراءة
+        els.readBtn.href = `reader.html?pdf=${encodeURIComponent(source)}&title=${encodeURIComponent(book.title)}&bookId=${encodeURIComponent(book.id)}`;
         if (book.pdf) {
             els.downloadBtn.href = book.pdf;
             els.downloadBtn.setAttribute('download', `${book.title}.pdf`);
@@ -62,7 +87,6 @@
             });
         } else { els.downloadBtn.style.display = 'none'; }
     } else {
-        // لا يوجد ملف بعد — إخفاء الأزرار وإظهار إشعار "قريباً".
         if (els.bookActions) els.bookActions.style.display = 'none';
         if (els.soonNotice) els.soonNotice.hidden = false;
     }
@@ -84,10 +108,8 @@
         els.coverFrame.innerHTML = `<div class="book-cover-fallback" aria-hidden="true">
             <div class="cf-top"><span class="cf-icon">${icon}</span></div>
             <div class="cf-mid"><h3 class="cf-title">${escapeHTML(book.title)}</h3></div>
-            <div class="cf-bottom">
-                <p class="cf-author">${escapeHTML(book.author || 'مؤلف غير معروف')}</p>
-                <p class="cf-publisher">${escapeHTML(publisher)}</p>
-            </div></div>`;
+            <div class="cf-bottom"><p class="cf-author">${escapeHTML(book.author || 'مؤلف غير معروف')}</p><p class="cf-publisher">${escapeHTML(publisher)}</p></div>
+        </div>`;
         if (typeof COVER !== 'undefined') {
             try {
                 const url = await COVER.resolve(book);
@@ -105,7 +127,6 @@
 
     function escapeHTML(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
     function showNotFound() { els.loading.hidden = true; els.notFound.hidden = false; }
-
     function initThemeToggle() {
         const theme = localStorage.getItem('taybaa-theme') || 'dark';
         document.documentElement.setAttribute('data-theme', theme);
