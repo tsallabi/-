@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#1a0f08">
     <title>المكتبة الطيبة — أكبر مكتبة عربية أونلاين</title>
     <meta name="description" content="دار نشر المكتبة الطيبة · واحة المعرفة.">
-    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/style.css?v=11">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:wght@700&family=Aref+Ruqaa:wght@700&display=swap" rel="stylesheet">
@@ -17,13 +17,11 @@
         .book-card.coming-soon { opacity: .9; }
         .book-card.coming-soon:hover { opacity: 1; }
 
-        /* زرّ المفضّلة على البطاقة */
         .fav-btn { position: absolute; top: .55rem; right: .55rem; z-index: 5; width: 36px; height: 36px; border-radius: 50%; border: 0; background: rgba(26,15,8,.6); backdrop-filter: blur(8px); color: #f5d76e; display: grid; place-items: center; cursor: pointer; transition: all .2s; font-size: 1.05rem; padding: 0; }
         .fav-btn:hover { background: rgba(206,17,38,.85); color: #fff; transform: scale(1.1); }
         .fav-btn.is-fav { background: linear-gradient(135deg, #ce1126, #8b1a1a); color: #fff; }
         .fav-btn.is-fav:hover { background: rgba(206,17,38,.7); }
 
-        /* زرّ الحساب والقائمة */
         .profile-wrap { position: relative; flex-shrink: 0; }
         .profile-btn { width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-subtle); color: var(--text); display: grid; place-items: center; transition: all .2s; cursor: pointer; }
         .profile-btn:hover { border-color: var(--gold); background: var(--gold-soft); color: var(--gold); transform: translateY(-1px); }
@@ -43,18 +41,12 @@
         .profile-last-read li a { display: block; padding: .45rem .75rem; background: var(--bg-subtle); border-radius: 8px; margin-bottom: .35rem; color: var(--text); text-decoration: none; font-size: .85rem; transition: all .15s; }
         .profile-last-read li a:hover { background: var(--gold-soft); color: var(--gold); }
         .profile-body hr { border: 0; border-top: 1px solid var(--border); margin: .85rem 0; }
-
         .login-form { display: flex; flex-direction: column; gap: .55rem; }
         .login-form input { width: 100%; padding: .65rem .85rem; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-subtle); color: var(--text); font-family: inherit; font-size: .9rem; }
         .login-form input:focus { outline: 0; border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-soft); }
-        .login-form button { padding: .7rem; background: var(--grad-gold); color: #2a1810; border: 0; border-radius: 10px; font-family: inherit; font-weight: 700; font-size: .95rem; cursor: pointer; transition: all .2s; }
-        .login-form button:hover { transform: translateY(-1px); box-shadow: 0 6px 15px rgba(184,148,31,.4); }
-        .login-error { margin: .25rem 0 0; color: #ce1126; font-size: .82rem; font-weight: 700; text-align: center; }
-
+        .login-form button { padding: .7rem; background: var(--grad-gold); color: #2a1810; border: 0; border-radius: 10px; font-family: inherit; font-weight: 700; font-size: .95rem; cursor: pointer; }
         .vip-indicator { margin: .25rem 0 .65rem; padding: .55rem .9rem; background: linear-gradient(135deg, rgba(90,122,58,.18), rgba(212,175,55,.18)); border: 1px solid rgba(212,175,55,.3); border-radius: 10px; text-align: center; color: var(--gold-glow); font-family: 'Aref Ruqaa', serif; font-size: .9rem; }
         .vip-lock-btn { width: 100%; padding: .7rem 1rem; border: 1px solid var(--border-strong); border-radius: 10px; background: var(--bg-subtle); color: var(--text); font-family: inherit; font-weight: 700; cursor: pointer; transition: all .2s; font-size: .95rem; }
-        .vip-lock-btn:hover { border-color: #ce1126; color: #ce1126; background: rgba(206,17,38,.05); }
-        .vip-lock-btn.vip-style:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-soft); }
     </style>
 </head>
 <body>
@@ -72,8 +64,7 @@
                         <path d="M31 30 Q23 23 20 18" stroke="#5a7a3a" stroke-width="2.4" fill="none" stroke-linecap="round"/>
                         <path d="M31 30 Q39 23 42 18" stroke="#5a7a3a" stroke-width="2.4" fill="none" stroke-linecap="round"/>
                         <path d="M31 30 Q31 23 31 18" stroke="#3d5a26" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-                        <circle cx="28" cy="30" r="1.2" fill="#3a2412"/>
-                        <circle cx="34" cy="30" r="1.2" fill="#3a2412"/>
+                        <circle cx="28" cy="30" r="1.2" fill="#3a2412"/><circle cx="34" cy="30" r="1.2" fill="#3a2412"/>
                         <path d="M0 52 Q12 47 24 52 T48 52 T64 52 L64 64 L0 64 Z" fill="#8b5a2b"/>
                         <path d="M0 56 Q14 52 28 56 T52 56 T64 56 L64 64 L0 64 Z" fill="#6b4423" opacity=".7"/>
                     </svg>
@@ -111,23 +102,66 @@
             <div class="hero-bg" aria-hidden="true">
                 <span class="hero-orb orb-1"></span><span class="hero-orb orb-2"></span><span class="hero-orb orb-3"></span>
             </div>
-            <svg class="hero-oasis" viewBox="0 0 200 220" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                    <linearGradient id="trunk" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#5a3a1a"/><stop offset="1" stop-color="#3a2412"/></linearGradient>
-                    <linearGradient id="frond" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#3d5a26"/><stop offset="1" stop-color="#5a7a3a"/></linearGradient>
-                </defs>
-                <path d="M97 95 Q103 130 100 200 Q98 205 100 210" stroke="url(#trunk)" stroke-width="7" fill="none" stroke-linecap="round"/>
-                <path d="M100 95 Q70 85 35 90 Q60 75 100 80" fill="url(#frond)"/>
-                <path d="M100 95 Q130 85 165 90 Q140 75 100 80" fill="url(#frond)"/>
-                <path d="M100 95 Q75 70 50 50 Q80 60 100 80" fill="url(#frond)"/>
-                <path d="M100 95 Q125 70 150 50 Q120 60 100 80" fill="url(#frond)"/>
-                <path d="M100 95 Q90 55 95 25 Q105 55 100 80" fill="url(#frond)"/>
-                <path d="M100 95 Q60 100 30 115 Q70 95 100 85" fill="url(#frond)" opacity=".85"/>
-                <path d="M100 95 Q140 100 170 115 Q130 95 100 85" fill="url(#frond)" opacity=".85"/>
-                <circle cx="95" cy="96" r="3" fill="#3a2412"/><circle cx="100" cy="99" r="3" fill="#3a2412"/><circle cx="104" cy="96" r="3" fill="#3a2412"/>
-            </svg>
 
             <div class="container hero-inner">
+                <svg class="hero-oasis" viewBox="0 0 240 220" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="trunk" x1="0" x2="0" y1="0" y2="1">
+                            <stop offset="0" stop-color="#8b5a2b"/>
+                            <stop offset=".5" stop-color="#6b4423"/>
+                            <stop offset="1" stop-color="#3a2412"/>
+                        </linearGradient>
+                        <linearGradient id="frond" x1="0" x2="1" y1="0" y2="1">
+                            <stop offset="0" stop-color="#3d5a26"/>
+                            <stop offset=".5" stop-color="#5a7a3a"/>
+                            <stop offset="1" stop-color="#7a9648"/>
+                        </linearGradient>
+                        <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#fff7d6" stop-opacity=".9"/>
+                            <stop offset="60%" stop-color="#d4af37" stop-opacity=".25"/>
+                            <stop offset="100%" stop-color="#d4af37" stop-opacity="0"/>
+                        </radialGradient>
+                        <radialGradient id="pool" cx="50%" cy="50%">
+                            <stop offset="0" stop-color="#5fa9e0"/>
+                            <stop offset="1" stop-color="#2a6a98"/>
+                        </radialGradient>
+                    </defs>
+                    <circle cx="190" cy="38" r="42" fill="url(#sunGlow)"/>
+                    <ellipse cx="120" cy="207" rx="75" ry="8" fill="url(#pool)" opacity=".7"/>
+                    <ellipse cx="120" cy="204" rx="58" ry="3" fill="#ffffff" opacity=".3"/>
+                    <path d="M115 90 Q122 130 118 195 Q120 200 122 207" stroke="url(#trunk)" stroke-width="8.5" fill="none" stroke-linecap="round"/>
+                    <g stroke="#2a1810" stroke-width="1.4" stroke-linecap="round" opacity=".65" fill="none">
+                        <path d="M113 113 Q120 116 124 113"/>
+                        <path d="M114 132 Q120 135 123 132"/>
+                        <path d="M114 152 Q120 155 122 152"/>
+                        <path d="M114 172 Q120 175 121 172"/>
+                        <path d="M115 190 Q120 193 121 190"/>
+                    </g>
+                    <g>
+                        <circle cx="111" cy="94" r="2.2" fill="#d4af37"/>
+                        <circle cx="115" cy="91" r="2" fill="#b8941f"/>
+                        <circle cx="120" cy="92" r="2.3" fill="#d4af37"/>
+                        <circle cx="125" cy="91" r="2" fill="#b8941f"/>
+                        <circle cx="129" cy="94" r="2.2" fill="#d4af37"/>
+                        <circle cx="116" cy="96" r="1.8" fill="#8b5a2b"/>
+                        <circle cx="124" cy="96" r="1.8" fill="#8b5a2b"/>
+                    </g>
+                    <path d="M120 90 Q85 80 38 88 Q73 65 120 80" fill="url(#frond)"/>
+                    <path d="M120 90 Q155 80 202 88 Q167 65 120 80" fill="url(#frond)"/>
+                    <path d="M120 90 Q88 60 53 38 Q95 55 120 78" fill="url(#frond)"/>
+                    <path d="M120 90 Q152 60 187 38 Q145 55 120 78" fill="url(#frond)"/>
+                    <path d="M120 90 Q108 55 115 20 Q120 55 120 78" fill="url(#frond)"/>
+                    <path d="M120 90 Q132 55 125 20 Q120 55 120 78" fill="url(#frond)"/>
+                    <path d="M120 90 Q70 105 22 118 Q68 88 120 82" fill="url(#frond)" opacity=".88"/>
+                    <path d="M120 90 Q170 105 218 118 Q172 88 120 82" fill="url(#frond)" opacity=".88"/>
+                    <g stroke="#3d5a26" stroke-width="1.6" stroke-linecap="round" fill="none">
+                        <path d="M60 207 L58 196 M65 207 L67 195 M70 207 L73 198"/>
+                        <path d="M170 207 L168 196 M175 207 L177 195 M180 207 L183 198"/>
+                        <path d="M40 207 L39 200 M44 207 L46 199"/>
+                        <path d="M196 207 L197 200 M200 207 L202 199"/>
+                    </g>
+                </svg>
+
                 <span class="hero-badge"><span>🏵️</span> واحة المعرفة · من ليبيا إلى الوطن العربي</span>
                 <h1 class="hero-title">واحة العلم في صحراء الجهل<br><span class="hero-grad">أكبر مكتبة عربية أونلاين</span></h1>
                 <p class="hero-subtitle">تطوير الذات · التحفيز · ريادة الأعمال · القيادة · التسويق · علم النفس</p>
@@ -182,11 +216,11 @@
         </div>
     </footer>
 
-    <script src="js/config.js?v=10"></script>
-    <script src="js/cover-resolver.js?v=10"></script>
-    <script src="js/data.js?v=10"></script>
-    <script src="js/user-system.js?v=10"></script>
-    <script src="js/app.js?v=10"></script>
-    <script src="js/profile.js?v=10"></script>
+    <script src="js/config.js?v=11"></script>
+    <script src="js/cover-resolver.js?v=11"></script>
+    <script src="js/data.js?v=11"></script>
+    <script src="js/user-system.js?v=11"></script>
+    <script src="js/app.js?v=11"></script>
+    <script src="js/profile.js?v=11"></script>
 </body>
 </html>
