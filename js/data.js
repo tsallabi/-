@@ -12,6 +12,12 @@ const DATA = (function() {
 
     const VIP_KEY = 'taybaa-vip-unlocked';
 
+    // حدود معرّفات الكتب التي تم توليدها بروابط archive.org مخترعة (غير صالحة).
+    // تلقائياً: يتم تفريغ حقل pdf لهذه المعرّفات حتى تظهر على الموقع بشارة "قريباً"
+    // بدلاً من فتح قارئ معطّل على أرشيفـأورغ.
+    const FAKE_PDF_ID_MIN = 116;
+    const FAKE_PDF_ID_MAX = 217;
+
     function isVIP() {
         try {
             const params = new URLSearchParams(location.search);
@@ -144,14 +150,21 @@ const DATA = (function() {
             for (const k of keys) if (raw[k] !== undefined && raw[k] !== null && raw[k] !== '') return raw[k];
             return '';
         };
+        let pdf = String(get('pdf', 'pdfUrl', 'رابط_pdf', 'الكتاب', 'ملف')).trim();
+        const id = String(get('id', 'ID', 'المعرف') || '').trim();
+        const numId = Number(id);
+        // تفريغ روابط archive.org الوهمية التي اخترعها المولّد.
+        if (pdf && /^https?:\/\/archive\.org\/embed\//.test(pdf) && numId >= FAKE_PDF_ID_MIN && numId <= FAKE_PDF_ID_MAX) {
+            pdf = '';
+        }
         return {
-            id: String(get('id', 'ID', 'المعرف') || '').trim(),
+            id: id,
             title: String(get('title', 'العنوان', 'الاسم')).trim(),
             author: String(get('author', 'المؤلف', 'الكاتب')).trim(),
             category: String(get('category', 'القسم', 'الباب', 'التصنيف')).trim(),
             pages: Number(get('pages', 'الصفحات', 'عدد الصفحات')) || 0,
             cover: String(get('cover', 'coverUrl', 'الغلاف', 'صورة الغلاف')).trim(),
-            pdf: String(get('pdf', 'pdfUrl', 'رابط_pdf', 'الكتاب', 'ملف')).trim(),
+            pdf: pdf,
             html: String(get('html', 'htmlContent', 'محتوى')).trim(),
             description: cleanReasoningLeak(String(get('description', 'النبذة', 'الوصف', 'نبذة')).trim()),
             introduction: cleanReasoningLeak(String(get('introduction', 'intro', 'المقدمة')).trim()),

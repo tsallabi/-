@@ -50,8 +50,16 @@
 
     const mgmtCats = ['تطوير الذات والنجاح', 'التحفيز والإلهام', 'القيادة والإدارة', 'إدارة الأعمال'];
     const entCats = ['ريادة الأعمال', 'فن البيع', 'التسويق', 'الإدارة المالية', 'المال والاستثمار'];
-    const mgmtBooks = allBooks.filter(b => mgmtCats.includes(b.category)).slice(0, 12);
-    const entBooks = allBooks.filter(b => entCats.includes(b.category)).slice(0, 12);
+    // فضّل عرض الكتب التي لها روابط عملية أولاً، ثم التي بلا روابط (قريباً)
+    function sortByAvailability(arr) {
+        return [...arr].sort((a, b) => {
+            const aHas = !!(a.pdf || a.html);
+            const bHas = !!(b.pdf || b.html);
+            return (bHas - aHas);
+        });
+    }
+    const mgmtBooks = sortByAvailability(allBooks.filter(b => mgmtCats.includes(b.category))).slice(0, 12);
+    const entBooks = sortByAvailability(allBooks.filter(b => entCats.includes(b.category))).slice(0, 12);
 
     renderAndHydrate(els.managementBooks, mgmtBooks);
     renderAndHydrate(els.entrepreneurshipBooks, entBooks);
@@ -110,6 +118,7 @@
     function bookCardHTML(book) {
         const icon = CONFIG.categoryIcons[book.category] || CONFIG.defaultCategoryIcon || '📚';
         const publisher = CONFIG.publisherShort || 'دار المكتبة الطيبة';
+        const hasFile = !!(book.pdf || book.html);
         const fallback = `<div class="book-cover-fallback" aria-hidden="true">
             <div class="cf-top"><span class="cf-icon">${icon}</span></div>
             <div class="cf-mid"><h3 class="cf-title">${escapeHTML(book.title)}</h3></div>
@@ -117,8 +126,9 @@
                 <p class="cf-author">${escapeHTML(book.author || 'مؤلف غير معروف')}</p>
                 <p class="cf-publisher">${escapeHTML(publisher)}</p>
             </div></div>`;
-        return `<a class="book-card" data-book-id="${escapeAttr(book.id)}" href="book.html?id=${encodeURIComponent(book.id)}">
-            <div class="book-cover-frame">${fallback}</div>
+        const soonBadge = hasFile ? '' : '<span class="soon-badge">قريباً</span>';
+        return `<a class="book-card${hasFile ? '' : ' coming-soon'}" data-book-id="${escapeAttr(book.id)}" href="book.html?id=${encodeURIComponent(book.id)}">
+            <div class="book-cover-frame">${fallback}${soonBadge}</div>
             <div class="book-body">
                 <h3 class="book-title">${escapeHTML(book.title)}</h3>
                 <p class="book-author">${escapeHTML(book.author || 'مؤلف غير معروف')}</p>
@@ -178,7 +188,6 @@
     }
 
     function initVIPUnlock() {
-        // 5 نقرات على الشعار خلال ثانيتين تفتح صندوق كلمة سرّ القسم الخاص
         const logo = document.querySelector('.logo-mark');
         if (!logo) return;
         let clicks = 0, timer = null;
@@ -187,16 +196,11 @@
             if (timer) clearTimeout(timer);
             timer = setTimeout(() => { clicks = 0; }, 2000);
             if (clicks >= 5) {
-                clicks = 0;
-                e.preventDefault();
+                clicks = 0; e.preventDefault();
                 const p = prompt('🔐 أدخل كلمة سرّ القسم الخاص:');
                 if (p === null) return;
-                if (DATA.unlockVIP(p)) {
-                    alert('✅ تم فتح القسم الخاص. أعد تحميل الصفحة.');
-                    location.reload();
-                } else {
-                    alert('❌ كلمة سرّ غير صحيحة.');
-                }
+                if (DATA.unlockVIP(p)) { alert('✅ تم الفتح.'); location.reload(); }
+                else alert('❌ كلمة سرّ غير صحيحة.');
             }
         });
     }

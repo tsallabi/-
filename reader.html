@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#0f172a">
+    <meta name="theme-color" content="#1a0f08">
     <title>القارئ — المكتبة الطيبة</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700&family=Aref+Ruqaa:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --rdr-bg: #0f172a;
-            --rdr-bar: rgba(15,23,42,.85);
-            --rdr-text: #f8fafc;
-            --rdr-accent: #14b8a6;
-            --rdr-border: rgba(255,255,255,.12);
+            --rdr-bg: #1a0f08;
+            --rdr-bar: rgba(26,15,8,.92);
+            --rdr-text: #f5e6c8;
+            --rdr-gold: #d4af37;
+            --rdr-brown: #8b5a2b;
+            --rdr-border: rgba(212,175,55,.25);
         }
         * { box-sizing: border-box; }
         body { margin: 0; background: var(--rdr-bg); font-family: 'Cairo', system-ui, sans-serif; color: var(--rdr-text); }
         .reader-bar {
             position: sticky; top: 0; z-index: 10;
             backdrop-filter: blur(14px) saturate(180%);
-            -webkit-backdrop-filter: blur(14px) saturate(180%);
             background: var(--rdr-bar);
             border-bottom: 1px solid var(--rdr-border);
             display: flex; align-items: center; gap: .5rem;
@@ -27,39 +27,66 @@
         }
         .reader-bar a, .reader-bar button {
             color: var(--rdr-text);
-            background: rgba(255,255,255,.06);
+            background: rgba(212,175,55,.10);
             border: 1px solid var(--rdr-border);
             padding: .5rem .9rem;
             border-radius: 10px;
             text-decoration: none;
-            font-family: inherit; font-size: .95rem; font-weight: 600;
+            font-family: inherit; font-size: .9rem; font-weight: 600;
             cursor: pointer;
             display: inline-flex; align-items: center; gap: .35rem;
-            transition: background .15s, border-color .15s;
+            transition: all .15s;
         }
         .reader-bar a:hover, .reader-bar button:hover {
-            background: rgba(255,255,255,.12);
-            border-color: var(--rdr-accent);
+            background: rgba(212,175,55,.20); border-color: var(--rdr-gold); color: var(--rdr-gold);
         }
+        .reader-bar button:disabled { opacity: .4; cursor: not-allowed; }
         .reader-title {
             font-weight: 700; flex: 1;
-            text-align: center;
-            padding: 0 .5rem;
+            text-align: center; padding: 0 .5rem;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            font-size: 1rem;
+            font-size: 1rem; font-family: 'Aref Ruqaa', 'Cairo', serif;
+            color: var(--rdr-gold);
         }
-        .reader-frame {
-            width: 100%; height: calc(100vh - 56px);
-            border: 0; display: block; background: #fff;
+        .reader-page-info {
+            font-size: .85rem; color: var(--rdr-text); opacity: .85;
+            font-weight: 600; padding: 0 .35rem;
         }
-        .reader-error {
+        .reader-stage {
+            min-height: calc(100vh - 56px);
+            display: flex; justify-content: center;
+            padding: 1rem;
+            background: var(--rdr-bg);
+        }
+        canvas#pdfCanvas {
+            max-width: 100%; height: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,.5);
+            background: #fff;
+            border-radius: 4px;
+        }
+        .reader-message {
             color: var(--rdr-text); padding: 3rem 1.5rem;
             text-align: center; font-size: 1.05rem;
+            max-width: 540px; margin: 0 auto;
         }
-        .reader-error a { color: var(--rdr-accent); }
+        .reader-message h2 {
+            font-family: 'Aref Ruqaa', 'Cairo', serif;
+            color: var(--rdr-gold); margin: 0 0 1rem;
+        }
+        .reader-message a {
+            color: var(--rdr-gold); text-decoration: underline;
+        }
+        .reader-loading {
+            display: inline-block; width: 24px; height: 24px;
+            border: 3px solid var(--rdr-border); border-top-color: var(--rdr-gold);
+            border-radius: 50%; animation: spin .8s linear infinite;
+            margin-inline-end: .55rem; vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
         @media (max-width: 600px) {
             .reader-title { font-size: .85rem; }
-            .reader-bar a, .reader-bar button { padding: .45rem .7rem; font-size: .85rem; }
+            .reader-bar a, .reader-bar button { padding: .45rem .7rem; font-size: .8rem; }
+            .reader-page-info { display: none; }
         }
     </style>
 </head>
@@ -67,15 +94,21 @@
     <div class="reader-bar">
         <a href="javascript:history.back()" aria-label="عودة">← عودة</a>
         <span class="reader-title" id="readerTitle">جارٍ التحميل...</span>
-        <button id="fullscreenBtn" aria-label="ملء الشاشة" type="button">⛶ ملء الشاشة</button>
+        <button id="prevPage" type="button" aria-label="الصفحة التالية" disabled>→</button>
+        <span class="reader-page-info" id="pageInfo">—</span>
+        <button id="nextPage" type="button" aria-label="الصفحة السابقة" disabled>←</button>
+        <button id="fullscreenBtn" type="button" aria-label="ملء الشاشة">⛶</button>
     </div>
 
-    <iframe id="pdfFrame" class="reader-frame" title="قارئ الكتاب" src="about:blank"></iframe>
+    <div class="reader-stage" id="readerStage">
+        <canvas id="pdfCanvas" hidden></canvas>
+        <div class="reader-message" id="readerMessage">
+            <span class="reader-loading"></span>
+            جارٍ تحضير الكتاب...
+        </div>
+    </div>
 
-    <p id="readerError" class="reader-error" hidden>
-        تعذّر تحميل الكتاب. <a href="index.html">عُد للرئيسية</a>
-    </p>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.js"></script>
     <script>
         (function() {
             const params = new URLSearchParams(location.search);
@@ -84,24 +117,100 @@
             document.getElementById('readerTitle').textContent = title;
             document.title = title + ' — المكتبة الطيبة';
 
-            const frame = document.getElementById('pdfFrame');
-            const errorEl = document.getElementById('readerError');
+            const stage = document.getElementById('readerStage');
+            const canvas = document.getElementById('pdfCanvas');
+            const ctx = canvas.getContext('2d');
+            const msg = document.getElementById('readerMessage');
+            const prevBtn = document.getElementById('prevPage');
+            const nextBtn = document.getElementById('nextPage');
+            const pageInfo = document.getElementById('pageInfo');
+            const fsBtn = document.getElementById('fullscreenBtn');
 
-            if (!pdfUrl) {
-                frame.hidden = true;
-                errorEl.hidden = false;
-                return;
-            }
-
-            const useGoogleViewer = params.get('viewer') === 'google';
-            frame.src = useGoogleViewer
-                ? 'https://docs.google.com/gview?embedded=true&url=' + encodeURIComponent(pdfUrl)
-                : pdfUrl;
-
-            document.getElementById('fullscreenBtn').addEventListener('click', () => {
+            fsBtn.addEventListener('click', () => {
                 if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
                 else document.exitFullscreen?.();
             });
+
+            if (!pdfUrl) { showError('لم يتم تحديد كتاب.'); return; }
+
+            // جاعل رابط archive.org/embed → رابط PDF مباشر لفتحه داخلياً بـ PDF.js
+            // ملاحظة: archive.org لديه قيود CORS تمنع التحميل المباشر دون وسيط.
+            // لذلك نستخدم cors.archive.org أو وسيط مفتوح.
+            let directPdf = pdfUrl;
+            const m = /archive\.org\/(?:embed|details)\/([^/?#]+)/.exec(pdfUrl);
+            if (m) {
+                // لا يمكن فتح أرشيف دوت أورغ داخلياً بسبب CORS،
+                // لكن الروابط المباشرة (download) تعمل بعض الأحيان.
+                // سنجرّب عبر وسيط archive.org العام:
+                directPdf = `https://archive.org/download/${m[1]}/${m[1]}.pdf`;
+            }
+
+            if (typeof pdfjsLib === 'undefined') {
+                showError('فشل تحميل مكتبة PDF.js');
+                return;
+            }
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.js';
+
+            let pdfDoc = null, currentPage = 1, totalPages = 0, rendering = false;
+
+            pdfjsLib.getDocument({
+                url: directPdf,
+                withCredentials: false,
+                disableAutoFetch: true,
+                disableStream: false
+            }).promise.then(doc => {
+                pdfDoc = doc;
+                totalPages = doc.numPages;
+                msg.style.display = 'none';
+                canvas.hidden = false;
+                updateNavButtons();
+                renderPage(1);
+            }).catch(err => {
+                console.error(err);
+                showError(`تعذّر تحميل الكتاب من هذا المصدر.<br>ملف PDF غير متاح أو غير مسموح بتحميله.`);
+            });
+
+            function renderPage(num) {
+                if (rendering) return;
+                rendering = true;
+                pdfDoc.getPage(num).then(page => {
+                    const scale = Math.min(2, Math.max(1, window.innerWidth / 700));
+                    const viewport = page.getViewport({ scale });
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+                    return page.render({ canvasContext: ctx, viewport }).promise;
+                }).then(() => {
+                    rendering = false;
+                    pageInfo.textContent = `${num} / ${totalPages}`;
+                    updateNavButtons();
+                }).catch(err => {
+                    rendering = false;
+                    console.error(err);
+                });
+            }
+            function updateNavButtons() {
+                prevBtn.disabled = currentPage >= totalPages;
+                nextBtn.disabled = currentPage <= 1;
+            }
+            prevBtn.addEventListener('click', () => {
+                if (currentPage < totalPages) { currentPage++; renderPage(currentPage); }
+            });
+            nextBtn.addEventListener('click', () => {
+                if (currentPage > 1) { currentPage--; renderPage(currentPage); }
+            });
+            document.addEventListener('keydown', e => {
+                if (e.key === 'ArrowRight') { prevBtn.click(); }
+                else if (e.key === 'ArrowLeft') { nextBtn.click(); }
+            });
+
+            function showError(htmlMsg) {
+                canvas.hidden = true;
+                msg.innerHTML = `
+                    <h2>📖 الكتاب غير متاح حالياً</h2>
+                    <p>${htmlMsg}</p>
+                    <p>سنعمل على توفيره في المكتبة قريباً. جرّب كتباً أخرى في <a href="index.html">الصفحة الرئيسية</a>.</p>`;
+                msg.style.display = 'block';
+            }
         })();
     </script>
 </body>
