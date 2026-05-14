@@ -1,7 +1,8 @@
-/* طبقة البيانات — JSON / Sheets / Firestore + فلتر الصلاحيات */
+/* طبقة البيانات + فلتر روابط وهميّة + Overrides */
 
 const DATA = (function() {
     let cachedBooks = null;
+    let overridesCache = null;
     let firebaseApp = null, firestoreRef = null, storageRef = null;
 
     const EXTRA_JSON_FILES = [
@@ -11,9 +12,6 @@ const DATA = (function() {
     ];
 
     const VIP_KEY = 'taybaa-vip-unlocked';
-
-    const FAKE_PDF_ID_MIN = 116;
-    const FAKE_PDF_ID_MAX = 217;
 
     function isVIP() {
         try {
@@ -35,12 +33,11 @@ const DATA = (function() {
     }
     function lockVIP() { try { localStorage.removeItem(VIP_KEY); } catch (_) {} }
 
-    /* صلاحية الاطلاع على قسم مقيّد (الدين والإسلاميات) */
     function userCanAccessCategory(category) {
         if (!category) return true;
         const hidden = new Set(CONFIG.hiddenCategories || []);
-        if (!hidden.has(category)) return true;     // قسم عام
-        if (isVIP()) return true;                    // VIP — للحالات الطارئة
+        if (!hidden.has(category)) return true;
+        if (isVIP()) return true;
         if (typeof USER === 'undefined') return false;
         const u = USER.current();
         if (!u) return false;
@@ -52,6 +49,25 @@ const DATA = (function() {
         const hidden = new Set(CONFIG.hiddenCategories || []);
         if (!hidden.size) return books;
         return books.filter(b => userCanAccessCategory(b.category));
+    }
+
+    /* اكتشاف الروابط الوهميّة المولّدة تلقائياً */
+    function isFakeArchiveSlug(slug) {
+        if (!slug) return false;
+        if (/^[a-z]+_\d{4,}$/i.test(slug)) return true;
+        if (/^\d{6,}$/.test(slug)) return true;
+        if (/^(downloads?|books?|files?|items?|pdfs?|texts?|arabic|library|kotob|kotobgy)_/i.test(slug) && /\d/.test(slug)) return true;
+        return false;
+    }
+
+    async function loadOverrides() {
+        if (overridesCache !== null) return overridesCache;
+        try {
+            const res = await fetch('data/book-overrides.json?t=' + Date.now());
+            if (!res.ok) { overridesCache = {}; return {}; }
+            overridesCache = await res.json();
+            return overridesCache;
+        } catch { overridesCache = {}; return {}; }
     }
 
     async function initFirebase() {
@@ -81,6 +97,18 @@ const DATA = (function() {
             console.warn(`فشل تحميل من ${source}.`, err);
             cachedBooks = await loadFromJSON();
         }
+        // تطبيق الـoverrides بعد التحميل
+        const overrides = await loadOverrides();
+        cachedBooks = cachedBooks.map(b => {
+            const ov = overrides[b.id];
+            if (!ov) return b;
+            return {
+                ...b,
+                cover: ov.cover || b.cover,
+                pdf: ov.pdf || b.pdf,
+                html: ov.html || b.html
+            };
+        });
         return cachedBooks;
     }
 
@@ -161,10 +189,15 @@ const DATA = (function() {
         };
         let pdf = String(get('pdf', 'pdfUrl', 'رابط_pdf', 'الكتاب', 'ملف')).trim();
         const id = String(get('id', 'ID', 'المعرف') || '').trim();
-        const numId = Number(id);
-        if (pdf && /^https?:\/\/archive\.org\/embed\//.test(pdf) && numId >= FAKE_PDF_ID_MIN && numId <= FAKE_PDF_ID_MAX) {
-            pdf = '';
+
+        // إفراغ روابط archive.org الوهميّة التي اخترعها المولّد التلقائي
+        if (pdf) {
+            const m = pdf.match(/archive\.org\/(?:embed|details|download)\/([^/?#]+)/);
+            if (m && isFakeArchiveSlug(m[1])) {
+                pdf = '';
+            }
         }
+
         return {
             id: id,
             title: String(get('title', 'العنوان', 'الاسم')).trim(),
@@ -234,6 +267,7 @@ const DATA = (function() {
     return {
         loadBooks, search, byCategory, topPopular, newest, recommended, findById,
         categoriesWithCounts, totals, saveBook, deleteBook, uploadFile, initFirebase,
-        isVIP, unlockVIP, lockVIP, filterForViewer, userCanAccessCategory
+        isVIP, unlockVIP, lockVIP, filterForViewer, userCanAccessCategory, loadOverrides,
+        isFakeArchiveSlug
     };
 })();

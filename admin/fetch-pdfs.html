@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جلب روابط PDF تلقائياً — المكتبة الطيبة</title>
+    <link rel="stylesheet" href="../css/style.css?v=11">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Aref+Ruqaa:wght@700&display=swap" rel="stylesheet">
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('taybaa-theme') || 'dark');</script>
+    <style>
+        body { padding: 1.5rem 1rem 4rem; }
+        .fp-wrap { max-width: 1100px; margin: 0 auto; }
+        .fp-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+        .fp-head h1 { font-family: 'Aref Ruqaa', serif; color: var(--gold); margin: 0; }
+        .fp-card { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.25rem; box-shadow: var(--shadow-md); }
+        .fp-card h2 { font-family: 'Aref Ruqaa', serif; color: var(--gold); margin: 0 0 .85rem; font-size: 1.15rem; }
+        .fp-stat { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+        .fp-stat div { background: var(--bg-subtle); padding: .7rem 1.2rem; border-radius: 10px; border: 1px solid var(--border); }
+        .fp-stat b { color: var(--gold); display: block; font-size: 1.4rem; font-family: 'Aref Ruqaa', serif; }
+        .fp-stat span { font-size: .8rem; color: var(--text-muted); }
+        .fp-controls { display: flex; gap: .65rem; flex-wrap: wrap; align-items: center; margin: 1rem 0; }
+        .fp-controls button { padding: .75rem 1.3rem; background: var(--grad-gold); color: #2a1810; border: 0; border-radius: 10px; font-family: inherit; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all .2s; }
+        .fp-controls button:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(184,148,31,.4); }
+        .fp-controls button:disabled { opacity: .5; cursor: not-allowed; }
+        .fp-controls .secondary { background: var(--bg-subtle); color: var(--text); border: 1px solid var(--border); }
+        .fp-progress { background: var(--bg-subtle); height: 24px; border-radius: 999px; overflow: hidden; position: relative; margin: .75rem 0; border: 1px solid var(--border); }
+        .fp-progress-bar { height: 100%; background: var(--grad-gold); transition: width .3s; width: 0; }
+        .fp-progress-text { position: absolute; inset: 0; display: grid; place-items: center; font-weight: 700; font-size: .85rem; color: var(--text); }
+        .fp-log { max-height: 350px; overflow-y: auto; background: var(--bg-subtle); padding: 1rem; border-radius: 10px; font-family: monospace; font-size: .82rem; line-height: 1.7; margin: 1rem 0; border: 1px solid var(--border); }
+        .fp-log-line { padding: .15rem 0; }
+        .fp-log-line.success { color: #5a7a3a; }
+        .fp-log-line.error { color: #ce1126; opacity: .7; }
+        .fp-log-line.info { color: var(--text-muted); }
+        .fp-results { display: grid; gap: .6rem; max-height: 600px; overflow-y: auto; padding-inline-end: .5rem; }
+        .fp-result-row { display: grid; grid-template-columns: auto 1fr auto; gap: 1rem; align-items: center; padding: .75rem 1rem; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px; }
+        .fp-result-row.is-checked { border-color: var(--gold); background: var(--gold-soft); }
+        .fp-result-row input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--gold); }
+        .fp-result-row .info b { color: var(--gold); display: block; font-size: .95rem; margin-bottom: .15rem; }
+        .fp-result-row .info span { font-size: .8rem; color: var(--text-muted); }
+        .fp-result-row .info .found { font-size: .75rem; color: #5a7a3a; font-weight: 700; margin-top: .25rem; display: block; direction: ltr; word-break: break-all; }
+        .fp-result-row .info .not-found { font-size: .75rem; color: #ce1126; font-weight: 700; margin-top: .25rem; display: block; }
+        .fp-result-row a { color: var(--gold); text-decoration: underline; font-size: .8rem; }
+        .fp-message { padding: .85rem 1rem; border-radius: 10px; margin: .85rem 0; }
+        .fp-message.success { background: rgba(90,122,58,.15); border: 1px solid #5a7a3a; color: #5a7a3a; }
+        .fp-message.error { background: rgba(206,17,38,.1); border: 1px solid #ce1126; color: #ce1126; }
+        a.back-link { color: var(--gold); text-decoration: none; font-weight: 700; }
+        a.back-link:hover { text-decoration: underline; }
+        .fp-info-block { padding: 1rem; background: var(--bg-subtle); border-right: 4px solid var(--gold); border-radius: 8px; font-size: .9rem; line-height: 1.7; }
+    </style>
+</head>
+<body>
+    <div class="fp-wrap">
+        <div class="fp-head">
+            <h1>🌐 جلب روابط PDF حقيقية — تلقائيًا</h1>
+            <a href="../admin.html" class="back-link">→ لوحة الإدارة</a>
+        </div>
+
+        <div class="fp-card">
+            <div class="fp-info-block">
+                <strong>كيف تعمل هذه الأداة:</strong><br>
+                1️⃣ تستخرج كل كتبك التي ليس لها PDF (أو لديها رابط وهمي)<br>
+                2️⃣ تبحث عن كل واحد في <strong>archive.org Search API</strong> بعنوانه واسم مؤلفه<br>
+                3️⃣ تعرض لك أول نتيجة لكل كتاب لتتأكّد<br>
+                4️⃣ تحفظ الروابط المحدّدة في <code>data/book-overrides.json</code> عبر GitHub PAT<br>
+                <em>كلّ شيء يحدث في متصفّحك. بعد الحفظ يعيد Cloudflare بناء الموقع خلال دقيقة.</em>
+            </div>
+            <div class="fp-stat" id="fpStats"></div>
+            <div class="fp-controls">
+                <button id="fpStartBtn" type="button">🔍 ابدأ البحث في archive.org</button>
+                <button id="fpSelectAll" class="secondary" type="button" disabled>✓ حدّد الكل</button>
+                <button id="fpSaveBtn" type="button" disabled>💾 حفظ المحدد</button>
+            </div>
+            <div class="fp-progress" id="fpProgress" hidden>
+                <div class="fp-progress-bar" id="fpProgressBar"></div>
+                <div class="fp-progress-text" id="fpProgressText">0%</div>
+            </div>
+            <div id="fpMessage"></div>
+            <div class="fp-log" id="fpLog" hidden></div>
+        </div>
+
+        <div class="fp-card" id="fpResultsCard" hidden>
+            <h2>📜 النتائج — حدّد ما ترغب في اعتماده</h2>
+            <p style="color:var(--text-muted);font-size:.9rem;">بعض النتائج قد لا تتطابق تمامًا — تحقّق بالضغط على الرابط الأخضر قبل حفظه للعرض العام.</p>
+            <div class="fp-results" id="fpResults"></div>
+        </div>
+    </div>
+
+    <script src="../js/config.js?v=11"></script>
+    <script src="../js/github-save.js?v=11"></script>
+    <script src="../js/user-system.js?v=11"></script>
+    <script src="../js/data.js?v=11"></script>
+    <script>
+        (async function() {
+            const OVERRIDES_PATH = 'data/book-overrides.json';
+            let results = [];
+
+            const allBooks = await DATA.loadBooks();
+            const needsPdf = allBooks.filter(b => !b.pdf && !b.html);
+            const hasGood = allBooks.length - needsPdf.length;
+
+            document.getElementById('fpStats').innerHTML = `
+                <div><b>${allBooks.length}</b><span>إجمالي الكتب</span></div>
+                <div><b style="color:#5a7a3a;">${hasGood}</b><span>لديها رابط صالح</span></div>
+                <div><b style="color:#ce1126;">${needsPdf.length}</b><span>تحتاج روابط</span></div>`;
+
+            const startBtn = document.getElementById('fpStartBtn');
+            const selectAllBtn = document.getElementById('fpSelectAll');
+            const saveBtn = document.getElementById('fpSaveBtn');
+            const progress = document.getElementById('fpProgress');
+            const progressBar = document.getElementById('fpProgressBar');
+            const progressText = document.getElementById('fpProgressText');
+            const log = document.getElementById('fpLog');
+            const resultsCard = document.getElementById('fpResultsCard');
+            const resultsList = document.getElementById('fpResults');
+            const messageBox = document.getElementById('fpMessage');
+
+            if (needsPdf.length === 0) {
+                showMessage('✅ كل الكتب لديها روابط بالفعل! لا حاجة للبحث.', 'success');
+                startBtn.disabled = true;
+            }
+
+            startBtn.addEventListener('click', async () => {
+                startBtn.disabled = true;
+                log.hidden = false;
+                log.innerHTML = '';
+                progress.hidden = false;
+                results = [];
+                showMessage('', '');
+
+                addLog(`⏳ جارٍ البحث عن ${needsPdf.length} كتابًا في archive.org...`, 'info');
+
+                for (let i = 0; i < needsPdf.length; i++) {
+                    const book = needsPdf[i];
+                    const pct = Math.round((i / needsPdf.length) * 100);
+                    progressBar.style.width = pct + '%';
+                    progressText.textContent = `${pct}% · ${i+1} / ${needsPdf.length}`;
+
+                    try {
+                        const identifier = await searchArchive(book);
+                        if (identifier) {
+                            results.push({ book, identifier, url: `https://archive.org/embed/${identifier}` });
+                            addLog(`✅ ${book.title} → ${identifier}`, 'success');
+                        } else {
+                            addLog(`⛔ ${book.title} — غير موجود`, 'error');
+                        }
+                    } catch (err) {
+                        addLog(`❌ ${book.title} — ${err.message}`, 'error');
+                    }
+
+                    // رفقًا بـ archive.org
+                    await sleep(250);
+                }
+
+                progressBar.style.width = '100%';
+                progressText.textContent = `100% · انتهى`;
+                addLog(`✨ البحث انتهى. وجدنا ${results.length} من أصل ${needsPdf.length}.`, 'info');
+
+                renderResults();
+                if (results.length) {
+                    selectAllBtn.disabled = false;
+                    saveBtn.disabled = false;
+                } else {
+                    showMessage('⚠️ لم نجد أي كتاب في archive.org. جرّب إضافة روابط يدوياً من صفحة books.html', 'error');
+                }
+            });
+
+            async function searchArchive(book) {
+                const titlePart = String(book.title).slice(0, 80).replace(/["'\\]/g, ' ');
+                const authorPart = String(book.author || '').slice(0, 40).replace(/["'\\]/g, ' ');
+                const q = `title:(${titlePart}) AND mediatype:texts${authorPart ? ` AND creator:(${authorPart})` : ''}`;
+                const url = `https://archive.org/advancedsearch.php?q=${encodeURIComponent(q)}&fl[]=identifier&fl[]=title&fl[]=creator&fl[]=language&rows=3&output=json`;
+                const res = await fetch(url);
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const data = await res.json();
+                const docs = data.response?.docs || [];
+                // فضّل العربية إن وجدت
+                const arabic = docs.find(d => Array.isArray(d.language) ? d.language.some(l => /arab/i.test(l)) : /arab/i.test(d.language || ''));
+                return arabic ? arabic.identifier : (docs[0] ? docs[0].identifier : null);
+            }
+
+            function renderResults() {
+                resultsCard.hidden = results.length === 0;
+                resultsList.innerHTML = results.map((r, i) => `
+                    <div class="fp-result-row" data-i="${i}">
+                        <input type="checkbox" checked>
+                        <div class="info">
+                            <b>${esc(r.book.title)}</b>
+                            <span>${esc(r.book.author || '—')} · ${esc(r.book.category)}</span>
+                            <a href="https://archive.org/details/${esc(r.identifier)}" target="_blank" rel="noopener">
+                                → فحص الرابط: ${esc(r.identifier)}
+                            </a>
+                        </div>
+                    </div>`).join('');
+                resultsList.querySelectorAll('.fp-result-row').forEach(row => {
+                    const cb = row.querySelector('input');
+                    row.classList.toggle('is-checked', cb.checked);
+                    cb.addEventListener('change', () => row.classList.toggle('is-checked', cb.checked));
+                });
+            }
+
+            selectAllBtn.addEventListener('click', () => {
+                const allChecked = Array.from(resultsList.querySelectorAll('input')).every(cb => cb.checked);
+                resultsList.querySelectorAll('input').forEach(cb => {
+                    cb.checked = !allChecked;
+                    cb.closest('.fp-result-row').classList.toggle('is-checked', cb.checked);
+                });
+            });
+
+            saveBtn.addEventListener('click', async () => {
+                if (!GHSAVE.hasToken()) {
+                    showMessage('⚠️ يلزم GitHub Token — أدخله أولاً من صفحة admin.html', 'error');
+                    return;
+                }
+                const picked = [];
+                resultsList.querySelectorAll('.fp-result-row').forEach(row => {
+                    if (row.querySelector('input').checked) {
+                        picked.push(results[Number(row.dataset.i)]);
+                    }
+                });
+                if (!picked.length) { showMessage('⚠️ لم تحدد أي رابط', 'error'); return; }
+
+                saveBtn.disabled = true;
+                showMessage(`جارٍ حفظ ${picked.length} رابط...`, '');
+
+                try {
+                    const token = GHSAVE.getToken();
+                    const apiBase = `https://api.github.com/repos/${GHSAVE.OWNER}/${GHSAVE.REPO}/contents/${OVERRIDES_PATH}`;
+                    let overrides = {}, sha = null;
+                    const r = await fetch(`${apiBase}?ref=${GHSAVE.BRANCH}`, { headers: { 'Authorization': 'Bearer ' + token } });
+                    if (r.ok) {
+                        const meta = await r.json();
+                        sha = meta.sha;
+                        const raw = atob(meta.content.replace(/\s/g, ''));
+                        overrides = JSON.parse(decodeURIComponent(escape(raw)));
+                    }
+                    picked.forEach(p => {
+                        const existing = overrides[p.book.id] || {};
+                        overrides[p.book.id] = { ...existing, pdf: p.url };
+                    });
+                    const body = JSON.stringify(overrides, null, 2);
+                    const content = btoa(unescape(encodeURIComponent(body)));
+                    const r2 = await fetch(apiBase, {
+                        method: 'PUT',
+                        headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: `admin: add ${picked.length} archive.org PDFs from auto-fetch`, content, sha, branch: GHSAVE.BRANCH })
+                    });
+                    if (!r2.ok) throw new Error('GitHub ' + r2.status);
+                    showMessage(`✅ تمّ حفظ ${picked.length} رابط! ستظهر على الموقع خلال دقيقة (Cloudflare يعيد البناء).`, 'success');
+                } catch (err) {
+                    showMessage(`❌ فشل الحفظ: ${err.message}`, 'error');
+                    saveBtn.disabled = false;
+                }
+            });
+
+            function addLog(text, type) {
+                const line = document.createElement('div');
+                line.className = 'fp-log-line ' + (type || 'info');
+                line.textContent = text;
+                log.appendChild(line);
+                log.scrollTop = log.scrollHeight;
+            }
+            function showMessage(text, type) {
+                messageBox.innerHTML = text ? `<div class="fp-message ${type || ''}">${esc(text)}</div>` : '';
+            }
+            function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+            function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+        })();
+    </script>
+</body>
+</html>
