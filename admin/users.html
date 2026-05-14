@@ -9,35 +9,41 @@
     <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('taybaa-theme') || 'dark');</script>
     <style>
         body { padding: 2rem 1rem; }
-        .um-wrap { max-width: 720px; margin: 0 auto; }
-        .um-wrap h1 { font-family: 'Aref Ruqaa', 'Cairo', serif; color: var(--gold); margin-bottom: .5rem; }
+        .um-wrap { max-width: 820px; margin: 0 auto; }
+        .um-wrap h1 { font-family: 'Aref Ruqaa', serif; color: var(--gold); margin-bottom: .5rem; }
         .um-wrap .sub { color: var(--text-muted); margin-bottom: 2rem; }
         .um-card { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 16px; padding: 1.75rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-md); }
-        .um-card h2 { font-family: 'Aref Ruqaa', 'Cairo', serif; color: var(--gold); margin: 0 0 1rem; font-size: 1.2rem; }
+        .um-card h2 { font-family: 'Aref Ruqaa', serif; color: var(--gold); margin: 0 0 1rem; font-size: 1.2rem; }
         .um-form { display: grid; gap: .8rem; }
         .um-form label { display: block; }
         .um-form .label-text { display: block; font-weight: 600; margin-bottom: .35rem; font-size: .95rem; }
         .um-form input { width: 100%; padding: .7rem 1rem; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-subtle); color: var(--text); font-family: inherit; font-size: 1rem; }
         .um-form input:focus { outline: 0; border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-soft); }
-        .um-form button { padding: .85rem; background: var(--grad-gold); color: #2a1810; border: 0; border-radius: 10px; font-family: inherit; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all .2s; }
+        .um-form button { padding: .85rem; background: var(--grad-gold); color: #2a1810; border: 0; border-radius: 10px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all .2s; }
         .um-form button:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(184,148,31,.4); }
-        .um-result { margin-top: 1rem; padding: 1rem; background: var(--bg-subtle); border-radius: 10px; font-family: monospace; font-size: .85rem; white-space: pre-wrap; word-break: break-all; direction: ltr; text-align: left; max-height: 200px; overflow: auto; }
+        .um-result { margin-top: 1rem; padding: 1rem; background: var(--bg-subtle); border-radius: 10px; font-family: monospace; font-size: .85rem; white-space: pre-wrap; word-break: break-all; direction: ltr; max-height: 200px; overflow: auto; }
         .um-list { list-style: none; padding: 0; margin: 0; }
-        .um-list li { padding: .85rem 1rem; border: 1px solid var(--border); border-radius: 10px; margin-bottom: .5rem; display: flex; justify-content: space-between; align-items: center; background: var(--bg-subtle); }
+        .um-list li { padding: .85rem 1rem; border: 1px solid var(--border); border-radius: 10px; margin-bottom: .5rem; background: var(--bg-subtle); }
+        .um-row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
         .um-list .uname { font-weight: 700; color: var(--gold); }
         .um-list .udate { font-size: .8rem; color: var(--text-muted); }
+        .um-perms { margin-top: .5rem; padding-top: .5rem; border-top: 1px dashed var(--border); display: flex; gap: .55rem; flex-wrap: wrap; align-items: center; }
+        .um-perms label { display: inline-flex; gap: .35rem; align-items: center; font-size: .85rem; padding: .25rem .65rem; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 999px; cursor: pointer; }
+        .um-perms label.has { border-color: var(--gold); color: var(--gold); }
+        .um-perms .save-btn { padding: .3rem .85rem; background: var(--grad-gold); color: #2a1810; border: 0; border-radius: 6px; font-weight: 700; font-size: .8rem; cursor: pointer; }
         .um-success { color: #5a7a3a; font-weight: 700; }
         .um-error { color: #ce1126; font-weight: 700; }
         .um-step { padding: .8rem 1rem; background: var(--bg-subtle); border-right: 4px solid var(--gold); border-radius: 6px; margin: .5rem 0; font-size: .9rem; }
-        a.back-link { color: var(--gold); text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: .35rem; margin-bottom: 1.5rem; }
+        a.back-link { color: var(--gold); text-decoration: none; font-weight: 700; }
         a.back-link:hover { text-decoration: underline; }
+        .perm-checkbox { display: flex; gap: .5rem; align-items: center; padding: .55rem .8rem; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 8px; }
     </style>
 </head>
 <body>
     <div class="um-wrap">
         <a href="../admin.html" class="back-link">→ عودة للوحة الإدارة</a>
         <h1>👤 إدارة المستخدمين</h1>
-        <p class="sub">أنشئ حسابات للقرّاء ليتمكّنوا من حفظ كتبهم في المفضّلة ومتابعة القراءة.</p>
+        <p class="sub">أنشئ حسابات للقرّاء، وإذا رغبت لبعضهم أن يروا الأقسام المقيّدة (كالدين)، حدد صلاحياتهم أدناه.</p>
 
         <div class="um-card">
             <h2>إنشاء حساب جديد</h2>
@@ -48,6 +54,9 @@
                     <input type="text" id="newDisplay" required placeholder="أحمد الجبلّي"></label>
                 <label><span class="label-text">كلمة السر (8 حروف فأكثر)</span>
                     <input type="password" id="newPassword" minlength="8" required placeholder="••••••••"></label>
+                <label><span class="label-text">صلاحيات على الأقسام المقيّدة (اختياري)</span>
+                    <div id="newPermsBox"></div>
+                </label>
                 <button type="submit">أضف حساباً إلى المكتبة</button>
             </form>
             <div id="createResult"></div>
@@ -61,7 +70,7 @@
         <div class="um-card">
             <h2>✏️ إعداد GitHub</h2>
             <p>لإضافة المستخدمين إلى الملف، تحتاج GitHub Personal Access Token بصلاحية الكتابة.</p>
-            <div class="um-step">في صفحة <a href="../admin.html">الأدمن الرئيسية</a> → أدخل الـ PAT مرّة واحدة (يُحفظ في localStorage فقط، غير مرئي على أحد).</div>
+            <div class="um-step">في صفحة <a href="../admin.html">الأدمن الرئيسية</a> → أدخل الـ PAT مرّة واحدة.</div>
         </div>
     </div>
 
@@ -71,6 +80,16 @@
     <script>
         (async function() {
             const FILE = 'data/users.json';
+            const RESTRICTED = CONFIG.hiddenCategories || [];
+
+            function renderPermsBox(container, selected) {
+                container.innerHTML = RESTRICTED.map(cat =>
+                    `<label class="perm-checkbox">
+                        <input type="checkbox" value="${esc(cat)}" ${selected.includes(cat) ? 'checked' : ''}>
+                        ${esc(cat)}
+                    </label>`).join('');
+            }
+            renderPermsBox(document.getElementById('newPermsBox'), []);
 
             async function loadCurrentUsers() {
                 try {
@@ -87,14 +106,49 @@
                     ul.innerHTML = '<li><em>لا يوجد مستخدمون بعد.</em></li>';
                     return;
                 }
-                ul.innerHTML = users.map(u =>
-                    `<li>
-                        <div>
-                            <span class="uname">${esc(u.displayName || u.username)}</span> · @${esc(u.username)}
+                ul.innerHTML = users.map((u, idx) => {
+                    const allowed = Array.isArray(u.allowedCategories) ? u.allowedCategories : [];
+                    return `<li data-username="${esc(u.username)}">
+                        <div class="um-row">
+                            <div>
+                                <span class="uname">${esc(u.displayName || u.username)}</span> · @${esc(u.username)}
+                            </div>
+                            <span class="udate">${esc(u.createdAt || '')}</span>
                         </div>
-                        <span class="udate">${esc(u.createdAt || '')}</span>
-                    </li>`
-                ).join('');
+                        <div class="um-perms">
+                            <span style="font-size:.8rem;color:var(--text-muted);">صلاحيات:</span>
+                            ${RESTRICTED.map(cat => `
+                                <label class="${allowed.includes(cat) ? 'has' : ''}">
+                                    <input type="checkbox" value="${esc(cat)}" ${allowed.includes(cat) ? 'checked' : ''}>
+                                    ${esc(cat)}
+                                </label>`).join('')}
+                            <button class="save-btn" type="button" data-action="save-perms">حفظ</button>
+                            <span class="save-status"></span>
+                        </div>
+                    </li>`;
+                }).join('');
+
+                ul.querySelectorAll('li').forEach(li => {
+                    const username = li.dataset.username;
+                    li.querySelector('[data-action="save-perms"]').addEventListener('click', async () => {
+                        const cats = Array.from(li.querySelectorAll('.um-perms input:checked')).map(i => i.value);
+                        const status = li.querySelector('.save-status');
+                        status.textContent = 'جارٍ...';
+                        status.style.color = '';
+                        try {
+                            await updateUserPerms(username, cats);
+                            status.textContent = '✅ محفوظ';
+                            status.style.color = '#5a7a3a';
+                            li.querySelectorAll('.um-perms label').forEach(lbl => {
+                                const cb = lbl.querySelector('input');
+                                lbl.classList.toggle('has', cb.checked);
+                            });
+                        } catch (err) {
+                            status.textContent = '❌ ' + err.message;
+                            status.style.color = '#ce1126';
+                        }
+                    });
+                });
             }
 
             async function refresh() {
@@ -103,79 +157,83 @@
                 return users;
             }
 
-            let users = await refresh();
+            async function fetchUsersJSON() {
+                const token = GHSAVE.getToken();
+                const apiBase = `https://api.github.com/repos/${GHSAVE.OWNER}/${GHSAVE.REPO}/contents/${FILE}?ref=${GHSAVE.BRANCH}`;
+                const r = await fetch(apiBase, { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' } });
+                if (!r.ok) return { sha: null, data: { users: [] } };
+                const meta = await r.json();
+                const raw = atob(meta.content.replace(/\s/g, ''));
+                const data = JSON.parse(decodeURIComponent(escape(raw)));
+                return { sha: meta.sha, data };
+            }
+            async function writeUsersJSON(sha, data) {
+                const token = GHSAVE.getToken();
+                const apiBase = `https://api.github.com/repos/${GHSAVE.OWNER}/${GHSAVE.REPO}/contents/${FILE}`;
+                const body = JSON.stringify(data, null, 2);
+                const content = btoa(unescape(encodeURIComponent(body)));
+                const r2 = await fetch(apiBase, {
+                    method: 'PUT',
+                    headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: 'admin: update users.json', content, sha, branch: GHSAVE.BRANCH })
+                });
+                if (!r2.ok) throw new Error('GitHub ' + r2.status);
+            }
+
+            async function updateUserPerms(username, allowedCategories) {
+                if (!GHSAVE.hasToken()) throw new Error('يلزم GitHub Token');
+                const { sha, data } = await fetchUsersJSON();
+                const u = (data.users || []).find(x => x.username.toLowerCase() === username.toLowerCase());
+                if (!u) throw new Error('غير موجود');
+                u.allowedCategories = allowedCategories;
+                await writeUsersJSON(sha, data);
+            }
 
             document.getElementById('createForm').addEventListener('submit', async e => {
                 e.preventDefault();
                 const username = document.getElementById('newUsername').value.trim();
                 const display = document.getElementById('newDisplay').value.trim();
                 const password = document.getElementById('newPassword').value;
+                const allowedCategories = Array.from(document.querySelectorAll('#newPermsBox input:checked')).map(i => i.value);
                 const resultEl = document.getElementById('createResult');
                 resultEl.innerHTML = '<p>جارٍ الحفظ...</p>';
 
-                // فحص التكرار
-                if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
-                    resultEl.innerHTML = '<p class="um-error">اسم المستخدم مستخدم بالفعل.</p>';
-                    return;
-                }
-
-                const passwordHash = await USER.sha256(password);
-                const newUser = {
-                    username,
-                    passwordHash,
-                    displayName: display,
-                    createdAt: new Date().toISOString().slice(0, 10),
-                    active: true
-                };
-
                 if (!GHSAVE.hasToken()) {
+                    const passwordHash = await USER.sha256(password);
+                    const newUser = { username, passwordHash, displayName: display, createdAt: new Date().toISOString().slice(0,10), active: true, allowedCategories };
                     resultEl.innerHTML = `
                         <p class="um-error">⚠️ لم يتم تعريف GitHub Token.</p>
-                        <p>انسخ الأسطر التالية وأضفها يدوياً إلى <code>data/users.json</code>:</p>
+                        <p>أضف هذا يدوياً إلى <code>data/users.json</code>:</p>
                         <pre class="um-result">${esc(JSON.stringify(newUser, null, 2))}</pre>`;
                     return;
                 }
 
                 try {
-                    // Read current users.json from GitHub
-                    const path = 'data/users.json';
-                    const ghOwner = GHSAVE.OWNER, ghRepo = GHSAVE.REPO, ghBranch = GHSAVE.BRANCH;
-                    const ghPath = path;
-
-                    const token = GHSAVE.getToken();
-                    const getRes = await fetch(`https://api.github.com/repos/${ghOwner}/${ghRepo}/contents/${ghPath}?ref=${ghBranch}`, {
-                        headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' }
-                    });
-                    let currentSha = null, currentData = { users: [] };
-                    if (getRes.ok) {
-                        const meta = await getRes.json();
-                        currentSha = meta.sha;
-                        const raw = atob(meta.content.replace(/\s/g, ''));
-                        currentData = JSON.parse(decodeURIComponent(escape(raw)));
+                    const { sha, data } = await fetchUsersJSON();
+                    data.users = data.users || [];
+                    if (data.users.find(x => x.username.toLowerCase() === username.toLowerCase())) {
+                        resultEl.innerHTML = '<p class="um-error">اسم المستخدم مستخدم بالفعل.</p>';
+                        return;
                     }
-                    currentData.users = currentData.users || [];
-                    currentData.users.push(newUser);
-                    const newText = JSON.stringify(currentData, null, 2);
-                    const content = btoa(unescape(encodeURIComponent(newText)));
-
-                    const putRes = await fetch(`https://api.github.com/repos/${ghOwner}/${ghRepo}/contents/${ghPath}`, {
-                        method: 'PUT',
-                        headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ message: `admin: add user ${username}`, content, sha: currentSha, branch: ghBranch })
+                    const passwordHash = await USER.sha256(password);
+                    data.users.push({
+                        username, passwordHash, displayName: display,
+                        createdAt: new Date().toISOString().slice(0, 10),
+                        active: true, allowedCategories
                     });
-                    if (!putRes.ok) throw new Error('GH ' + putRes.status);
-                    resultEl.innerHTML = `<p class="um-success">✅ تمّ إنشاء الحساب! تستطيع إخبار المستخدم ببياناته الآن.</p>`;
+                    await writeUsersJSON(sha, data);
+                    resultEl.innerHTML = `<p class="um-success">✅ تمّ إنشاء الحساب بصلاحياته.</p>`;
                     document.getElementById('createForm').reset();
-                    users = await refresh();
+                    renderPermsBox(document.getElementById('newPermsBox'), []);
+                    await refresh();
                 } catch (err) {
                     resultEl.innerHTML = `<p class="um-error">❌ فشل الحفظ: ${esc(err.message)}</p>`;
                 }
             });
 
-            function esc(s) {
-                return String(s ?? '').replace(/[&<>"']/g, c =>
-                    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-            }
+            function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+            await refresh();
         })();
     </script>
 </body>

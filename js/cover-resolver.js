@@ -1,16 +1,28 @@
-/* محلّل أغلفة الكتب: يحاول الحصول على صورة حقيقية من Google Books
-   ثم يحفظ النتيجة في localStorage، وإلا يبقى على غلاف CSS الأنيق. */
+/* محلّل أغلفة الكتب: overrides ← Google Books ← cache */
 
 const COVER = (function() {
-    const CACHE_KEY = 'taybaa-cover-cache-v2';
+    const CACHE_KEY = 'taybaa-cover-cache-v3';
     let cache = {};
+    let overrides = null;
+    let overridesLoading = null;
+
     try { cache = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}'); } catch (_) { cache = {}; }
 
-    function persist() {
-        try { localStorage.setItem(CACHE_KEY, JSON.stringify(cache)); } catch (_) {}
-    }
-    function keyOf(book) {
-        return ((book.title || '') + '|' + (book.author || '')).toLowerCase().trim();
+    function persist() { try { localStorage.setItem(CACHE_KEY, JSON.stringify(cache)); } catch (_) {} }
+    function keyOf(book) { return ((book.title || '') + '|' + (book.author || '')).toLowerCase().trim(); }
+
+    async function loadOverrides() {
+        if (overrides !== null) return overrides;
+        if (overridesLoading) return overridesLoading;
+        overridesLoading = (async () => {
+            try {
+                const res = await fetch('data/book-overrides.json?t=' + Date.now());
+                if (!res.ok) { overrides = {}; return {}; }
+                overrides = await res.json();
+                return overrides;
+            } catch { overrides = {}; return {}; }
+        })();
+        return overridesLoading;
     }
 
     async function fromGoogleBooks(book) {
@@ -30,6 +42,8 @@ const COVER = (function() {
 
     async function resolve(book) {
         if (!book || !book.title) return '';
+        const ov = await loadOverrides();
+        if (ov && ov[book.id] && ov[book.id].cover) return ov[book.id].cover;
         const k = keyOf(book);
         if (cache[k] !== undefined) return cache[k];
         if (book.cover && !/pollinations\.ai/.test(book.cover)) {
@@ -67,7 +81,7 @@ const COVER = (function() {
         }
     }
 
-    function clear() { cache = {}; persist(); }
+    function clear() { cache = {}; persist(); overrides = null; overridesLoading = null; }
 
-    return { resolve, hydrate, clear };
+    return { resolve, hydrate, clear, loadOverrides };
 })();
