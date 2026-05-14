@@ -96,11 +96,22 @@
     }
 
     function bookCardHTML(book) {
-        const cover = book.cover
-            ? `<img class="book-cover" src="${escapeAttr(book.cover)}" alt="${escapeAttr(book.title)}" loading="lazy">`
-            : `<div class="book-cover-placeholder">${escapeHTML(book.title.charAt(0) || '📖')}</div>`;
+        const icon = CONFIG.categoryIcons[book.category] || CONFIG.defaultCategoryIcon || '📚';
+        const publisher = (typeof CONFIG !== 'undefined' && CONFIG.publisherShort) || 'دار المكتبة الطيبة';
+        const fallback = `
+            <div class="book-cover-fallback" aria-hidden="true">
+                <div class="cf-top"><span class="cf-icon">${icon}</span></div>
+                <div class="cf-mid"><h3 class="cf-title">${escapeHTML(book.title)}</h3></div>
+                <div class="cf-bottom">
+                    <p class="cf-author">${escapeHTML(book.author || 'مؤلف غير معروف')}</p>
+                    <p class="cf-publisher">${escapeHTML(publisher)}</p>
+                </div>
+            </div>`;
+        const img = book.cover
+            ? `<img class="book-cover" src="${escapeAttr(book.cover)}" alt="${escapeAttr(book.title)}" loading="lazy" onerror="this.remove();">`
+            : '';
         return `<a class="book-card" href="book.html?id=${encodeURIComponent(book.id)}">
-            ${cover}
+            <div class="book-cover-frame">${fallback}${img}</div>
             <div class="book-body">
                 <h3 class="book-title">${escapeHTML(book.title)}</h3>
                 <p class="book-author">${escapeHTML(book.author || 'مؤلف غير معروف')}</p>

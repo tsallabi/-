@@ -11,7 +11,7 @@
         loading: document.getElementById('loadingState'),
         notFound: document.getElementById('notFoundState'),
         detail: document.getElementById('bookDetail'),
-        cover: document.getElementById('bookCover'),
+        coverFrame: document.getElementById('bookCoverFrame'),
         category: document.getElementById('bookCategory'),
         title: document.getElementById('bookTitle'),
         author: document.getElementById('bookAuthor'),
@@ -38,15 +38,7 @@
     els.loading.hidden = true;
     els.detail.hidden = false;
 
-    if (book.cover) {
-        els.cover.src = book.cover;
-        els.cover.alt = book.title;
-    } else {
-        const ph = document.createElement('div');
-        ph.className = 'book-cover-placeholder';
-        ph.textContent = book.title.charAt(0) || '📖';
-        els.cover.parentNode.replaceChild(ph, els.cover);
-    }
+    renderCoverFrame(book);
     els.category.textContent = book.category || 'غير مصنّف';
     els.title.textContent = book.title;
     els.author.textContent = book.author || 'غير معروف';
@@ -83,6 +75,27 @@
         if (typeof live.downloads === 'number') els.downloads.textContent = live.downloads;
     }
 
+    function renderCoverFrame(book) {
+        if (!els.coverFrame) return;
+        const icon = (typeof CONFIG !== 'undefined' && CONFIG.categoryIcons && CONFIG.categoryIcons[book.category]) || (CONFIG && CONFIG.defaultCategoryIcon) || '📚';
+        const publisher = (typeof CONFIG !== 'undefined' && CONFIG.publisherShort) || 'دار المكتبة الطيبة';
+        const fallback = `
+            <div class="book-cover-fallback" aria-hidden="true">
+                <div class="cf-top"><span class="cf-icon">${icon}</span></div>
+                <div class="cf-mid"><h3 class="cf-title">${escapeHTML(book.title)}</h3></div>
+                <div class="cf-bottom">
+                    <p class="cf-author">${escapeHTML(book.author || 'مؤلف غير معروف')}</p>
+                    <p class="cf-publisher">${escapeHTML(publisher)}</p>
+                </div>
+            </div>`;
+        const img = book.cover
+            ? `<img class="book-cover" src="${escapeAttr(book.cover)}" alt="${escapeAttr(book.title)}" loading="lazy" onerror="this.remove();">`
+            : '';
+        els.coverFrame.innerHTML = fallback + img;
+    }
+
+    function escapeHTML(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+    function escapeAttr(s) { return escapeHTML(s); }
     function showNotFound() { els.loading.hidden = true; els.notFound.hidden = false; }
 
     function initThemeToggle() {
