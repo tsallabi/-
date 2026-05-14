@@ -12,7 +12,6 @@
             --rdr-bar: rgba(26,15,8,.92);
             --rdr-text: #f5e6c8;
             --rdr-gold: #d4af37;
-            --rdr-brown: #8b5a2b;
             --rdr-border: rgba(212,175,55,.25);
         }
         * { box-sizing: border-box; }
@@ -35,61 +34,19 @@
             font-family: inherit; font-size: .9rem; font-weight: 600;
             cursor: pointer;
             display: inline-flex; align-items: center; gap: .35rem;
-            transition: all .15s;
         }
-        .reader-bar a:hover, .reader-bar button:hover {
-            background: rgba(212,175,55,.20); border-color: var(--rdr-gold); color: var(--rdr-gold);
-        }
+        .reader-bar a:hover, .reader-bar button:hover { background: rgba(212,175,55,.20); border-color: var(--rdr-gold); color: var(--rdr-gold); }
         .reader-bar button:disabled { opacity: .4; cursor: not-allowed; }
-        .reader-title {
-            font-weight: 700; flex: 1;
-            text-align: center; padding: 0 .5rem;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            font-size: 1rem; font-family: 'Aref Ruqaa', 'Cairo', serif;
-            color: var(--rdr-gold);
-        }
-        .reader-page-info {
-            font-size: .85rem; color: var(--rdr-text); opacity: .85;
-            font-weight: 600; padding: 0 .35rem;
-        }
-        .reader-stage {
-            min-height: calc(100vh - 56px);
-            display: flex; justify-content: center;
-            padding: 1rem;
-            background: var(--rdr-bg);
-        }
-        canvas#pdfCanvas {
-            max-width: 100%; height: auto;
-            box-shadow: 0 10px 40px rgba(0,0,0,.5);
-            background: #fff;
-            border-radius: 4px;
-        }
-        .reader-message {
-            color: var(--rdr-text); padding: 3rem 1.5rem;
-            text-align: center; font-size: 1.05rem;
-            max-width: 540px; margin: 0 auto;
-        }
-        .reader-message h2 {
-            font-family: 'Aref Ruqaa', 'Cairo', serif;
-            color: var(--rdr-gold); margin: 0 0 1rem;
-        }
+        .reader-title { font-weight: 700; flex: 1; text-align: center; padding: 0 .5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 1rem; font-family: 'Aref Ruqaa', 'Cairo', serif; color: var(--rdr-gold); }
+        .reader-page-info { font-size: .85rem; color: var(--rdr-text); opacity: .85; font-weight: 600; padding: 0 .35rem; }
+        .reader-stage { min-height: calc(100vh - 56px); display: flex; justify-content: center; padding: 1rem; background: var(--rdr-bg); }
+        canvas#pdfCanvas { max-width: 100%; height: auto; box-shadow: 0 10px 40px rgba(0,0,0,.5); background: #fff; border-radius: 4px; }
+        .iframe-stage { width: 100%; height: calc(100vh - 56px); border: 0; background: #000; display: block; }
+        .reader-message { color: var(--rdr-text); padding: 3rem 1.5rem; text-align: center; font-size: 1.05rem; max-width: 560px; margin: 0 auto; }
+        .reader-message h2 { font-family: 'Aref Ruqaa', 'Cairo', serif; color: var(--rdr-gold); margin: 0 0 1rem; }
         .reader-message a { color: var(--rdr-gold); text-decoration: underline; }
-        .reader-loading {
-            display: inline-block; width: 24px; height: 24px;
-            border: 3px solid var(--rdr-border); border-top-color: var(--rdr-gold);
-            border-radius: 50%; animation: spin .8s linear infinite;
-            margin-inline-end: .55rem; vertical-align: middle;
-        }
-        .resume-toast {
-            position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
-            background: rgba(58,36,18,.95); color: var(--rdr-gold);
-            border: 1px solid var(--rdr-gold);
-            padding: .75rem 1.25rem; border-radius: 10px;
-            font-family: 'Aref Ruqaa', 'Cairo', serif;
-            font-size: .9rem; z-index: 50;
-            box-shadow: 0 10px 30px rgba(0,0,0,.5);
-            animation: slideUp .4s ease-out;
-        }
+        .reader-loading { display: inline-block; width: 24px; height: 24px; border: 3px solid var(--rdr-border); border-top-color: var(--rdr-gold); border-radius: 50%; animation: spin .8s linear infinite; margin-inline-end: .55rem; vertical-align: middle; }
+        .resume-toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); background: rgba(58,36,18,.95); color: var(--rdr-gold); border: 1px solid var(--rdr-gold); padding: .75rem 1.25rem; border-radius: 10px; font-family: 'Aref Ruqaa','Cairo',serif; font-size: .9rem; z-index: 50; box-shadow: 0 10px 30px rgba(0,0,0,.5); animation: slideUp .4s ease-out; }
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes slideUp { from { transform: translate(-50%, 20px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
         @media (max-width: 600px) {
@@ -101,11 +58,11 @@
 </head>
 <body>
     <div class="reader-bar">
-        <a href="javascript:history.back()" aria-label="عودة">← عودة</a>
+        <a href="javascript:history.back()" aria-label="عودة">→ عودة</a>
         <span class="reader-title" id="readerTitle">جارٍ التحميل...</span>
-        <button id="prevPage" type="button" aria-label="الصفحة التالية" disabled>→</button>
-        <span class="reader-page-info" id="pageInfo">—</span>
-        <button id="nextPage" type="button" aria-label="الصفحة السابقة" disabled>←</button>
+        <button id="prevPage" type="button" aria-label="السابق" hidden>→</button>
+        <span class="reader-page-info" id="pageInfo" hidden>—</span>
+        <button id="nextPage" type="button" aria-label="التالي" hidden>←</button>
         <button id="fullscreenBtn" type="button" aria-label="ملء الشاشة">⛶</button>
     </div>
 
@@ -117,20 +74,19 @@
         </div>
     </div>
 
-    <script src="js/user-system.js?v=10"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.js"></script>
+    <script src="js/user-system.js?v=11"></script>
     <script>
         (function() {
             const params = new URLSearchParams(location.search);
             const pdfUrl = params.get('pdf');
             const title = params.get('title') || 'قراءة';
             const bookId = params.get('bookId') || params.get('id');
+
             document.getElementById('readerTitle').textContent = title;
             document.title = title + ' — المكتبة الطيبة';
 
             const stage = document.getElementById('readerStage');
             const canvas = document.getElementById('pdfCanvas');
-            const ctx = canvas.getContext('2d');
             const msg = document.getElementById('readerMessage');
             const prevBtn = document.getElementById('prevPage');
             const nextBtn = document.getElementById('nextPage');
@@ -144,71 +100,104 @@
 
             if (!pdfUrl) { showError('لم يتم تحديد كتاب.'); return; }
 
-            let directPdf = pdfUrl;
-            const m = /archive\.org\/(?:embed|details)\/([^/?#]+)/.exec(pdfUrl);
-            if (m) {
-                directPdf = `https://archive.org/download/${m[1]}/${m[1]}.pdf`;
-            }
-
-            if (typeof pdfjsLib === 'undefined') {
-                showError('فشل تحميل مكتبة PDF.js');
+            // 🥇 طريقة 1: archive.org → iframe رسمي (يدعم PDF + التصفّح + يتجاوز CORS)
+            const archiveMatch = /archive\.org\/(?:embed|details|download)\/([^/?#]+)/.exec(pdfUrl);
+            if (archiveMatch) {
+                showArchiveIframe(archiveMatch[1]);
                 return;
             }
-            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.js';
 
-            let pdfDoc = null, currentPage = 1, totalPages = 0, rendering = false;
+            // 🥈 طريقة 2: PDF مباشر → PDF.js
+            loadPdfJs();
 
-            pdfjsLib.getDocument({ url: directPdf, withCredentials: false }).promise.then(doc => {
-                pdfDoc = doc;
-                totalPages = doc.numPages;
+            function showArchiveIframe(slug) {
                 msg.style.display = 'none';
-                canvas.hidden = false;
+                const iframe = document.createElement('iframe');
+                iframe.className = 'iframe-stage';
+                iframe.src = `https://archive.org/embed/${slug}`;
+                iframe.allow = 'fullscreen';
+                iframe.allowFullscreen = true;
+                iframe.referrerPolicy = 'no-referrer';
+                stage.style.padding = '0';
+                stage.appendChild(iframe);
+            }
 
-                // استئناف القراءة من آخر صفحة
-                let startPage = 1;
-                if (bookId && typeof READING !== 'undefined') {
-                    startPage = Math.min(READING.getPage(bookId), totalPages);
-                    if (startPage > 1) showResumeToast(startPage);
-                }
-                currentPage = startPage;
-                updateNavButtons();
-                renderPage(currentPage);
-            }).catch(err => {
-                console.error(err);
-                showError('تعذّر تحميل الكتاب من هذا المصدر.<br>ملف PDF غير متاح أو غير مسموح بتحميله.');
-            });
+            function loadPdfJs() {
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+                script.onload = () => {
+                    if (typeof pdfjsLib === 'undefined') return fallbackToGoogleViewer();
+                    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                    renderPDF();
+                };
+                script.onerror = () => fallbackToGoogleViewer();
+                document.head.appendChild(script);
+            }
 
-            function renderPage(num) {
-                if (rendering) return;
-                rendering = true;
-                pdfDoc.getPage(num).then(page => {
-                    const scale = Math.min(2, Math.max(1, window.innerWidth / 700));
-                    const viewport = page.getViewport({ scale });
-                    canvas.width = viewport.width;
-                    canvas.height = viewport.height;
-                    return page.render({ canvasContext: ctx, viewport }).promise;
-                }).then(() => {
-                    rendering = false;
-                    pageInfo.textContent = `${num} / ${totalPages}`;
+            function fallbackToGoogleViewer() {
+                msg.style.display = 'none';
+                const iframe = document.createElement('iframe');
+                iframe.className = 'iframe-stage';
+                iframe.src = `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`;
+                stage.style.padding = '0';
+                stage.appendChild(iframe);
+            }
+
+            function renderPDF() {
+                prevBtn.hidden = false; nextBtn.hidden = false; pageInfo.hidden = false;
+                const ctx = canvas.getContext('2d');
+                let pdfDoc = null, currentPage = 1, totalPages = 0, rendering = false;
+
+                pdfjsLib.getDocument({ url: pdfUrl, withCredentials: false }).promise.then(doc => {
+                    pdfDoc = doc;
+                    totalPages = doc.numPages;
+                    msg.style.display = 'none';
+                    canvas.hidden = false;
+
+                    let startPage = 1;
+                    if (bookId && typeof READING !== 'undefined') {
+                        startPage = Math.min(READING.getPage(bookId), totalPages);
+                        if (startPage > 1) showResumeToast(startPage);
+                    }
+                    currentPage = startPage;
                     updateNavButtons();
-                    // حفظ موقع القراءة
-                    if (bookId && typeof READING !== 'undefined') READING.setPage(bookId, num);
-                }).catch(err => { rendering = false; console.error(err); });
+                    renderPage(currentPage);
+                }).catch(err => {
+                    console.error('PDF.js failed:', err);
+                    fallbackToGoogleViewer();
+                });
+
+                function renderPage(num) {
+                    if (rendering) return;
+                    rendering = true;
+                    pdfDoc.getPage(num).then(page => {
+                        const scale = Math.min(2, Math.max(1, window.innerWidth / 700));
+                        const viewport = page.getViewport({ scale });
+                        canvas.width = viewport.width;
+                        canvas.height = viewport.height;
+                        return page.render({ canvasContext: ctx, viewport }).promise;
+                    }).then(() => {
+                        rendering = false;
+                        pageInfo.textContent = `${num} / ${totalPages}`;
+                        updateNavButtons();
+                        if (bookId && typeof READING !== 'undefined') READING.setPage(bookId, num);
+                    }).catch(err => { rendering = false; console.error(err); });
+                }
+                function updateNavButtons() {
+                    prevBtn.disabled = currentPage >= totalPages;
+                    nextBtn.disabled = currentPage <= 1;
+                }
+                prevBtn.addEventListener('click', () => {
+                    if (currentPage < totalPages) { currentPage++; renderPage(currentPage); }
+                });
+                nextBtn.addEventListener('click', () => {
+                    if (currentPage > 1) { currentPage--; renderPage(currentPage); }
+                });
+                document.addEventListener('keydown', e => {
+                    if (e.key === 'ArrowRight') prevBtn.click();
+                    else if (e.key === 'ArrowLeft') nextBtn.click();
+                });
             }
-            function updateNavButtons() {
-                prevBtn.disabled = currentPage >= totalPages;
-                nextBtn.disabled = currentPage <= 1;
-            }
-            prevBtn.addEventListener('click', () => {
-                if (currentPage < totalPages) { currentPage++; renderPage(currentPage); }
-            });
-            nextBtn.addEventListener('click', () => {
-                if (currentPage > 1) { currentPage--; renderPage(currentPage); }
-            });
-            document.addEventListener('keydown', e => {
-                if (e.key === 'ArrowRight') prevBtn.click();
-                else if (e.key === 'ArrowLeft') nextBtn.click();
-            });
 
             function showResumeToast(page) {
                 const t = document.createElement('div');
@@ -218,11 +207,10 @@
                 setTimeout(() => t.remove(), 4000);
             }
             function showError(htmlMsg) {
-                canvas.hidden = true;
                 msg.innerHTML = `
                     <h2>📖 الكتاب غير متاح حالياً</h2>
                     <p>${htmlMsg}</p>
-                    <p>سنعمل على توفيره في المكتبة قريباً. جرّب كتباً أخرى في <a href="index.html">الصفحة الرئيسية</a>.</p>`;
+                    <p>سنعمل على توفيره قريباً. <a href="index.html">جرّب كتباً أخرى في الصفحة الرئيسية</a></p>`;
                 msg.style.display = 'block';
             }
         })();
