@@ -5,14 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0a0e1a">
     <title>لوحة الإدارة — المكتبة الطيبة</title>
-    <link rel="stylesheet" href="css/style.css?v=11">
-    <link rel="stylesheet" href="css/admin.css?v=11">
+    <link rel="stylesheet" href="css/style.css?v=12">
+    <link rel="stylesheet" href="css/admin.css?v=12">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:wght@700&family=Aref+Ruqaa:wght@700&display=swap" rel="stylesheet">
     <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('taybaa-theme') || 'dark');</script>
     <style>
-        /* لوحة أدوات الإدارة السريعة */
         .admin-tools {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -44,6 +43,22 @@
             text-decoration: none;
         }
         .admin-tool-card:hover::before { opacity: 1; }
+        .admin-tool-card.recommended {
+            border-color: var(--gold);
+            background: linear-gradient(135deg, var(--bg-elevated), var(--gold-soft));
+        }
+        .admin-tool-card.recommended::after {
+            content: '⭐ موصى به';
+            position: absolute;
+            top: .35rem; left: .55rem;
+            background: var(--grad-gold);
+            color: #2a1810;
+            padding: .15rem .5rem;
+            border-radius: 999px;
+            font-size: .65rem;
+            font-weight: 800;
+            font-family: 'Aref Ruqaa', sans-serif;
+        }
         .admin-tool-card .tool-icon {
             width: 48px; height: 48px;
             border-radius: 12px;
@@ -126,46 +141,53 @@
             <div class="admin-stat-card"><span class="stat-icon">📂</span><div><b id="totalCategories">0</b><span>قسم</span></div></div>
         </section>
 
-        <h2 class="admin-section-head">⚡ أدوات الإدارة السريعة <span class="admin-sub">— كل الأدوات الجديدة هنا</span></h2>
+        <h2 class="admin-section-head">⚡ أدوات الإدارة <span class="admin-sub">— اختر ما تحتاج</span></h2>
         <section class="admin-tools">
+            <a href="admin/quick-add.html" class="admin-tool-card recommended">
+                <span class="tool-icon">⚡</span>
+                <span class="tool-info">
+                    <strong>إضافة كتاب سريعة</strong>
+                    <span>4 حقول فقط — مثالي لكتبك الدينية</span>
+                </span>
+            </a>
             <a href="admin/fetch-pdfs.html" class="admin-tool-card">
                 <span class="tool-icon">🌐</span>
                 <span class="tool-info">
                     <strong>إثراء الكتب تلقائياً</strong>
-                    <span>ابحث في archive.org وجلب روابط PDF حقيقية</span>
+                    <span>archive.org + Open Library + Gutenberg</span>
                 </span>
             </a>
             <a href="admin/books.html" class="admin-tool-card">
                 <span class="tool-icon">🔍</span>
                 <span class="tool-info">
                     <strong>بحث Google Books</strong>
-                    <span>استورد كتباً جديدة + عدّل الأغلفة + أضف PDF برابط</span>
+                    <span>استيراد دفعة + تعديل الأغلفة</span>
                 </span>
             </a>
             <a href="admin/users.html" class="admin-tool-card">
                 <span class="tool-icon">👤</span>
                 <span class="tool-info">
                     <strong>إدارة المستخدمين</strong>
-                    <span>أنشئ حسابات + امنح صلاحية قسم الدين</span>
+                    <span>أنشئ حسابات + صلاحية قسم الدين</span>
                 </span>
             </a>
             <a href="#" id="settingsBtn2" class="admin-tool-card">
                 <span class="tool-icon">⚙️</span>
                 <span class="tool-info">
                     <strong>إعدادات GitHub Token</strong>
-                    <span>مطلوب مرّة واحدة لحفظ التغييرات</span>
+                    <span>مطلوب مرّة واحدة فقط</span>
                 </span>
             </a>
         </section>
 
         <section class="admin-toolbar">
-            <div><h2>📚 جدول الكتب</h2><p class="section-sub">عدّل، احذف، أو أضف كتاباً يدوياً</p></div>
+            <div><h2>📚 جدول الكتب</h2><p class="section-sub">عدّل، احذف، أو أضف كتاباً (محرّر متقدّم 3 خطوات)</p></div>
             <div class="toolbar-actions">
                 <input type="search" id="adminSearch" placeholder="🔍 بحث في الكتب..." class="admin-search">
                 <button class="link-btn" id="settingsBtn" type="button">⚙️ Token</button>
                 <button class="btn btn-primary" id="addBookBtn" type="button">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M12 5v14M5 12h14"/></svg>
-                    أضف كتاباً يدوياً
+                    إضافة متقدّمة
                 </button>
             </div>
         </section>
@@ -360,13 +382,12 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
-    <script src="js/config.js?v=11"></script>
-    <script src="js/user-system.js?v=11"></script>
-    <script src="js/data.js?v=11"></script>
-    <script src="js/github-save.js?v=11"></script>
-    <script src="js/admin.js?v=11"></script>
+    <script src="js/config.js?v=12"></script>
+    <script src="js/user-system.js?v=12"></script>
+    <script src="js/data.js?v=12"></script>
+    <script src="js/github-save.js?v=12"></script>
+    <script src="js/admin.js?v=12"></script>
     <script>
-        // ربط زر "إعدادات GitHub" الجديد في لوحة الأدوات بنفس modal الموجود
         document.addEventListener('DOMContentLoaded', () => {
             const newBtn = document.getElementById('settingsBtn2');
             const originalBtn = document.getElementById('settingsBtn');
