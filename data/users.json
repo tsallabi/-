@@ -6,7 +6,17 @@
       "displayName": "قارئ تجريبي",
       "createdAt": "2026-05-14",
       "active": true,
+      "allowedCategories": [],
       "note": "كلمة السر: demo123 — احذف هذا الحساب بعد التجربة"
+    },
+    {
+      "username": "sheikh",
+      "passwordHash": "79ff5644f062a15f804fa0c478d8c70e96be9948572d8965b0a2b19697c201c7",
+      "displayName": "عضو القسم الديني",
+      "createdAt": "2026-05-14",
+      "active": true,
+      "allowedCategories": ["الدين والإسلاميات", "Islamic Studies (English)"],
+      "note": "كلمة السر: reader2026 — مثال لحساب لديه صلاحية رؤية القسم الديني"
     }
   ]
 }
