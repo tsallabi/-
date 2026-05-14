@@ -5,14 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#1a0f08">
     <title>المكتبة الطيبة — أكبر مكتبة عربية أونلاين · واحة المعرفة في ليبيا</title>
-    <meta name="description" content="دار نشر المكتبة الطيبة · واحة المعرفة في صحراء الجهل. تطوير الذات · ريادة الأعمال · الإدارة.">
-    <link rel="stylesheet" href="css/style.css?v=8">
+    <meta name="description" content="دار نشر المكتبة الطيبة · واحة المعرفة في صحراء الجهل.">
+    <link rel="stylesheet" href="css/style.css?v=9">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:wght@700&family=Aref+Ruqaa:wght@700&display=swap" rel="stylesheet">
     <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('taybaa-theme') || 'dark');</script>
     <style>
-        /* شارة "قريباً" على بطاقات الكتب التي بلا ملف بعد */
         .soon-badge {
             position: absolute; top: .65rem; left: .65rem;
             z-index: 4;
@@ -35,6 +34,86 @@
         }
         .book-card.coming-soon { opacity: .9; }
         .book-card.coming-soon:hover { opacity: 1; }
+
+        /* زرّ الحساب والقائمة */
+        .profile-wrap { position: relative; flex-shrink: 0; }
+        .profile-btn {
+            width: 44px; height: 44px; border-radius: 12px;
+            border: 1px solid var(--border); background: var(--bg-subtle);
+            color: var(--text); display: grid; place-items: center;
+            transition: all .2s; cursor: pointer;
+        }
+        .profile-btn:hover {
+            border-color: var(--gold); background: var(--gold-soft);
+            color: var(--gold); transform: translateY(-1px);
+        }
+        .profile-menu {
+            position: absolute; top: calc(100% + .65rem); left: 0;
+            min-width: 290px; max-width: 340px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-strong);
+            border-radius: 16px;
+            box-shadow: 0 25px 60px rgba(0,0,0,.4);
+            overflow: hidden;
+            z-index: 100;
+            animation: profileFade .18s ease-out;
+        }
+        @keyframes profileFade {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: none; }
+        }
+        .profile-header {
+            padding: 1rem 1.25rem;
+            background: linear-gradient(135deg, #3a2412, #1a0f08);
+            color: #f5d76e;
+            font-family: 'Aref Ruqaa', 'Cairo', serif;
+            font-weight: 700;
+            font-size: 1.05rem;
+            display: flex; align-items: center; gap: .5rem;
+        }
+        .profile-body { padding: 1.1rem 1.25rem; }
+        .profile-status {
+            margin: 0 0 .25rem; color: var(--text);
+            font-weight: 600; font-size: .98rem;
+        }
+        .profile-tagline {
+            margin: 0; color: var(--text-muted);
+            font-size: .85rem;
+            font-family: 'Aref Ruqaa', 'Amiri', serif;
+        }
+        .profile-vip hr {
+            border: 0; border-top: 1px solid var(--border);
+            margin: .9rem 0;
+        }
+        .vip-indicator {
+            margin: 0 0 .65rem;
+            padding: .55rem .9rem;
+            background: linear-gradient(135deg, rgba(90,122,58,.18), rgba(212,175,55,.18));
+            border: 1px solid rgba(212,175,55,.3);
+            border-radius: 10px;
+            text-align: center;
+            color: var(--gold-glow);
+            font-family: 'Aref Ruqaa', serif;
+            font-size: .9rem;
+        }
+        .vip-lock-btn {
+            width: 100%;
+            padding: .7rem 1rem;
+            border: 1px solid var(--border-strong);
+            border-radius: 10px;
+            background: var(--bg-subtle);
+            color: var(--text);
+            font-family: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .2s;
+            font-size: .95rem;
+        }
+        .vip-lock-btn:hover {
+            border-color: #ce1126;
+            color: #ce1126;
+            background: rgba(206,17,38,.05);
+        }
     </style>
 </head>
 <body>
@@ -44,12 +123,7 @@
             <a href="index.html" class="logo" aria-label="الصفحة الرئيسية">
                 <span class="logo-mark" aria-hidden="true" title="المكتبة الطيبة — واحة المعرفة">
                     <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <radialGradient id="sun" cx="50%" cy="50%" r="50%">
-                                <stop offset="0%" stop-color="#fff7d6"/>
-                                <stop offset="100%" stop-color="#d4af37"/>
-                            </radialGradient>
-                        </defs>
+                        <defs><radialGradient id="sun" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#fff7d6"/><stop offset="100%" stop-color="#d4af37"/></radialGradient></defs>
                         <circle cx="32" cy="14" r="6" fill="url(#sun)"/>
                         <path d="M30.5 30 Q31.5 40 30.5 50" stroke="#3a2412" stroke-width="2.2" fill="none" stroke-linecap="round"/>
                         <path d="M31 30 Q22 25 16 30" stroke="#3d5a26" stroke-width="2.6" fill="none" stroke-linecap="round"/>
@@ -78,6 +152,30 @@
             </form>
 
             <span class="vip-badge" id="vipBadge" hidden>✨ VIP</span>
+
+            <div class="profile-wrap">
+                <button class="profile-btn" id="profileBtn" aria-label="حسابي" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                        <circle cx="12" cy="8" r="4"/>
+                        <path d="M4 21v-1a8 8 0 0 1 16 0v1"/>
+                    </svg>
+                </button>
+                <div class="profile-menu" id="profileMenu" hidden>
+                    <div class="profile-header">
+                        <span>👤</span> <span>حسابي</span>
+                    </div>
+                    <div class="profile-body">
+                        <p class="profile-status">أهلاً بك في <strong>المكتبة الطيبة</strong></p>
+                        <p class="profile-tagline">واحة المعرفة · مجاناً للجميع</p>
+
+                        <div class="profile-vip" id="profileVip" hidden>
+                            <hr>
+                            <p class="vip-indicator">✨ القسم الخاص مفتوح</p>
+                            <button id="vipLockBtn" class="vip-lock-btn" type="button">🔒 تسجيل خروج · إغلاق القسم الخاص</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <button class="theme-toggle" id="themeToggle" aria-label="تبديل الوضع الليلي" type="button">
                 <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
@@ -145,7 +243,7 @@
                 <header class="section-head">
                     <div>
                         <h2><span class="gold-icon">🚀</span> ريادة الأعمال والتسويق</h2>
-                        <p class="section-sub">سرّ البيع، فن التسويق، والاستثمار الذكي</p>
+                        <p class="section-sub">سرّ البيع، فن التسويق، والاستثمار الذكي</span></p>
                     </div>
                 </header>
                 <div class="books-grid" id="entrepreneurshipBooks"></div>
@@ -223,9 +321,10 @@
         </div>
     </footer>
 
-    <script src="js/config.js?v=8"></script>
-    <script src="js/cover-resolver.js?v=8"></script>
-    <script src="js/data.js?v=8"></script>
-    <script src="js/app.js?v=8"></script>
+    <script src="js/config.js?v=9"></script>
+    <script src="js/cover-resolver.js?v=9"></script>
+    <script src="js/data.js?v=9"></script>
+    <script src="js/app.js?v=9"></script>
+    <script src="js/profile.js?v=9"></script>
 </body>
 </html>
