@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة الكتب — المكتبة الطيبة</title>
+    <link rel="stylesheet" href="../css/style.css?v=10">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Aref+Ruqaa:wght@700&display=swap" rel="stylesheet">
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('taybaa-theme') || 'dark');</script>
+    <style>
+        body { padding: 1.5rem 1rem 4rem; }
+        .bm-wrap { max-width: 1100px; margin: 0 auto; }
+        .bm-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+        .bm-head h1 { font-family: 'Aref Ruqaa', serif; color: var(--gold); margin: 0; }
+        .bm-tabs { display: flex; gap: .4rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+        .bm-tab { padding: .65rem 1rem; background: transparent; border: 0; color: var(--text-muted); font-family: inherit; font-weight: 700; cursor: pointer; border-bottom: 3px solid transparent; }
+        .bm-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+        .bm-card { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.25rem; }
+        .bm-card h2 { font-family: 'Aref Ruqaa', serif; color: var(--gold); margin: 0 0 1rem; font-size: 1.15rem; }
+        .bm-form { display: grid; gap: .8rem; }
+        .bm-form input, .bm-form select, .bm-form textarea { padding: .65rem .9rem; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-subtle); color: var(--text); font-family: inherit; font-size: .95rem; width: 100%; }
+        .bm-form button { padding: .8rem; background: var(--grad-gold); color: #2a1810; border: 0; border-radius: 10px; font-weight: 700; font-size: 1rem; cursor: pointer; }
+        .bm-form button:hover { transform: translateY(-1px); }
+        .bm-form .row { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+        @media (max-width: 600px) { .bm-form .row { grid-template-columns: 1fr; } }
+        .gb-results { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; margin-top: 1.25rem; }
+        .gb-card { background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; cursor: pointer; transition: all .2s; position: relative; }
+        .gb-card:hover { border-color: var(--gold); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .gb-card.selected { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-soft); }
+        .gb-card img { width: 100%; height: 220px; object-fit: cover; background: var(--bg-base); display: block; }
+        .gb-card .gb-info { padding: .65rem .75rem; }
+        .gb-card .gb-info h3 { font-size: .9rem; margin: 0 0 .3rem; line-height: 1.35; max-height: 2.8em; overflow: hidden; }
+        .gb-card .gb-info p { font-size: .75rem; margin: 0; color: var(--text-muted); }
+        .gb-card .gb-tag { position: absolute; top: .4rem; right: .4rem; background: rgba(184,148,31,.95); color: #2a1810; padding: .15rem .5rem; border-radius: 999px; font-size: .7rem; font-weight: 800; }
+        .gb-card .gb-check { position: absolute; top: .4rem; left: .4rem; background: var(--gold); color: #2a1810; width: 24px; height: 24px; border-radius: 50%; display: none; place-items: center; font-weight: 800; }
+        .gb-card.selected .gb-check { display: grid; }
+        .bm-book-list { display: grid; gap: .65rem; max-height: 600px; overflow-y: auto; }
+        .bm-book-row { display: grid; grid-template-columns: 60px 1fr auto; gap: 1rem; align-items: center; padding: .75rem; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px; }
+        .bm-book-row .mini-cover { width: 50px; height: 70px; border-radius: 6px; background: var(--bg-base); display: grid; place-items: center; font-size: 1.5rem; overflow: hidden; }
+        .bm-book-row .mini-cover img { width: 100%; height: 100%; object-fit: cover; }
+        .bm-book-row .mini-info b { color: var(--gold); display: block; font-size: .95rem; }
+        .bm-book-row .mini-info span { font-size: .8rem; color: var(--text-muted); }
+        .bm-book-row button { background: var(--bg-elevated); border: 1px solid var(--border); padding: .5rem .85rem; border-radius: 8px; font-family: inherit; font-weight: 700; cursor: pointer; color: var(--text); }
+        .bm-book-row button:hover { border-color: var(--gold); color: var(--gold); }
+        .bm-message { padding: .85rem 1rem; border-radius: 10px; margin: .85rem 0; }
+        .bm-message.success { background: rgba(90,122,58,.15); border: 1px solid #5a7a3a; color: #5a7a3a; }
+        .bm-message.error { background: rgba(206,17,38,.1); border: 1px solid #ce1126; color: #ce1126; }
+        .bm-search-bar { display: flex; gap: .5rem; }
+        .bm-search-bar input { flex: 1; }
+        .bm-bulk-actions { display: flex; gap: .5rem; align-items: center; margin: 1rem 0; flex-wrap: wrap; }
+        .bm-bulk-actions button { padding: .65rem 1.1rem; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-subtle); color: var(--text); cursor: pointer; font-family: inherit; font-weight: 700; }
+        .bm-bulk-actions button:hover { border-color: var(--gold); color: var(--gold); }
+        .bm-bulk-actions .selected-count { color: var(--gold); font-weight: 700; }
+        a.back-link { color: var(--gold); text-decoration: none; font-weight: 700; }
+        a.back-link:hover { text-decoration: underline; }
+        .cover-preview { width: 100px; height: 140px; border-radius: 8px; background: var(--bg-base); overflow: hidden; }
+        .cover-preview img { width: 100%; height: 100%; object-fit: cover; }
+        .cover-edit-row { display: grid; grid-template-columns: 110px 1fr; gap: 1rem; align-items: start; }
+        .small-note { font-size: .8rem; color: var(--text-muted); margin: .3rem 0 0; }
+    </style>
+</head>
+<body>
+    <div class="bm-wrap">
+        <div class="bm-head">
+            <h1>📚 إدارة الكتب</h1>
+            <a href="../admin.html" class="back-link">→ لوحة الإدارة</a>
+        </div>
+
+        <div class="bm-tabs">
+            <button class="bm-tab active" data-tab="search" type="button">🔍 بحث وإضافة (Google Books)</button>
+            <button class="bm-tab" data-tab="covers" type="button">🖼️ تعديل الأغلفة</button>
+            <button class="bm-tab" data-tab="pdf" type="button">📄 إضافة PDF من رابط</button>
+        </div>
+
+        <!-- Tab 1: Google Books Search -->
+        <section class="bm-panel" data-panel="search">
+            <div class="bm-card">
+                <h2>🔍 بحث Google Books</h2>
+                <p>ابحث عن عنوان أو مؤلف أو موضوع، ثم حدّد الكتب التي ترغب في إضافتها دفعة واحدة.</p>
+                <div class="bm-search-bar">
+                    <input type="search" id="gbQuery" placeholder="مثال: ستيفن كوفي" />
+                    <select id="gbLang" style="max-width: 110px;">
+                        <option value="">الكل</option>
+                        <option value="ar" selected>عربي</option>
+                        <option value="en">إنجليزي</option>
+                    </select>
+                    <button id="gbSearchBtn" type="button" style="padding:.65rem 1.3rem;background:var(--grad-gold);color:#2a1810;border:0;border-radius:10px;font-weight:700;cursor:pointer;">ابحث</button>
+                </div>
+                <div class="bm-bulk-actions" id="gbBulkBar" hidden>
+                    <span class="selected-count"><span id="gbSelectedCount">0</span> محدد</span>
+                    <button id="gbSelectAll" type="button">تحديد الكل</button>
+                    <button id="gbDeselectAll" type="button">إلغاء التحديد</button>
+                    <select id="gbBulkCategory">
+                        <option value="">اختر القسم...</option>
+                    </select>
+                    <button id="gbImportBtn" type="button" style="background:var(--grad-gold);color:#2a1810;border:0;">⬇️ استورد المحدد</button>
+                </div>
+                <div id="gbMessage"></div>
+                <div class="gb-results" id="gbResults"></div>
+            </div>
+        </section>
+
+        <!-- Tab 2: Edit Covers -->
+        <section class="bm-panel" data-panel="covers" hidden>
+            <div class="bm-card">
+                <h2>🖼️ تعديل غلاف كتاب</h2>
+                <p>ابحث عن الكتاب ثم اختره لتغيير غلافه.</p>
+                <div class="bm-search-bar" style="margin-bottom:1rem;">
+                    <input type="search" id="bookFilter" placeholder="ابحث بالعنوان أو المؤلف..." />
+                </div>
+                <div id="bookListMsg"></div>
+                <div class="bm-book-list" id="bookList"></div>
+            </div>
+            <div class="bm-card" id="coverEditCard" hidden>
+                <h2>تغيير الغلاف</h2>
+                <div class="cover-edit-row">
+                    <div class="cover-preview" id="coverPreview"><div style="padding:1rem;text-align:center;font-size:1.5rem;">📖</div></div>
+                    <div>
+                        <b id="editBookTitle"></b>
+                        <p class="small-note" id="editBookAuthor"></p>
+                        <div class="bm-form" style="margin-top:.7rem;">
+                            <input type="url" id="coverUrl" placeholder="https://example.com/cover.jpg" />
+                            <p class="small-note">أو تلصيق رابط صورة. يمكن جلبها من Google Books أو Goodreads أو أي مصدر.</p>
+                            <button id="saveCoverBtn" type="button">حفظ الغلاف</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="coverMessage"></div>
+            </div>
+        </section>
+
+        <!-- Tab 3: PDF from URL -->
+        <section class="bm-panel" data-panel="pdf" hidden>
+            <div class="bm-card">
+                <h2>📄 إضافة كتاب برابط PDF</h2>
+                <p>ألصق رابط PDF من أي موقع (archive.org، جامعات، ملف مباشر...). الرابط يجب أن يسمح بالتضمين (CORS) حتّى يعرض في القارئ.</p>
+                <form class="bm-form" id="pdfForm">
+                    <div class="row">
+                        <input type="text" id="pdfTitle" placeholder="عنوان الكتاب" required />
+                        <input type="text" id="pdfAuthor" placeholder="المؤلف" required />
+                    </div>
+                    <select id="pdfCategory" required>
+                        <option value="">اختر القسم</option>
+                    </select>
+                    <input type="url" id="pdfUrl" placeholder="https://archive.org/download/.../book.pdf" required />
+                    <input type="url" id="pdfCoverUrl" placeholder="رابط غلاف (اختياري)" />
+                    <div class="row">
+                        <input type="number" id="pdfPages" placeholder="عدد الصفحات (اختياري)" />
+                        <input type="text" id="pdfDate" placeholder="التاريخ" value="" />
+                    </div>
+                    <textarea id="pdfDescription" rows="3" placeholder="نبذة (اختياري)"></textarea>
+                    <button type="submit">أضف إلى المكتبة</button>
+                </form>
+                <div id="pdfMessage"></div>
+            </div>
+            <div class="bm-card">
+                <h2>💡 مصادر موصى بها للبحث عن PDFs في مجال مكتبتنا</h2>
+                <ul style="line-height:2;">
+                    <li><a href="https://archive.org/details/texts?and[]=language%3A%22Arabic%22" target="_blank">📚 Archive.org — الكتب العربية</a> (أفضل مصدر مجاني)</li>
+                    <li><a href="https://www.hindawi.org/books/" target="_blank">🌟 مؤسسة هنداوي</a> (عربي تنمية ذاتية)</li>
+                    <li><a href="https://www.almeshkat.net/books" target="_blank">🌃 المشكاة</a> (ديني وعام)</li>
+                    <li><a href="https://noor-book.com/" target="_blank">📖 نور بوك</a> (تطوير وإدارة)</li>
+                    <li><a href="https://www.gutenberg.org/" target="_blank">Project Gutenberg</a> (عالمي)</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <script src="../js/config.js?v=10"></script>
+    <script src="../js/github-save.js?v=10"></script>
+    <script src="../js/cover-resolver.js?v=10"></script>
+    <script src="../js/data.js?v=10"></script>
+    <script src="../js/user-system.js?v=10"></script>
+    <script src="books.js?v=10"></script>
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a0f08">
+    <title>مفضّلتي — المكتبة الطيبة</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:wght@700&family=Aref+Ruqaa:wght@700&display=swap" rel="stylesheet">
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('taybaa-theme') || 'dark');</script>
+    <style>
+        .fav-page-head { text-align: center; padding: 3rem 1rem 2rem; }
+        .fav-page-head h1 { font-family: 'Aref Ruqaa', 'Cairo', serif; font-size: clamp(2rem, 5vw, 2.8rem); color: var(--gold); margin: 0 0 .5rem; }
+        .fav-page-head p { color: var(--text-muted); margin: 0; }
+        .fav-page-head .heart-icon { font-size: 3rem; display: block; margin-bottom: .5rem; }
+        .fav-empty { text-align: center; padding: 3rem 1.5rem; background: var(--bg-elevated); border: 1px dashed var(--border-strong); border-radius: 16px; max-width: 600px; margin: 2rem auto; }
+        .fav-empty h2 { font-family: 'Aref Ruqaa', serif; color: var(--gold); margin-top: 0; }
+        .fav-empty a { color: var(--gold); font-weight: 700; }
+        .fav-tabs { display: flex; gap: .5rem; justify-content: center; margin: 0 0 1.5rem; flex-wrap: wrap; }
+        .fav-tab { padding: .6rem 1.2rem; border: 1px solid var(--border); border-radius: 999px; background: var(--bg-subtle); color: var(--text); font-family: inherit; font-weight: 700; cursor: pointer; transition: all .2s; }
+        .fav-tab:hover { border-color: var(--gold); color: var(--gold); }
+        .fav-tab.active { background: var(--grad-gold); color: #2a1810; border-color: transparent; }
+        .fav-btn { position: absolute; top: .55rem; right: .55rem; z-index: 5; width: 36px; height: 36px; border-radius: 50%; border: 0; background: linear-gradient(135deg, #ce1126, #8b1a1a); color: #fff; display: grid; place-items: center; cursor: pointer; transition: all .2s; font-size: 1.05rem; padding: 0; }
+        .fav-btn:hover { transform: scale(1.1); background: rgba(206,17,38,.7); }
+        .resume-mini { display: block; padding: .35rem .65rem; background: linear-gradient(135deg, rgba(90,122,58,.18), rgba(212,175,55,.18)); border-radius: 8px; font-size: .75rem; color: var(--gold); margin-top: .35rem; text-align: center; }
+        .profile-wrap { position: relative; flex-shrink: 0; }
+        .profile-btn { width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-subtle); color: var(--text); display: grid; place-items: center; transition: all .2s; cursor: pointer; }
+        .profile-btn:hover { border-color: var(--gold); background: var(--gold-soft); color: var(--gold); }
+        .profile-menu { position: absolute; top: calc(100% + .65rem); left: 0; min-width: 300px; max-width: 360px; background: var(--bg-elevated); border: 1px solid var(--border-strong); border-radius: 16px; box-shadow: 0 25px 60px rgba(0,0,0,.4); overflow: hidden; z-index: 100; }
+        .profile-header { padding: 1rem 1.25rem; background: linear-gradient(135deg, #3a2412, #1a0f08); color: #f5d76e; font-family: 'Aref Ruqaa', 'Cairo', serif; font-weight: 700; }
+        .profile-body { padding: 1.1rem 1.25rem; }
+    </style>
+</head>
+<body>
+    <div class="flag-strip" aria-hidden="true"></div>
+    <header class="site-header" id="siteHeader">
+        <div class="container header-inner">
+            <a href="index.html" class="logo" aria-label="الصفحة الرئيسية">
+                <span class="logo-mark" aria-hidden="true">
+                    <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                        <defs><radialGradient id="sun" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#fff7d6"/><stop offset="100%" stop-color="#d4af37"/></radialGradient></defs>
+                        <circle cx="32" cy="14" r="6" fill="url(#sun)"/>
+                        <path d="M30.5 30 Q31.5 40 30.5 50" stroke="#3a2412" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                        <path d="M0 52 Q12 47 24 52 T48 52 T64 52 L64 64 L0 64 Z" fill="#8b5a2b"/>
+                    </svg>
+                </span>
+                <span class="logo-text"><span class="logo-title">المكتبة الطيبة</span><span class="logo-tag">TAYBAA · LIBRARY</span></span>
+            </a>
+            <a href="index.html" class="link-btn">→ الرئيسية</a>
+            <div class="profile-wrap">
+                <button class="profile-btn" id="profileBtn" aria-label="حسابي" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg>
+                </button>
+                <div class="profile-menu" id="profileMenu" hidden>
+                    <div class="profile-header">👤 حسابي</div>
+                    <div class="profile-body" id="profileMenuBody"></div>
+                </div>
+            </div>
+            <button class="theme-toggle" id="themeToggle" aria-label="تبديل الوضع" type="button">
+                <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="20" height="20"><circle cx="12" cy="12" r="4"/></svg>
+                <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="20" height="20"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <div class="fav-page-head">
+            <span class="heart-icon">♥</span>
+            <h1>مفضّلتي</h1>
+            <p id="favSubtitle">الكتب التي اخترتها لترجع إليها لاحقاً</p>
+        </div>
+
+        <div class="container">
+            <div class="fav-tabs" id="favTabs">
+                <button class="fav-tab active" data-tab="favorites" type="button">♥ المفضّلة (<span id="favCount">0</span>)</button>
+                <button class="fav-tab" data-tab="reading" type="button">📖 قيد القراءة (<span id="readingCount">0</span>)</button>
+            </div>
+
+            <section id="favoritesSection">
+                <div class="books-grid" id="favBooks"></div>
+                <div class="fav-empty" id="favEmpty" hidden>
+                    <h2>📖 أضف كتباً إلى مفضّلتك</h2>
+                    <p>تصفّح <a href="index.html">المكتبة</a> واضغط على القلب ♡ في أي كتاب لحفظه هنا.</p>
+                </div>
+            </section>
+
+            <section id="readingSection" hidden>
+                <div class="books-grid" id="readingBooks"></div>
+                <div class="fav-empty" id="readingEmpty" hidden>
+                    <h2>📖 لم تبدأ أي كتاب بعد</h2>
+                    <p>افتح أي كتاب في <a href="index.html">المكتبة</a> لتتبع قراءتك تلقائياً.</p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <div class="footer-brand">
+                <strong>دار نشر المكتبة الطيبة</strong>
+                <span>واحة المعرفة · مجاناً للجميع</span>
+            </div>
+            <p class="footer-copy">© <span id="year"></span> TAYBAA-LIBRARY</p>
+        </div>
+    </footer>
+
+    <script src="js/config.js?v=10"></script>
+    <script src="js/cover-resolver.js?v=10"></script>
+    <script src="js/user-system.js?v=10"></script>
+    <script src="js/data.js?v=10"></script>
+    <script src="js/profile.js?v=10"></script>
+    <script>
+        (async function() {
+            document.getElementById('year').textContent = new Date().getFullYear();
+            initThemeToggle();
+
+            const subtitle = document.getElementById('favSubtitle');
+            const u = USER.current();
+            if (u) subtitle.textContent = `مرحباً ${u.displayName} · إليك كتبك المحفوظة`;
+
+            // التبويب
+            document.querySelectorAll('.fav-tab').forEach(t => {
+                t.addEventListener('click', () => {
+                    document.querySelectorAll('.fav-tab').forEach(x => x.classList.remove('active'));
+                    t.classList.add('active');
+                    const tab = t.dataset.tab;
+                    document.getElementById('favoritesSection').hidden = tab !== 'favorites';
+                    document.getElementById('readingSection').hidden = tab !== 'reading';
+                });
+            });
+
+            let books = [];
+            try { books = DATA.filterForViewer(await DATA.loadBooks()); }
+            catch (err) { console.error(err); }
+
+            const byId = new Map(books.map(b => [String(b.id), b]));
+
+            // المفضّلة
+            const favIds = FAVS.getAll();
+            const favBooks = favIds.map(id => byId.get(id)).filter(Boolean);
+            document.getElementById('favCount').textContent = favBooks.length;
+            renderBooks(document.getElementById('favBooks'), favBooks, true);
+            document.getElementById('favEmpty').hidden = favBooks.length > 0;
+
+            // قيد القراءة
+            const reading = READING.lastReadBooks(50)
+                .map(r => ({ ...r, book: byId.get(String(r.bookId)) }))
+                .filter(r => r.book);
+            document.getElementById('readingCount').textContent = reading.length;
+            renderReading(document.getElementById('readingBooks'), reading);
+            document.getElementById('readingEmpty').hidden = reading.length > 0;
+
+            function renderBooks(container, list, removable) {
+                container.innerHTML = list.map(book => {
+                    const icon = CONFIG.categoryIcons[book.category] || '📚';
+                    const publisher = CONFIG.publisherShort || 'دار المكتبة الطيبة';
+                    const lastPage = READING.getPage(book.id);
+                    return `<a class="book-card" href="book.html?id=${encodeURIComponent(book.id)}">
+                        <div class="book-cover-frame">
+                            <div class="book-cover-fallback" aria-hidden="true">
+                                <div class="cf-top"><span class="cf-icon">${icon}</span></div>
+                                <div class="cf-mid"><h3 class="cf-title">${esc(book.title)}</h3></div>
+                                <div class="cf-bottom"><p class="cf-author">${esc(book.author || 'مؤلف غير معروف')}</p><p class="cf-publisher">${esc(publisher)}</p></div>
+                            </div>
+                            ${removable ? `<button class="fav-btn" data-book-id="${esc(book.id)}" aria-label="إزالة" type="button">♥</button>` : ''}
+                        </div>
+                        <div class="book-body">
+                            <h3 class="book-title">${esc(book.title)}</h3>
+                            <p class="book-author">${esc(book.author || 'غير معروف')}</p>
+                            ${lastPage > 1 ? `<span class="resume-mini">📖 أنت عند الصفحة ${lastPage}</span>` : ''}
+                        </div>
+                    </a>`;
+                }).join('');
+                container.querySelectorAll('.fav-btn').forEach(btn => {
+                    btn.addEventListener('click', e => {
+                        e.preventDefault(); e.stopPropagation();
+                        FAVS.remove(btn.dataset.bookId);
+                        location.reload();
+                    });
+                });
+                if (typeof COVER !== 'undefined') COVER.hydrate(container, list);
+            }
+
+            function renderReading(container, items) {
+                const list = items.map(r => r.book);
+                renderBooks(container, list, false);
+            }
+
+            function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+            function initThemeToggle() {
+                const btn = document.getElementById('themeToggle');
+                if (!btn) return;
+                btn.addEventListener('click', () => {
+                    const cur = document.documentElement.getAttribute('data-theme');
+                    const next = cur === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', next);
+                    localStorage.setItem('taybaa-theme', next);
+                });
+            }
+        })();
+    </script>
+</body>
+</html>
