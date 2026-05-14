@@ -1,9 +1,8 @@
-/* منطق الصفحة الرئيسية + فلتر VIP + أقسام مميّزة */
+/* منطق الصفحة الرئيسية + فلتر VIP + المفضّلة */
 
 (async function() {
     initThemeToggle();
     document.getElementById('year').textContent = new Date().getFullYear();
-    initVIPUnlock();
 
     const els = {
         categoriesGrid: document.getElementById('categoriesGrid'),
@@ -50,7 +49,6 @@
 
     const mgmtCats = ['تطوير الذات والنجاح', 'التحفيز والإلهام', 'القيادة والإدارة', 'إدارة الأعمال'];
     const entCats = ['ريادة الأعمال', 'فن البيع', 'التسويق', 'الإدارة المالية', 'المال والاستثمار'];
-    // فضّل عرض الكتب التي لها روابط عملية أولاً، ثم التي بلا روابط (قريباً)
     function sortByAvailability(arr) {
         return [...arr].sort((a, b) => {
             const aHas = !!(a.pdf || a.html);
@@ -112,6 +110,18 @@
         if (!container) return;
         if (!books.length) { container.innerHTML = '<p class="empty-state">لا توجد كتب لعرضها.</p>'; return; }
         container.innerHTML = books.map(bookCardHTML).join('');
+        // ربط أزرار المفضّلة
+        container.querySelectorAll('.fav-btn').forEach(btn => {
+            btn.addEventListener('click', e => {
+                e.preventDefault();
+                e.stopPropagation();
+                const id = btn.dataset.bookId;
+                const nowFav = (typeof FAVS !== 'undefined') ? FAVS.toggle(id) : false;
+                btn.classList.toggle('is-fav', nowFav);
+                btn.setAttribute('aria-label', nowFav ? 'إزالة من المفضلة' : 'إضافة للمفضلة');
+                btn.innerHTML = nowFav ? '♥' : '♡';
+            });
+        });
         if (typeof COVER !== 'undefined') COVER.hydrate(container, books);
     }
 
@@ -119,16 +129,16 @@
         const icon = CONFIG.categoryIcons[book.category] || CONFIG.defaultCategoryIcon || '📚';
         const publisher = CONFIG.publisherShort || 'دار المكتبة الطيبة';
         const hasFile = !!(book.pdf || book.html);
+        const isFav = (typeof FAVS !== 'undefined') && FAVS.has(book.id);
         const fallback = `<div class="book-cover-fallback" aria-hidden="true">
             <div class="cf-top"><span class="cf-icon">${icon}</span></div>
             <div class="cf-mid"><h3 class="cf-title">${escapeHTML(book.title)}</h3></div>
-            <div class="cf-bottom">
-                <p class="cf-author">${escapeHTML(book.author || 'مؤلف غير معروف')}</p>
-                <p class="cf-publisher">${escapeHTML(publisher)}</p>
-            </div></div>`;
+            <div class="cf-bottom"><p class="cf-author">${escapeHTML(book.author || 'مؤلف غير معروف')}</p><p class="cf-publisher">${escapeHTML(publisher)}</p></div>
+        </div>`;
+        const favBtn = `<button class="fav-btn ${isFav ? 'is-fav' : ''}" data-book-id="${escapeAttr(book.id)}" aria-label="${isFav ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}" type="button">${isFav ? '♥' : '♡'}</button>`;
         const soonBadge = hasFile ? '' : '<span class="soon-badge">قريباً</span>';
         return `<a class="book-card${hasFile ? '' : ' coming-soon'}" data-book-id="${escapeAttr(book.id)}" href="book.html?id=${encodeURIComponent(book.id)}">
-            <div class="book-cover-frame">${fallback}${soonBadge}</div>
+            <div class="book-cover-frame">${fallback}${soonBadge}${favBtn}</div>
             <div class="book-body">
                 <h3 class="book-title">${escapeHTML(book.title)}</h3>
                 <p class="book-author">${escapeHTML(book.author || 'مؤلف غير معروف')}</p>
@@ -173,7 +183,6 @@
         };
         requestAnimationFrame(step);
     }
-
     function initThemeToggle() {
         const theme = localStorage.getItem('taybaa-theme') || 'dark';
         document.documentElement.setAttribute('data-theme', theme);
@@ -184,24 +193,6 @@
             const next = cur === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', next);
             localStorage.setItem('taybaa-theme', next);
-        });
-    }
-
-    function initVIPUnlock() {
-        const logo = document.querySelector('.logo-mark');
-        if (!logo) return;
-        let clicks = 0, timer = null;
-        logo.addEventListener('click', e => {
-            clicks++;
-            if (timer) clearTimeout(timer);
-            timer = setTimeout(() => { clicks = 0; }, 2000);
-            if (clicks >= 5) {
-                clicks = 0; e.preventDefault();
-                const p = prompt('🔐 أدخل كلمة سرّ القسم الخاص:');
-                if (p === null) return;
-                if (DATA.unlockVIP(p)) { alert('✅ تم الفتح.'); location.reload(); }
-                else alert('❌ كلمة سرّ غير صحيحة.');
-            }
         });
     }
 })();

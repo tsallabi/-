@@ -1,0 +1,79 @@
+name: 📤 رفع PDFs إلى DigitalOcean Spaces
+
+# برنامج يرفع الـ PDFs من مجلّد /pdfs-to-upload/ في الريبو إلى DigitalOcean Spaces.
+# يتطلّب الأسرار التالية في إعدادات الريبو:
+#   DO_SPACES_KEY      — Access Key
+#   DO_SPACES_SECRET   — Secret Key
+#   DO_SPACES_REGION   — مثل ams3, fra1, nyc3
+#   DO_SPACES_BUCKET   — اسم الـ Space
+# (تضعها في: Settings → Secrets and variables → Actions)
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'pdfs-to-upload/**'
+
+permissions:
+  contents: write
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    if: ${{ secrets.DO_SPACES_KEY != '' }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install s3cmd
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y s3cmd
+
+      - name: Configure s3cmd for DigitalOcean Spaces
+        run: |
+          cat > ~/.s3cfg <<EOF
+          [default]
+          access_key = ${{ secrets.DO_SPACES_KEY }}
+          secret_key = ${{ secrets.DO_SPACES_SECRET }}
+          host_base = ${{ secrets.DO_SPACES_REGION }}.digitaloceanspaces.com
+          host_bucket = %(bucket)s.${{ secrets.DO_SPACES_REGION }}.digitaloceanspaces.com
+          use_https = True
+          signature_v2 = False
+          EOF
+
+      - name: Upload PDFs to Spaces
+        env:
+          BUCKET: ${{ secrets.DO_SPACES_BUCKET }}
+          REGION: ${{ secrets.DO_SPACES_REGION }}
+        run: |
+          set -e
+          mkdir -p pdfs-to-upload
+          if [ -z "$(ls -A pdfs-to-upload 2>/dev/null)" ]; then
+            echo 'No PDFs to upload.'
+            exit 0
+          fi
+          for f in pdfs-to-upload/*.pdf; do
+            [ -f "$f" ] || continue
+            name=$(basename "$f")
+            echo "Uploading $name"
+            s3cmd put "$f" "s3://$BUCKET/books/$name" --acl-public --add-header='Content-Type:application/pdf'
+            url="https://$BUCKET.$REGION.cdn.digitaloceanspaces.com/books/$name"
+            echo "→ $url"
+          done
+          echo 'Done.'
+
+      - name: Move uploaded files to archive folder
+        run: |
+          mkdir -p pdfs-uploaded
+          for f in pdfs-to-upload/*.pdf; do
+            [ -f "$f" ] || continue
+            mv "$f" pdfs-uploaded/
+          done
+          if ls pdfs-uploaded/*.pdf >/dev/null 2>&1; then
+            git config user.name 'taybaa-bot'
+            git config user.email 'bot@taybaa-library.local'
+            git add pdfs-to-upload pdfs-uploaded
+            git commit -m 'bot: archive uploaded PDFs' || true
+            git push || true
+          fi
