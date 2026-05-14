@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#0a0e16">
+    <meta name="theme-color" content="#1a0f08">
     <title>تفاصيل الكتاب — المكتبة الطيبة</title>
-    <link rel="stylesheet" href="css/style.css?v=6">
+    <link rel="stylesheet" href="css/style.css?v=7">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:wght@700&family=Aref+Ruqaa:wght@700&display=swap" rel="stylesheet">
@@ -15,22 +15,14 @@
             display: inline-flex; align-items: center; gap: .5rem;
             margin: .85rem 0 1.2rem;
             padding: .55rem 1.15rem;
-            background: linear-gradient(135deg, rgba(0,107,60,.10), rgba(184,148,31,.12));
-            border: 1px solid rgba(184,148,31,.4);
+            background: linear-gradient(135deg, rgba(107,68,35,.12), rgba(184,148,31,.15));
+            border: 1px solid rgba(184,148,31,.45);
             border-radius: 999px;
             font-family: 'Aref Ruqaa', 'Amiri', serif;
             font-size: .95rem;
             color: var(--text);
         }
-        .book-publisher::before {
-            content: '🏛️';
-            font-size: 1.05rem;
-        }
-        [data-theme="dark"] .book-publisher {
-            background: linear-gradient(135deg, rgba(26,128,80,.15), rgba(212,175,55,.15));
-            border-color: rgba(212,175,55,.4);
-            color: var(--gold-glow);
-        }
+        .book-publisher::before { content: '🏵️'; font-size: 1.05rem; }
     </style>
 </head>
 <body>
@@ -39,9 +31,24 @@
         <div class="container header-inner">
             <a href="index.html" class="logo" aria-label="الصفحة الرئيسية">
                 <span class="logo-mark" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24">
-                        <path d="M4 19.5A2.5 2.5 0 016.5 17H20V3H6.5A2.5 2.5 0 004 5.5v14z"/>
-                        <path d="M4 19.5A2.5 2.5 0 016.5 22H20v-5"/>
+                    <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <radialGradient id="sun" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" stop-color="#fff7d6"/>
+                                <stop offset="100%" stop-color="#d4af37"/>
+                            </radialGradient>
+                        </defs>
+                        <circle cx="32" cy="14" r="6" fill="url(#sun)"/>
+                        <path d="M30.5 30 Q31.5 40 30.5 50" stroke="#3a2412" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                        <path d="M31 30 Q22 25 16 30" stroke="#3d5a26" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+                        <path d="M31 30 Q40 25 46 30" stroke="#3d5a26" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+                        <path d="M31 30 Q23 23 20 18" stroke="#5a7a3a" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+                        <path d="M31 30 Q39 23 42 18" stroke="#5a7a3a" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+                        <path d="M31 30 Q31 23 31 18" stroke="#3d5a26" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+                        <circle cx="28" cy="30" r="1.2" fill="#3a2412"/>
+                        <circle cx="34" cy="30" r="1.2" fill="#3a2412"/>
+                        <path d="M0 52 Q12 47 24 52 T48 52 T64 52 L64 64 L0 64 Z" fill="#8b5a2b"/>
+                        <path d="M0 56 Q14 52 28 56 T52 56 T64 56 L64 64 L0 64 Z" fill="#6b4423" opacity=".7"/>
                     </svg>
                 </span>
                 <span class="logo-text">
@@ -112,16 +119,17 @@
         <div class="container footer-inner">
             <div class="footer-brand">
                 <strong>دار نشر المكتبة الطيبة</strong>
-                <span>نشر العلم · مجاناً للجميع</span>
+                <span>واحة المعرفة · مجاناً للجميع</span>
                 <span class="footer-identity">🇱🇾 من ليبيا · إلى كل قارئ في الوطن العربي</span>
             </div>
             <p class="footer-copy">© <span id="year"></span> TAYBAA-LIBRARY · مشروع مفتوح للقرّاء</p>
         </div>
     </footer>
 
-    <script src="js/config.js?v=6"></script>
-    <script src="js/data.js?v=6"></script>
-    <script src="js/firebase-counter.js?v=6"></script>
-    <script src="js/book.js?v=6"></script>
+    <script src="js/config.js?v=7"></script>
+    <script src="js/cover-resolver.js?v=7"></script>
+    <script src="js/data.js?v=7"></script>
+    <script src="js/firebase-counter.js?v=7"></script>
+    <script src="js/book.js?v=7"></script>
 </body>
 </html>
