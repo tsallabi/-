@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فحص الكتب — المكتبة الطيبة</title>
+    <link rel="stylesheet" href="../css/style.css?v=13">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Aref+Ruqaa:wght@700&display=swap" rel="stylesheet">
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('taybaa-theme') || 'dark');</script>
+    <style>
+        body { padding: 1.5rem 1rem 4rem; font-family: 'Cairo', sans-serif; }
+        .a-wrap { max-width: 1100px; margin: 0 auto; }
+        .a-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+        .a-head h1 { font-family: 'Aref Ruqaa', serif; color: var(--gold); margin: 0; }
+        .a-card { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.25rem; box-shadow: var(--shadow-md); }
+        .a-card h2 { font-family: 'Aref Ruqaa', serif; color: var(--gold); margin: 0 0 .85rem; font-size: 1.15rem; }
+        .a-stat { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: .85rem; margin-bottom: 1.25rem; }
+        .a-stat div { background: var(--bg-subtle); padding: .85rem 1rem; border-radius: 10px; border: 1px solid var(--border); text-align: center; }
+        .a-stat b { color: var(--gold); display: block; font-size: 1.6rem; font-family: 'Aref Ruqaa', serif; }
+        .a-stat span { font-size: .8rem; color: var(--text-muted); }
+        .a-stat .ok b { color: #5a7a3a; }
+        .a-stat .bad b { color: #ce1126; }
+        .a-stat .meh b { color: #b8941f; }
+        .a-controls { display: flex; gap: .75rem; flex-wrap: wrap; margin: 1rem 0; }
+        .a-controls button { padding: .85rem 1.4rem; background: var(--grad-gold); color: #2a1810; border: 0; border-radius: 10px; font-family: inherit; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all .2s; }
+        .a-controls button:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(184,148,31,.4); }
+        .a-controls button:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+        .a-controls .danger { background: linear-gradient(135deg,#ce1126,#8b1a1a); color: #fff; }
+        .a-controls .secondary { background: var(--bg-subtle); color: var(--text); border: 1px solid var(--border); }
+        .a-progress { background: var(--bg-subtle); height: 28px; border-radius: 999px; overflow: hidden; position: relative; margin: 1rem 0; border: 1px solid var(--border); }
+        .a-progress-bar { height: 100%; background: var(--grad-gold); transition: width .3s; width: 0; }
+        .a-progress-text { position: absolute; inset: 0; display: grid; place-items: center; font-weight: 700; font-size: .85rem; color: var(--text); }
+        .a-log { max-height: 400px; overflow-y: auto; background: #000; color: #d4af37; padding: 1rem; border-radius: 10px; font-family: 'Courier New', monospace; font-size: .82rem; line-height: 1.7; margin: 1rem 0; border: 1px solid var(--border); direction: ltr; text-align: left; }
+        .a-log-line { padding: .1rem 0; white-space: pre-wrap; word-break: break-word; }
+        .a-log-line.ok { color: #5fc97e; }
+        .a-log-line.bad { color: #ff6b6b; }
+        .a-log-line.warn { color: #ffd966; }
+        .a-log-line.info { color: #7fb3d5; }
+        .a-log-line.bold { font-weight: 700; color: #fff; }
+        .a-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        .a-table th, .a-table td { padding: .65rem .85rem; text-align: right; border-bottom: 1px solid var(--border); }
+        .a-table th { background: var(--bg-subtle); font-family: 'Aref Ruqaa', serif; color: var(--gold); font-weight: 700; }
+        .a-table tr.broken { background: rgba(206,17,38,.06); }
+        .a-table .status { display: inline-block; padding: .15rem .55rem; border-radius: 999px; font-size: .72rem; font-weight: 700; }
+        .a-table .status.ok { background: rgba(90,122,58,.18); color: #5a7a3a; }
+        .a-table .status.bad { background: rgba(206,17,38,.15); color: #ce1126; }
+        .a-table .status.warn { background: rgba(184,148,31,.18); color: var(--gold); }
+        .a-msg { padding: 1rem; border-radius: 10px; margin: 1rem 0; font-weight: 700; }
+        .a-msg.success { background: rgba(90,122,58,.15); border: 1px solid #5a7a3a; color: #5a7a3a; }
+        .a-msg.error { background: rgba(206,17,38,.1); border: 1px solid #ce1126; color: #ce1126; }
+        .a-msg.info { background: var(--gold-soft); border: 1px solid var(--gold); color: var(--gold); }
+        a.back-link { color: var(--gold); text-decoration: none; font-weight: 700; }
+        a.back-link:hover { text-decoration: underline; }
+        .a-explain { padding: 1rem 1.25rem; background: var(--bg-subtle); border-right: 4px solid var(--gold); border-radius: 8px; font-size: .9rem; line-height: 1.7; margin-bottom: 1rem; }
+        .a-explain strong { color: var(--gold); }
+    </style>
+</head>
+<body>
+    <div class="a-wrap">
+        <div class="a-head">
+            <h1>🩺 فحص جميع الكتب</h1>
+            <a href="../admin.html" class="back-link">→ لوحة الإدارة</a>
+        </div>
+
+        <div class="a-card">
+            <div class="a-explain">
+                <strong>ماذا تفعل هذه الأداة؟</strong><br>
+                • تتحقّق فعلاً من وجود كل رابط على archive.org عبر واجهة metadata الرسمية<br>
+                • تصنف الروابط إلى: ✅ صالح · ❌ معطّل · ⚠️ غير معروف (PDF مباشر)<br>
+                • تعرض لك قائمة بالمعطلة + زرّ لمسحها كلّها مرّة واحدة<br>
+                • بعد التنظيف، استخدم أداة “إثراء الكتب تلقائياً” للبحث عن روابط جديدة حقيقية<br>
+                <em>لا تستغرق أكثر من دقيقتين لـ218 كتاب (بمعدل 200ms لكل رابط).</em>
+            </div>
+
+            <div class="a-stat">
+                <div><b id="st-total">—</b><span>إجمالي الكتب</span></div>
+                <div class="ok"><b id="st-ok">0</b><span>✅ تعمل</span></div>
+                <div class="bad"><b id="st-bad">0</b><span>❌ معطلة</span></div>
+                <div class="meh"><b id="st-meh">0</b><span>⚠️ غير معروف</span></div>
+                <div><b id="st-none">0</b><span>💭 بلا رابط</span></div>
+            </div>
+
+            <div class="a-controls">
+                <button id="startBtn" disabled>🔍 ابدأ فحص كل الكتب</button>
+                <button id="clearBrokenBtn" class="danger" disabled>🗑️ امسح الروابط المعطلة</button>
+            </div>
+
+            <div class="a-progress" id="progress" hidden>
+                <div class="a-progress-bar" id="progressBar"></div>
+                <div class="a-progress-text" id="progressText">0%</div>
+            </div>
+
+            <div id="msg"></div>
+            <div id="log" class="a-log" hidden></div>
+        </div>
+
+        <div class="a-card" id="resultsCard" hidden>
+            <h2>❌ الكتب ذات الروابط المعطلة</h2>
+            <table class="a-table">
+                <thead><tr><th>الحالة</th><th>العنوان</th><th>المؤلف</th><th>الرابط</th></tr></thead>
+                <tbody id="brokenBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="../js/config.js?v=13"></script>
+    <script src="../js/github-save.js?v=13"></script>
+    <script>
+        const $ = id => document.getElementById(id);
+        const startBtn = $('startBtn'), clearBtn = $('clearBrokenBtn');
+        const log = $('log'), msg = $('msg');
+        const progress = $('progress'), progressBar = $('progressBar'), progressText = $('progressText');
+
+        let allBooks = [];
+        let brokenBooks = [];
+        let okBooks = [];
+
+        function addLog(text, type) {
+            log.hidden = false;
+            const line = document.createElement('div');
+            line.className = 'a-log-line ' + (type || 'info');
+            line.textContent = text;
+            log.appendChild(line);
+            log.scrollTop = log.scrollHeight;
+        }
+        function showMsg(text, type) {
+            msg.innerHTML = `<div class="a-msg ${type || 'info'}">${esc(text)}</div>`;
+        }
+        function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+        function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+        (async function loadBooks() {
+            try {
+                const files = ['../data/books-sample.json', '../data/books-extra-1.json', '../data/books-extra-2.json', '../data/books-extra-3.json'];
+                const all = [];
+                for (const f of files) {
+                    try {
+                        const r = await fetch(f + '?t=' + Date.now());
+                        if (!r.ok) continue;
+                        const j = await r.json();
+                        (j.books || []).forEach(b => all.push(b));
+                    } catch (e) {}
+                }
+                const seen = new Set();
+                allBooks = all.filter(b => {
+                    const id = String(b.id || '');
+                    if (!id || seen.has(id)) return false;
+                    seen.add(id);
+                    return true;
+                });
+                $('st-total').textContent = allBooks.length;
+                const noLink = allBooks.filter(b => !b.pdf || !b.pdf.trim()).length;
+                $('st-none').textContent = noLink;
+                startBtn.disabled = false;
+                showMsg(`✅ تمّ تحميل ${allBooks.length} كتاب. ${noLink} بلا رابط. اضغط “ابدأ الفحص” لتفحص الباقي.`, 'success');
+            } catch (err) {
+                showMsg(`❌ فشل تحميل البيانات: ${err.message}`, 'error');
+            }
+        })();
+
+        async function checkBook(book) {
+            const pdf = String(book.pdf || '').trim();
+            if (!pdf) return { ok: null, reason: 'no-link' };
+            const m = pdf.match(/archive\.org\/(?:embed|details|download)\/([^/?#]+)/);
+            if (m) {
+                const id = m[1];
+                try {
+                    const r = await fetch(`https://archive.org/metadata/${id}`);
+                    if (!r.ok) return { ok: false, reason: `http-${r.status}` };
+                    const d = await r.json();
+                    if (!d.metadata || Object.keys(d.metadata).length === 0) {
+                        return { ok: false, reason: 'not-found' };
+                    }
+                    if (d.is_dark) return { ok: false, reason: 'item-removed' };
+                    return { ok: true, reason: 'verified', meta: d.metadata };
+                } catch (err) {
+                    return { ok: false, reason: 'error: ' + err.message };
+                }
+            }
+            // روابط أخرى (لا نستطيع التحقق بسبب CORS)
+            return { ok: null, reason: 'cannot-verify-direct-pdf' };
+        }
+
+        startBtn.addEventListener('click', async () => {
+            startBtn.disabled = true;
+            clearBtn.disabled = true;
+            log.hidden = false; log.innerHTML = '';
+            progress.hidden = false;
+            brokenBooks = []; okBooks = [];
+            $('st-ok').textContent = '0'; $('st-bad').textContent = '0'; $('st-meh').textContent = '0';
+
+            const toCheck = allBooks.filter(b => b.pdf && b.pdf.trim());
+            addLog(`🚀 بدأ فحص ${toCheck.length} رابط...`, 'bold');
+
+            let okCount = 0, badCount = 0, mehCount = 0;
+            for (let i = 0; i < toCheck.length; i++) {
+                const book = toCheck[i];
+                const pct = Math.round(((i + 1) / toCheck.length) * 100);
+                progressBar.style.width = pct + '%';
+                progressText.textContent = `${pct}% · ${i + 1} / ${toCheck.length}`;
+
+                const res = await checkBook(book);
+                if (res.ok === true) {
+                    okCount++;
+                    okBooks.push({ book, ...res });
+                    if (i % 10 === 0) addLog(`✅ #${book.id} ${book.title}`, 'ok');
+                } else if (res.ok === false) {
+                    badCount++;
+                    brokenBooks.push({ book, ...res });
+                    addLog(`❌ #${book.id} ${book.title} — ${res.reason}`, 'bad');
+                } else {
+                    mehCount++;
+                    addLog(`⚠️ #${book.id} ${book.title} — ${res.reason}`, 'warn');
+                }
+                $('st-ok').textContent = okCount;
+                $('st-bad').textContent = badCount;
+                $('st-meh').textContent = mehCount;
+                await sleep(180);
+            }
+
+            addLog(`✨ انتهى الفحص. صالح:${okCount} | معطل:${badCount} | غير معروف:${mehCount}`, 'bold');
+            renderBroken();
+            startBtn.disabled = false;
+            clearBtn.disabled = brokenBooks.length === 0;
+            if (brokenBooks.length === 0) {
+                showMsg('🎉 لا توجد روابط معطلة! كل الروابط archive.org تعمل.', 'success');
+            } else {
+                showMsg(`⚠️ وجدنا ${brokenBooks.length} رابط معطل. اضغط “امسح” لتفريغها، ثمّ استخدم “إثراء تلقائي” لجلب بدائل.`, 'info');
+            }
+        });
+
+        function renderBroken() {
+            $('resultsCard').hidden = brokenBooks.length === 0;
+            $('brokenBody').innerHTML = brokenBooks.map(({ book, reason }) => `
+                <tr class="broken">
+                    <td><span class="status bad">❌ ${esc(reason)}</span></td>
+                    <td>${esc(book.title)}</td>
+                    <td>${esc(book.author || '—')}</td>
+                    <td><a href="${esc(book.pdf)}" target="_blank" style="font-size:.78rem;direction:ltr;display:inline-block;" rel="noopener">${esc(book.pdf.slice(0,60))}…</a></td>
+                </tr>`).join('');
+        }
+
+        clearBtn.addEventListener('click', async () => {
+            if (!brokenBooks.length) return;
+            if (!GHSAVE.hasToken()) {
+                showMsg('⚠️ يلزم GitHub Token. اضبطه أولاً من لوحة الأدمن.', 'error');
+                return;
+            }
+            if (!confirm(`سأفرغ روابط ${brokenBooks.length} كتاب. ستظهر بشارة “قريباً”. متأكد؟`)) return;
+            clearBtn.disabled = true;
+            showMsg('جارٍ الحفظ...', 'info');
+            addLog(`💾 جارٍ تفريغ ${brokenBooks.length} رابط في book-overrides.json...`, 'bold');
+
+            try {
+                const token = GHSAVE.getToken();
+                const apiBase = `https://api.github.com/repos/${GHSAVE.OWNER}/${GHSAVE.REPO}/contents/data/book-overrides.json`;
+                let overrides = {}, sha = null;
+                const r = await fetch(`${apiBase}?ref=${GHSAVE.BRANCH}`, { headers: { 'Authorization': 'Bearer ' + token } });
+                if (r.ok) {
+                    const meta = await r.json();
+                    sha = meta.sha;
+                    const raw = atob(meta.content.replace(/\s/g, ''));
+                    overrides = JSON.parse(decodeURIComponent(escape(raw)));
+                }
+                brokenBooks.forEach(({ book }) => {
+                    const existing = overrides[book.id] || {};
+                    overrides[book.id] = { ...existing, pdf: '' };
+                });
+                const body = JSON.stringify(overrides, null, 2);
+                const content = btoa(unescape(encodeURIComponent(body)));
+                const r2 = await fetch(apiBase, {
+                    method: 'PUT',
+                    headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: `admin: audit cleared ${brokenBooks.length} broken PDF URLs`, content, sha, branch: GHSAVE.BRANCH })
+                });
+                if (!r2.ok) throw new Error('GitHub ' + r2.status);
+                addLog(`✅ تمّ تفريغ ${brokenBooks.length} رابط. Cloudflare يعيد البناء خلال دقيقة.`, 'ok');
+                showMsg(`✅ تمّت إزالة ${brokenBooks.length} رابط. الآن اذهب لــ“إثراء الكتب تلقائياً” لجلب بدائل.`, 'success');
+            } catch (err) {
+                addLog(`❌ فشل الحفظ: ${err.message}`, 'bad');
+                showMsg(`❌ فشل الحفظ: ${err.message}`, 'error');
+                clearBtn.disabled = false;
+            }
+        });
+
+        window.addEventListener('error', e => addLog(`❌ JS error: ${e.message}`, 'bad'));
+    </script>
+</body>
+</html>
