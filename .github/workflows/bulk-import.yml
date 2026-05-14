@@ -38,7 +38,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Checkout development branch
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           ref: claude/online-library-design-ROC6E
@@ -58,5 +58,5 @@ jobs:
           git add data/books-extra-3.json
           git diff --staged --quiet && echo "ℹ️ no changes" || {
             git commit -m "feat: bulk import «${{ inputs.category }}» (${{ inputs.count }} requested)"
-            git push origin claude/online-library-design-ROC6E
+            git push
           }
