@@ -1,29 +1,52 @@
-/* طبقة البيانات — JSON / Sheets / Firestore */
+/* طبقة البيانات — JSON / Sheets / Firestore + فلتر VIP */
 
 const DATA = (function() {
     let cachedBooks = null;
-    let firebaseApp = null;
-    let firestoreRef = null;
-    let storageRef = null;
+    let firebaseApp = null, firestoreRef = null, storageRef = null;
 
-    // ملفات JSON تُجمع كلها عند التحميل. الأدمن يكتب على books-sample.json فقط،
-    // أما الملفات الإضافية (books-extra-*.json) فهي بيانات منسّقة جاهزة.
     const EXTRA_JSON_FILES = [
         'data/books-extra-1.json',
         'data/books-extra-2.json',
         'data/books-extra-3.json'
     ];
 
+    const VIP_KEY = 'taybaa-vip-unlocked';
+
+    function isVIP() {
+        try {
+            const params = new URLSearchParams(location.search);
+            const fromUrl = params.get('vip');
+            if (fromUrl && fromUrl === (CONFIG.vipPassword || '')) {
+                localStorage.setItem(VIP_KEY, '1');
+                return true;
+            }
+            return localStorage.getItem(VIP_KEY) === '1';
+        } catch (_) { return false; }
+    }
+    function unlockVIP(password) {
+        if (password && password === CONFIG.vipPassword) {
+            try { localStorage.setItem(VIP_KEY, '1'); } catch (_) {}
+            return true;
+        }
+        return false;
+    }
+    function lockVIP() { try { localStorage.removeItem(VIP_KEY); } catch (_) {} }
+
+    function filterForViewer(books) {
+        if (isVIP()) return books;
+        const hidden = new Set(CONFIG.hiddenCategories || []);
+        if (!hidden.size) return books;
+        return books.filter(b => !hidden.has(b.category));
+    }
+
     async function initFirebase() {
         if (firebaseApp) return { db: firestoreRef, storage: storageRef };
         if (!CONFIG.firebase.enabled) throw new Error('Firebase غير مفعّل');
-
         const [{ initializeApp }, fs, st] = await Promise.all([
             import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js'),
             import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js'),
             import('https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js')
         ]);
-
         firebaseApp = initializeApp(CONFIG.firebase.config);
         firestoreRef = { db: fs.getFirestore(firebaseApp), ...fs };
         storageRef = { storage: st.getStorage(firebaseApp), ...st };
@@ -40,7 +63,7 @@ const DATA = (function() {
                 default:          cachedBooks = await loadFromJSON();      break;
             }
         } catch (err) {
-            console.warn(`فشل تحميل من ${source}، يتم استخدام JSON كاحتياط.`, err);
+            console.warn(`فشل تحميل من ${source}.`, err);
             cachedBooks = await loadFromJSON();
         }
         return cachedBooks;
@@ -52,23 +75,16 @@ const DATA = (function() {
             if (!res.ok) return [];
             const json = await res.json();
             return json.books || [];
-        } catch (_) {
-            return [];
-        }
+        } catch (_) { return []; }
     }
 
     async function loadFromJSON() {
-        // الملف الأساسي: قابل للتعديل من لوحة الأدمن
         const mainRes = await fetch('data/books-sample.json?t=' + Date.now());
         if (!mainRes.ok) throw new Error('تعذّر قراءة ملف العينة');
         const mainJson = await mainRes.json();
         const mainBooks = mainJson.books || [];
-
-        // الملفات الإضافية: بيانات منسّقة جاهزة (لا يكتب عليها الأدمن)
         const extraArrays = await Promise.all(EXTRA_JSON_FILES.map(fetchJsonBooks));
         const extraBooks = extraArrays.flat();
-
-        // دمج مع إعطاء الأولوية للملف الأساسي عند تكرار المعرّف
         const seen = new Set(mainBooks.map(b => String(b.id)));
         const merged = mainBooks.concat(extraBooks.filter(b => !seen.has(String(b.id))));
         return merged.map(normalizeBook);
@@ -76,8 +92,7 @@ const DATA = (function() {
 
     async function loadFromSheets() {
         if (!CONFIG.sheetId) throw new Error('sheetId غير مضبوط');
-        const url = `https://docs.google.com/spreadsheets/d/${CONFIG.sheetId}` +
-                    `/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(CONFIG.sheetName)}`;
+        const url = `https://docs.google.com/spreadsheets/d/${CONFIG.sheetId}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(CONFIG.sheetName)}`;
         const res = await fetch(url);
         if (!res.ok) throw new Error('فشل الاتصال بـ Google Sheets');
         const text = await res.text();
@@ -109,14 +124,12 @@ const DATA = (function() {
         cachedBooks = null;
         return dataToSave;
     }
-
     async function deleteBook(id) {
         const { db } = await initFirebase();
         const ref = db.doc(db.db, 'books', String(id));
         await db.deleteDoc(ref);
         cachedBooks = null;
     }
-
     async function uploadFile(file, folder = 'books') {
         const { storage } = await initFirebase();
         const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
@@ -128,9 +141,7 @@ const DATA = (function() {
 
     function normalizeBook(raw) {
         const get = (...keys) => {
-            for (const k of keys) {
-                if (raw[k] !== undefined && raw[k] !== null && raw[k] !== '') return raw[k];
-            }
+            for (const k of keys) if (raw[k] !== undefined && raw[k] !== null && raw[k] !== '') return raw[k];
             return '';
         };
         return {
@@ -155,7 +166,6 @@ const DATA = (function() {
         const s = String(v).trim().toLowerCase();
         return s === 'true' || s === '1' || s === 'نعم' || s === 'yes';
     }
-
     function cleanReasoningLeak(text) {
         if (!text) return '';
         if (text.startsWith('{') && /"role"|"reasoning"|"choices"/.test(text)) {
@@ -186,11 +196,11 @@ const DATA = (function() {
     function findById(books, id) { return books.find(b => b.id === String(id)); }
     function categoriesWithCounts(books) {
         const map = new Map();
-        for (const b of books) {
-            if (!b.category) continue;
-            map.set(b.category, (map.get(b.category) || 0) + 1);
-        }
-        return Array.from(map, ([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count);
+        for (const b of books) { if (!b.category) continue; map.set(b.category, (map.get(b.category) || 0) + 1); }
+        const order = CONFIG.categoryOrder || [];
+        const rank = name => { const i = order.indexOf(name); return i === -1 ? 999 : i; };
+        return Array.from(map, ([name, count]) => ({ name, count }))
+            .sort((a, b) => rank(a.name) - rank(b.name) || b.count - a.count);
     }
     function totals(books) {
         return {
@@ -200,5 +210,9 @@ const DATA = (function() {
         };
     }
 
-    return { loadBooks, search, byCategory, topPopular, newest, recommended, findById, categoriesWithCounts, totals, saveBook, deleteBook, uploadFile, initFirebase };
+    return {
+        loadBooks, search, byCategory, topPopular, newest, recommended, findById,
+        categoriesWithCounts, totals, saveBook, deleteBook, uploadFile, initFirebase,
+        isVIP, unlockVIP, lockVIP, filterForViewer
+    };
 })();
