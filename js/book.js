@@ -20,6 +20,8 @@
         downloads: document.getElementById('bookDownloads'),
         readBtn: document.getElementById('readBtn'),
         downloadBtn: document.getElementById('downloadBtn'),
+        soonNotice: document.getElementById('soonNotice'),
+        bookActions: document.getElementById('bookActions'),
         descSection: document.getElementById('descriptionSection'),
         introSection: document.getElementById('introSection'),
         description: document.getElementById('bookDescription'),
@@ -49,6 +51,7 @@
 
     const source = book.pdf || book.html;
     if (source) {
+        // القارئ الداخلي (لا يفتح موقعاً خارجياً)
         els.readBtn.href = `reader.html?pdf=${encodeURIComponent(source)}&title=${encodeURIComponent(book.title)}`;
         if (book.pdf) {
             els.downloadBtn.href = book.pdf;
@@ -59,9 +62,9 @@
             });
         } else { els.downloadBtn.style.display = 'none'; }
     } else {
-        els.readBtn.style.opacity = '.5';
-        els.readBtn.style.pointerEvents = 'none';
-        els.downloadBtn.style.display = 'none';
+        // لا يوجد ملف بعد — إخفاء الأزرار وإظهار إشعار "قريباً".
+        if (els.bookActions) els.bookActions.style.display = 'none';
+        if (els.soonNotice) els.soonNotice.hidden = false;
     }
 
     if (book.description) { els.description.textContent = book.description; els.descSection.hidden = false; }
