@@ -4,267 +4,407 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>جلب روابط PDF تلقائياً — المكتبة الطيبة</title>
-    <link rel="stylesheet" href="../css/style.css?v=11">
+    <link rel="stylesheet" href="../css/style.css?v=12">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Aref+Ruqaa:wght@700&display=swap" rel="stylesheet">
     <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('taybaa-theme') || 'dark');</script>
     <style>
-        body { padding: 1.5rem 1rem 4rem; }
+        body { padding: 1.5rem 1rem 4rem; font-family: 'Cairo', sans-serif; }
         .fp-wrap { max-width: 1100px; margin: 0 auto; }
         .fp-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
         .fp-head h1 { font-family: 'Aref Ruqaa', serif; color: var(--gold); margin: 0; }
         .fp-card { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.25rem; box-shadow: var(--shadow-md); }
         .fp-card h2 { font-family: 'Aref Ruqaa', serif; color: var(--gold); margin: 0 0 .85rem; font-size: 1.15rem; }
+        .fp-status { padding: 1rem; background: var(--bg-subtle); border-radius: 10px; margin-bottom: 1rem; font-weight: 700; }
+        .fp-status.loading { color: var(--gold); }
+        .fp-status.error { color: #ce1126; background: rgba(206,17,38,.1); border: 1px solid #ce1126; }
+        .fp-status.success { color: #5a7a3a; background: rgba(90,122,58,.1); border: 1px solid #5a7a3a; }
         .fp-stat { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
         .fp-stat div { background: var(--bg-subtle); padding: .7rem 1.2rem; border-radius: 10px; border: 1px solid var(--border); }
         .fp-stat b { color: var(--gold); display: block; font-size: 1.4rem; font-family: 'Aref Ruqaa', serif; }
         .fp-stat span { font-size: .8rem; color: var(--text-muted); }
         .fp-controls { display: flex; gap: .65rem; flex-wrap: wrap; align-items: center; margin: 1rem 0; }
-        .fp-controls button { padding: .75rem 1.3rem; background: var(--grad-gold); color: #2a1810; border: 0; border-radius: 10px; font-family: inherit; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all .2s; }
+        .fp-controls button { padding: .85rem 1.5rem; background: var(--grad-gold); color: #2a1810; border: 0; border-radius: 10px; font-family: inherit; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all .2s; }
         .fp-controls button:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(184,148,31,.4); }
-        .fp-controls button:disabled { opacity: .5; cursor: not-allowed; }
+        .fp-controls button:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
         .fp-controls .secondary { background: var(--bg-subtle); color: var(--text); border: 1px solid var(--border); }
-        .fp-progress { background: var(--bg-subtle); height: 24px; border-radius: 999px; overflow: hidden; position: relative; margin: .75rem 0; border: 1px solid var(--border); }
+        .fp-source-toggle { display: flex; gap: .5rem; flex-wrap: wrap; margin: .5rem 0 1rem; }
+        .fp-source-toggle label { display: inline-flex; align-items: center; gap: .35rem; padding: .5rem .85rem; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 999px; cursor: pointer; font-weight: 700; font-size: .85rem; }
+        .fp-source-toggle input { accent-color: var(--gold); }
+        .fp-source-toggle label.active { border-color: var(--gold); color: var(--gold); background: var(--gold-soft); }
+        .fp-progress { background: var(--bg-subtle); height: 28px; border-radius: 999px; overflow: hidden; position: relative; margin: .75rem 0; border: 1px solid var(--border); }
         .fp-progress-bar { height: 100%; background: var(--grad-gold); transition: width .3s; width: 0; }
         .fp-progress-text { position: absolute; inset: 0; display: grid; place-items: center; font-weight: 700; font-size: .85rem; color: var(--text); }
-        .fp-log { max-height: 350px; overflow-y: auto; background: var(--bg-subtle); padding: 1rem; border-radius: 10px; font-family: monospace; font-size: .82rem; line-height: 1.7; margin: 1rem 0; border: 1px solid var(--border); }
-        .fp-log-line { padding: .15rem 0; }
-        .fp-log-line.success { color: #5a7a3a; }
-        .fp-log-line.error { color: #ce1126; opacity: .7; }
-        .fp-log-line.info { color: var(--text-muted); }
+        .fp-log { max-height: 350px; overflow-y: auto; background: #000; color: #d4af37; padding: 1rem; border-radius: 10px; font-family: 'Courier New', monospace; font-size: .82rem; line-height: 1.7; margin: 1rem 0; border: 1px solid var(--border); direction: ltr; text-align: left; }
+        .fp-log-line { padding: .15rem 0; white-space: pre-wrap; word-break: break-word; }
+        .fp-log-line.success { color: #5fc97e; }
+        .fp-log-line.error { color: #ff6b6b; }
+        .fp-log-line.info { color: #7fb3d5; }
+        .fp-log-line.bold { font-weight: 700; color: #fff; }
         .fp-results { display: grid; gap: .6rem; max-height: 600px; overflow-y: auto; padding-inline-end: .5rem; }
         .fp-result-row { display: grid; grid-template-columns: auto 1fr auto; gap: 1rem; align-items: center; padding: .75rem 1rem; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px; }
         .fp-result-row.is-checked { border-color: var(--gold); background: var(--gold-soft); }
         .fp-result-row input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--gold); }
         .fp-result-row .info b { color: var(--gold); display: block; font-size: .95rem; margin-bottom: .15rem; }
         .fp-result-row .info span { font-size: .8rem; color: var(--text-muted); }
-        .fp-result-row .info .found { font-size: .75rem; color: #5a7a3a; font-weight: 700; margin-top: .25rem; display: block; direction: ltr; word-break: break-all; }
-        .fp-result-row .info .not-found { font-size: .75rem; color: #ce1126; font-weight: 700; margin-top: .25rem; display: block; }
-        .fp-result-row a { color: var(--gold); text-decoration: underline; font-size: .8rem; }
-        .fp-message { padding: .85rem 1rem; border-radius: 10px; margin: .85rem 0; }
-        .fp-message.success { background: rgba(90,122,58,.15); border: 1px solid #5a7a3a; color: #5a7a3a; }
-        .fp-message.error { background: rgba(206,17,38,.1); border: 1px solid #ce1126; color: #ce1126; }
+        .fp-result-row .info a { display: block; font-size: .75rem; color: #5fc97e; font-weight: 700; margin-top: .25rem; direction: ltr; word-break: break-all; text-decoration: underline; }
+        .fp-result-row .source-tag { font-size: .7rem; padding: .15rem .55rem; border-radius: 999px; background: var(--bg-elevated); color: var(--gold); font-weight: 700; }
         a.back-link { color: var(--gold); text-decoration: none; font-weight: 700; }
         a.back-link:hover { text-decoration: underline; }
-        .fp-info-block { padding: 1rem; background: var(--bg-subtle); border-right: 4px solid var(--gold); border-radius: 8px; font-size: .9rem; line-height: 1.7; }
     </style>
 </head>
 <body>
     <div class="fp-wrap">
         <div class="fp-head">
-            <h1>🌐 جلب روابط PDF حقيقية — تلقائيًا</h1>
+            <h1>🌐 جلب روابط PDF تلقائياً</h1>
             <a href="../admin.html" class="back-link">→ لوحة الإدارة</a>
         </div>
 
         <div class="fp-card">
-            <div class="fp-info-block">
-                <strong>كيف تعمل هذه الأداة:</strong><br>
-                1️⃣ تستخرج كل كتبك التي ليس لها PDF (أو لديها رابط وهمي)<br>
-                2️⃣ تبحث عن كل واحد في <strong>archive.org Search API</strong> بعنوانه واسم مؤلفه<br>
-                3️⃣ تعرض لك أول نتيجة لكل كتاب لتتأكّد<br>
-                4️⃣ تحفظ الروابط المحدّدة في <code>data/book-overrides.json</code> عبر GitHub PAT<br>
-                <em>كلّ شيء يحدث في متصفّحك. بعد الحفظ يعيد Cloudflare بناء الموقع خلال دقيقة.</em>
-            </div>
+            <div id="fpStatusBox" class="fp-status loading">⏳ جارٍ تحميل بيانات الكتب...</div>
             <div class="fp-stat" id="fpStats"></div>
+
+            <div>
+                <p style="font-weight:700;margin:.5rem 0 .35rem;">حدّد المصادر:</p>
+                <div class="fp-source-toggle">
+                    <label class="active"><input type="checkbox" checked data-src="archive"> 📚 Archive.org</label>
+                    <label class="active"><input type="checkbox" checked data-src="openlib"> 📖 Open Library</label>
+                    <label class="active"><input type="checkbox" checked data-src="gutendex"> 🌐 Project Gutenberg</label>
+                </div>
+            </div>
+
             <div class="fp-controls">
-                <button id="fpStartBtn" type="button">🔍 ابدأ البحث في archive.org</button>
+                <button id="fpTestBtn" class="secondary" type="button">🔬 تجربة على كتاب واحد</button>
+                <button id="fpStartBtn" type="button" disabled>🔍 ابدأ البحث على الكل</button>
                 <button id="fpSelectAll" class="secondary" type="button" disabled>✓ حدّد الكل</button>
                 <button id="fpSaveBtn" type="button" disabled>💾 حفظ المحدد</button>
             </div>
+
             <div class="fp-progress" id="fpProgress" hidden>
                 <div class="fp-progress-bar" id="fpProgressBar"></div>
                 <div class="fp-progress-text" id="fpProgressText">0%</div>
             </div>
-            <div id="fpMessage"></div>
-            <div class="fp-log" id="fpLog" hidden></div>
+
+            <div id="fpLog" class="fp-log" hidden></div>
         </div>
 
         <div class="fp-card" id="fpResultsCard" hidden>
-            <h2>📜 النتائج — حدّد ما ترغب في اعتماده</h2>
-            <p style="color:var(--text-muted);font-size:.9rem;">بعض النتائج قد لا تتطابق تمامًا — تحقّق بالضغط على الرابط الأخضر قبل حفظه للعرض العام.</p>
+            <h2>📜 النتائج — تحقّق واحفظ</h2>
+            <p style="color:var(--text-muted);font-size:.9rem;">اضغط على الرابط الأخضر للتحقّق قبل الحفظ.</p>
             <div class="fp-results" id="fpResults"></div>
         </div>
     </div>
 
-    <script src="../js/config.js?v=11"></script>
-    <script src="../js/github-save.js?v=11"></script>
-    <script src="../js/user-system.js?v=11"></script>
-    <script src="../js/data.js?v=11"></script>
+    <script src="../js/config.js?v=12"></script>
+    <script src="../js/github-save.js?v=12"></script>
     <script>
-        (async function() {
-            const OVERRIDES_PATH = 'data/book-overrides.json';
-            let results = [];
+        // ============== تحميل عازل للأخطاء ==============
+        const $ = id => document.getElementById(id);
+        const statusBox = $('fpStatusBox');
+        const statsBox = $('fpStats');
+        const startBtn = $('fpStartBtn');
+        const testBtn = $('fpTestBtn');
+        const selectAllBtn = $('fpSelectAll');
+        const saveBtn = $('fpSaveBtn');
+        const progress = $('fpProgress');
+        const progressBar = $('fpProgressBar');
+        const progressText = $('fpProgressText');
+        const log = $('fpLog');
+        const resultsCard = $('fpResultsCard');
+        const resultsList = $('fpResults');
 
-            const allBooks = await DATA.loadBooks();
-            const needsPdf = allBooks.filter(b => !b.pdf && !b.html);
-            const hasGood = allBooks.length - needsPdf.length;
+        let allBooks = [];
+        let needsPdf = [];
+        let results = [];
 
-            document.getElementById('fpStats').innerHTML = `
-                <div><b>${allBooks.length}</b><span>إجمالي الكتب</span></div>
-                <div><b style="color:#5a7a3a;">${hasGood}</b><span>لديها رابط صالح</span></div>
-                <div><b style="color:#ce1126;">${needsPdf.length}</b><span>تحتاج روابط</span></div>`;
+        // تبديل مصادر البحث
+        document.querySelectorAll('.fp-source-toggle input').forEach(cb => {
+            cb.addEventListener('change', () => cb.closest('label').classList.toggle('active', cb.checked));
+        });
 
-            const startBtn = document.getElementById('fpStartBtn');
-            const selectAllBtn = document.getElementById('fpSelectAll');
-            const saveBtn = document.getElementById('fpSaveBtn');
-            const progress = document.getElementById('fpProgress');
-            const progressBar = document.getElementById('fpProgressBar');
-            const progressText = document.getElementById('fpProgressText');
-            const log = document.getElementById('fpLog');
-            const resultsCard = document.getElementById('fpResultsCard');
-            const resultsList = document.getElementById('fpResults');
-            const messageBox = document.getElementById('fpMessage');
+        function setStatus(text, kind) {
+            statusBox.className = 'fp-status ' + (kind || '');
+            statusBox.textContent = text;
+        }
+        function addLog(text, type) {
+            log.hidden = false;
+            const line = document.createElement('div');
+            line.className = 'fp-log-line ' + (type || 'info');
+            line.textContent = text;
+            log.appendChild(line);
+            log.scrollTop = log.scrollHeight;
+        }
+        function activeSources() {
+            return Array.from(document.querySelectorAll('.fp-source-toggle input:checked')).map(cb => cb.dataset.src);
+        }
 
-            if (needsPdf.length === 0) {
-                showMessage('✅ كل الكتب لديها روابط بالفعل! لا حاجة للبحث.', 'success');
-                startBtn.disabled = true;
-            }
-
-            startBtn.addEventListener('click', async () => {
-                startBtn.disabled = true;
-                log.hidden = false;
-                log.innerHTML = '';
-                progress.hidden = false;
-                results = [];
-                showMessage('', '');
-
-                addLog(`⏳ جارٍ البحث عن ${needsPdf.length} كتابًا في archive.org...`, 'info');
-
-                for (let i = 0; i < needsPdf.length; i++) {
-                    const book = needsPdf[i];
-                    const pct = Math.round((i / needsPdf.length) * 100);
-                    progressBar.style.width = pct + '%';
-                    progressText.textContent = `${pct}% · ${i+1} / ${needsPdf.length}`;
-
+        // ============== تحميل الكتب مباشرة (دون الاعتماد على DATA) ==============
+        (async function loadBooks() {
+            try {
+                const files = ['../data/books-sample.json', '../data/books-extra-1.json', '../data/books-extra-2.json', '../data/books-extra-3.json'];
+                const all = [];
+                for (const f of files) {
                     try {
-                        const identifier = await searchArchive(book);
-                        if (identifier) {
-                            results.push({ book, identifier, url: `https://archive.org/embed/${identifier}` });
-                            addLog(`✅ ${book.title} → ${identifier}`, 'success');
-                        } else {
-                            addLog(`⛔ ${book.title} — غير موجود`, 'error');
-                        }
-                    } catch (err) {
-                        addLog(`❌ ${book.title} — ${err.message}`, 'error');
+                        const r = await fetch(f + '?t=' + Date.now());
+                        if (!r.ok) continue;
+                        const j = await r.json();
+                        (j.books || []).forEach(b => all.push(b));
+                    } catch (e) {
+                        console.warn('skip', f, e);
                     }
-
-                    // رفقًا بـ archive.org
-                    await sleep(250);
                 }
+                // ترشيح التكرار
+                const seen = new Set();
+                allBooks = all.filter(b => {
+                    const id = String(b.id || '');
+                    if (!id || seen.has(id)) return false;
+                    seen.add(id);
+                    return true;
+                });
 
-                progressBar.style.width = '100%';
-                progressText.textContent = `100% · انتهى`;
-                addLog(`✨ البحث انتهى. وجدنا ${results.length} من أصل ${needsPdf.length}.`, 'info');
+                // كتب بدون PDF صالح (الوهميّة أو الفارغة)
+                needsPdf = allBooks.filter(b => {
+                    if (!b.pdf || b.pdf.trim() === '') return true;
+                    // فحص الروابط الوهميّة
+                    const m = String(b.pdf).match(/archive\.org\/(?:embed|details|download)\/([^/?#]+)/);
+                    if (m) {
+                        const slug = m[1];
+                        if (/^[a-z]+_\d{4,}$/i.test(slug) || /^\d{6,}$/.test(slug)) return true;
+                    }
+                    return false;
+                });
 
-                renderResults();
-                if (results.length) {
-                    selectAllBtn.disabled = false;
-                    saveBtn.disabled = false;
+                const has = allBooks.length - needsPdf.length;
+                statsBox.innerHTML = `
+                    <div><b>${allBooks.length}</b><span>إجمالي</span></div>
+                    <div><b style="color:#5a7a3a">${has}</b><span>لديها روابط</span></div>
+                    <div><b style="color:#ce1126">${needsPdf.length}</b><span>تحتاج بحث</span></div>`;
+
+                if (needsPdf.length === 0) {
+                    setStatus('✅ كلّ الكتب لديها روابط بالفعل!', 'success');
                 } else {
-                    showMessage('⚠️ لم نجد أي كتاب في archive.org. جرّب إضافة روابط يدوياً من صفحة books.html', 'error');
+                    setStatus(`✅ جاهز! ${needsPdf.length} كتابًا يحتاج رابطًا. اضغط “تجربة” أو “ابدأ البحث”.`, 'success');
+                    startBtn.disabled = false;
+                    testBtn.disabled = false;
                 }
-            });
-
-            async function searchArchive(book) {
-                const titlePart = String(book.title).slice(0, 80).replace(/["'\\]/g, ' ');
-                const authorPart = String(book.author || '').slice(0, 40).replace(/["'\\]/g, ' ');
-                const q = `title:(${titlePart}) AND mediatype:texts${authorPart ? ` AND creator:(${authorPart})` : ''}`;
-                const url = `https://archive.org/advancedsearch.php?q=${encodeURIComponent(q)}&fl[]=identifier&fl[]=title&fl[]=creator&fl[]=language&rows=3&output=json`;
-                const res = await fetch(url);
-                if (!res.ok) throw new Error('HTTP ' + res.status);
-                const data = await res.json();
-                const docs = data.response?.docs || [];
-                // فضّل العربية إن وجدت
-                const arabic = docs.find(d => Array.isArray(d.language) ? d.language.some(l => /arab/i.test(l)) : /arab/i.test(d.language || ''));
-                return arabic ? arabic.identifier : (docs[0] ? docs[0].identifier : null);
+            } catch (err) {
+                console.error(err);
+                setStatus('❌ فشل تحميل البيانات: ' + err.message, 'error');
             }
+        })();
 
-            function renderResults() {
-                resultsCard.hidden = results.length === 0;
-                resultsList.innerHTML = results.map((r, i) => `
-                    <div class="fp-result-row" data-i="${i}">
-                        <input type="checkbox" checked>
-                        <div class="info">
-                            <b>${esc(r.book.title)}</b>
-                            <span>${esc(r.book.author || '—')} · ${esc(r.book.category)}</span>
-                            <a href="https://archive.org/details/${esc(r.identifier)}" target="_blank" rel="noopener">
-                                → فحص الرابط: ${esc(r.identifier)}
-                            </a>
-                        </div>
-                    </div>`).join('');
-                resultsList.querySelectorAll('.fp-result-row').forEach(row => {
-                    const cb = row.querySelector('input');
-                    row.classList.toggle('is-checked', cb.checked);
-                    cb.addEventListener('change', () => row.classList.toggle('is-checked', cb.checked));
-                });
-            }
-
-            selectAllBtn.addEventListener('click', () => {
-                const allChecked = Array.from(resultsList.querySelectorAll('input')).every(cb => cb.checked);
-                resultsList.querySelectorAll('input').forEach(cb => {
-                    cb.checked = !allChecked;
-                    cb.closest('.fp-result-row').classList.toggle('is-checked', cb.checked);
-                });
-            });
-
-            saveBtn.addEventListener('click', async () => {
-                if (!GHSAVE.hasToken()) {
-                    showMessage('⚠️ يلزم GitHub Token — أدخله أولاً من صفحة admin.html', 'error');
-                    return;
+        // ============== تجربة على كتاب واحد ==============
+        testBtn.addEventListener('click', async () => {
+            if (!needsPdf.length) return;
+            testBtn.disabled = true; startBtn.disabled = true;
+            log.hidden = false; log.innerHTML = '';
+            const book = needsPdf[0];
+            addLog(`🔬 اختبار البحث عن: ${book.title}`, 'bold');
+            addLog(`   المؤلف: ${book.author || '(غير معروف)'}`, 'info');
+            const sources = activeSources();
+            addLog(`   المصادر المفعلة: ${sources.join(', ')}`, 'info');
+            try {
+                const found = await searchAllSources(book, sources, true);
+                if (found) {
+                    addLog(`✅ وجدنا: ${found.url}`, 'success');
+                    addLog(`   المصدر: ${found.source}`, 'success');
+                } else {
+                    addLog(`⛔ لم نجد في أي مصدر`, 'error');
                 }
-                const picked = [];
-                resultsList.querySelectorAll('.fp-result-row').forEach(row => {
-                    if (row.querySelector('input').checked) {
-                        picked.push(results[Number(row.dataset.i)]);
-                    }
-                });
-                if (!picked.length) { showMessage('⚠️ لم تحدد أي رابط', 'error'); return; }
+            } catch (err) {
+                addLog(`❌ خطأ: ${err.message}`, 'error');
+            }
+            testBtn.disabled = false;
+            startBtn.disabled = false;
+        });
 
-                saveBtn.disabled = true;
-                showMessage(`جارٍ حفظ ${picked.length} رابط...`, '');
+        // ============== بدء البحث الكامل ==============
+        startBtn.addEventListener('click', async () => {
+            const sources = activeSources();
+            if (!sources.length) { alert('حدّد مصدرًا واحدًا على الأقل'); return; }
+            startBtn.disabled = true; testBtn.disabled = true;
+            results = [];
+            log.hidden = false; log.innerHTML = '';
+            progress.hidden = false;
+            progressBar.style.width = '0%';
+
+            addLog(`🚀 بدأ البحث عن ${needsPdf.length} كتابًا في ${sources.length} مصدر`, 'bold');
+
+            for (let i = 0; i < needsPdf.length; i++) {
+                const book = needsPdf[i];
+                const pct = Math.round(((i + 1) / needsPdf.length) * 100);
+                progressBar.style.width = pct + '%';
+                progressText.textContent = `${pct}% · ${i + 1} / ${needsPdf.length}`;
 
                 try {
-                    const token = GHSAVE.getToken();
-                    const apiBase = `https://api.github.com/repos/${GHSAVE.OWNER}/${GHSAVE.REPO}/contents/${OVERRIDES_PATH}`;
-                    let overrides = {}, sha = null;
-                    const r = await fetch(`${apiBase}?ref=${GHSAVE.BRANCH}`, { headers: { 'Authorization': 'Bearer ' + token } });
-                    if (r.ok) {
-                        const meta = await r.json();
-                        sha = meta.sha;
-                        const raw = atob(meta.content.replace(/\s/g, ''));
-                        overrides = JSON.parse(decodeURIComponent(escape(raw)));
+                    const found = await searchAllSources(book, sources, false);
+                    if (found) {
+                        results.push({ book, url: found.url, source: found.source, identifier: found.identifier });
+                        addLog(`✅ [${found.source}] ${book.title}`, 'success');
+                    } else {
+                        addLog(`⛔ لم نجد: ${book.title}`, 'error');
                     }
-                    picked.forEach(p => {
-                        const existing = overrides[p.book.id] || {};
-                        overrides[p.book.id] = { ...existing, pdf: p.url };
-                    });
-                    const body = JSON.stringify(overrides, null, 2);
-                    const content = btoa(unescape(encodeURIComponent(body)));
-                    const r2 = await fetch(apiBase, {
-                        method: 'PUT',
-                        headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ message: `admin: add ${picked.length} archive.org PDFs from auto-fetch`, content, sha, branch: GHSAVE.BRANCH })
-                    });
-                    if (!r2.ok) throw new Error('GitHub ' + r2.status);
-                    showMessage(`✅ تمّ حفظ ${picked.length} رابط! ستظهر على الموقع خلال دقيقة (Cloudflare يعيد البناء).`, 'success');
                 } catch (err) {
-                    showMessage(`❌ فشل الحفظ: ${err.message}`, 'error');
-                    saveBtn.disabled = false;
+                    addLog(`❌ ${book.title} — ${err.message}`, 'error');
                 }
-            });
+                await sleep(250);
+            }
 
-            function addLog(text, type) {
-                const line = document.createElement('div');
-                line.className = 'fp-log-line ' + (type || 'info');
-                line.textContent = text;
-                log.appendChild(line);
-                log.scrollTop = log.scrollHeight;
+            addLog(`✨ انتهى. وجدنا ${results.length}/${needsPdf.length}.`, 'bold');
+            renderResults();
+            if (results.length) { selectAllBtn.disabled = false; saveBtn.disabled = false; }
+            startBtn.disabled = false; testBtn.disabled = false;
+        });
+
+        // ============== البحث في عدّة مصادر ==============
+        async function searchAllSources(book, sources, verbose) {
+            for (const src of sources) {
+                if (verbose) addLog(`   ⏳ أبحث في ${src}...`, 'info');
+                try {
+                    let found = null;
+                    if (src === 'archive') found = await searchArchive(book);
+                    else if (src === 'openlib') found = await searchOpenLib(book);
+                    else if (src === 'gutendex') found = await searchGutendex(book);
+                    if (found) return found;
+                } catch (err) {
+                    if (verbose) addLog(`   ⚠️ ${src}: ${err.message}`, 'error');
+                }
             }
-            function showMessage(text, type) {
-                messageBox.innerHTML = text ? `<div class="fp-message ${type || ''}">${esc(text)}</div>` : '';
+            return null;
+        }
+
+        async function searchArchive(book) {
+            // إستراتيجية: ابحث بالعنوان فقط أولاً (أوسع نتائج)، ثمّ فلتر باللغة
+            const titlePart = String(book.title).slice(0, 80).replace(/["'\\:]/g, ' ');
+            const q = `title:(${titlePart}) AND mediatype:texts`;
+            const url = `https://archive.org/advancedsearch.php?q=${encodeURIComponent(q)}&fl[]=identifier&fl[]=title&fl[]=creator&fl[]=language&rows=5&output=json`;
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('archive ' + res.status);
+            const data = await res.json();
+            const docs = data.response?.docs || [];
+            if (!docs.length) return null;
+            // فضّل العربية
+            const arabic = docs.find(d => {
+                const lang = Array.isArray(d.language) ? d.language.join(' ') : (d.language || '');
+                return /arab/i.test(lang);
+            });
+            const pick = arabic || docs[0];
+            return { url: `https://archive.org/embed/${pick.identifier}`, source: 'archive.org', identifier: pick.identifier };
+        }
+
+        async function searchOpenLib(book) {
+            // Open Library Search API (CORS-friendly)
+            const q = encodeURIComponent(String(book.title).slice(0, 80));
+            const url = `https://openlibrary.org/search.json?q=${q}&fields=key,title,author_name,ia,language&limit=5`;
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('openlib ' + res.status);
+            const data = await res.json();
+            const docs = data.docs || [];
+            // الحقل ia يحتوي على رموز archive.org المرتبطة
+            for (const d of docs) {
+                if (d.ia && d.ia.length) {
+                    const id = d.ia[0];
+                    return { url: `https://archive.org/embed/${id}`, source: 'open-library', identifier: id };
+                }
             }
-            function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-            function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-        })();
+            return null;
+        }
+
+        async function searchGutendex(book) {
+            // Project Gutenberg (gutendex.com — CORS-friendly)
+            const q = encodeURIComponent(String(book.title).slice(0, 80));
+            const url = `https://gutendex.com/books?search=${q}&languages=ar,en`;
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('gutendex ' + res.status);
+            const data = await res.json();
+            const results = data.results || [];
+            if (!results.length) return null;
+            const top = results[0];
+            // ابحث عن صيغة PDF في formats
+            const formats = top.formats || {};
+            const pdfKey = Object.keys(formats).find(k => /pdf/i.test(k));
+            if (pdfKey) {
+                return { url: formats[pdfKey], source: 'gutenberg', identifier: 'gb-' + top.id };
+            }
+            return null;
+        }
+
+        function renderResults() {
+            resultsCard.hidden = results.length === 0;
+            resultsList.innerHTML = results.map((r, i) => `
+                <div class="fp-result-row" data-i="${i}">
+                    <input type="checkbox" checked>
+                    <div class="info">
+                        <b>${esc(r.book.title)}</b>
+                        <span>${esc(r.book.author || '—')} · ${esc(r.book.category)} <span class="source-tag">${esc(r.source)}</span></span>
+                        <a href="${esc(r.url.replace('/embed/', '/details/'))}" target="_blank" rel="noopener">
+                            → افتح للتحقّق: ${esc(r.identifier || r.url)}
+                        </a>
+                    </div>
+                </div>`).join('');
+            resultsList.querySelectorAll('.fp-result-row').forEach(row => {
+                const cb = row.querySelector('input');
+                row.classList.toggle('is-checked', cb.checked);
+                cb.addEventListener('change', () => row.classList.toggle('is-checked', cb.checked));
+            });
+        }
+
+        selectAllBtn.addEventListener('click', () => {
+            const all = resultsList.querySelectorAll('input');
+            const checked = Array.from(all).every(cb => cb.checked);
+            all.forEach(cb => { cb.checked = !checked; cb.closest('.fp-result-row').classList.toggle('is-checked', cb.checked); });
+        });
+
+        saveBtn.addEventListener('click', async () => {
+            if (!GHSAVE.hasToken()) {
+                alert('⚠️ يلزم GitHub Token. اضبطه أولاً من صفحة admin.html.');
+                return;
+            }
+            const picked = [];
+            resultsList.querySelectorAll('.fp-result-row').forEach(row => {
+                if (row.querySelector('input').checked) picked.push(results[Number(row.dataset.i)]);
+            });
+            if (!picked.length) { alert('لم تحدد أي رابط'); return; }
+            saveBtn.disabled = true;
+            addLog(`💾 جارٍ حفظ ${picked.length} رابط...`, 'bold');
+
+            try {
+                const token = GHSAVE.getToken();
+                const apiBase = `https://api.github.com/repos/${GHSAVE.OWNER}/${GHSAVE.REPO}/contents/data/book-overrides.json`;
+                let overrides = {}, sha = null;
+                const r = await fetch(`${apiBase}?ref=${GHSAVE.BRANCH}`, { headers: { 'Authorization': 'Bearer ' + token } });
+                if (r.ok) {
+                    const meta = await r.json();
+                    sha = meta.sha;
+                    const raw = atob(meta.content.replace(/\s/g, ''));
+                    overrides = JSON.parse(decodeURIComponent(escape(raw)));
+                }
+                picked.forEach(p => {
+                    const existing = overrides[p.book.id] || {};
+                    overrides[p.book.id] = { ...existing, pdf: p.url };
+                });
+                const body = JSON.stringify(overrides, null, 2);
+                const content = btoa(unescape(encodeURIComponent(body)));
+                const r2 = await fetch(apiBase, {
+                    method: 'PUT',
+                    headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: `admin: add ${picked.length} PDFs auto-fetched`, content, sha, branch: GHSAVE.BRANCH })
+                });
+                if (!r2.ok) throw new Error('GitHub ' + r2.status);
+                addLog(`✅ حفظ ${picked.length} رابط. ستظهر على الموقع خلال دقيقة.`, 'success');
+                setStatus(`✅ تمّ حفظ ${picked.length} رابط. Cloudflare يعيد البناء...`, 'success');
+            } catch (err) {
+                addLog(`❌ فشل الحفظ: ${err.message}`, 'error');
+                saveBtn.disabled = false;
+            }
+        });
+
+        function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+        function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+        // عرض أي خطأ غير متوقّع
+        window.addEventListener('error', e => {
+            addLog(`❌ خطأ JavaScript: ${e.message}`, 'error');
+        });
     </script>
 </body>
 </html>

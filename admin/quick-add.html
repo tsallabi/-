@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إضافة كتاب سريعة — المكتبة الطيبة</title>
+    <link rel="stylesheet" href="../css/style.css?v=12">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Aref+Ruqaa:wght@700&display=swap" rel="stylesheet">
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('taybaa-theme') || 'dark');</script>
+    <style>
+        body { padding: 1.5rem 1rem 4rem; font-family: 'Cairo', sans-serif; }
+        .qa-wrap { max-width: 640px; margin: 0 auto; }
+        .qa-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+        .qa-head h1 { font-family: 'Aref Ruqaa', serif; color: var(--gold); margin: 0; font-size: 1.6rem; }
+        .qa-card { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 16px; padding: 1.75rem; box-shadow: var(--shadow-md); }
+        .qa-sub { color: var(--text-muted); margin: 0 0 1.5rem; font-size: .95rem; }
+        .qa-form { display: grid; gap: 1rem; }
+        .qa-form label { display: block; }
+        .qa-form .lbl { display: block; font-weight: 700; margin-bottom: .4rem; font-size: .95rem; color: var(--text); }
+        .qa-form .req { color: #ce1126; }
+        .qa-form input, .qa-form select, .qa-form textarea {
+            width: 100%; padding: .75rem 1rem;
+            border: 1px solid var(--border); border-radius: 10px;
+            background: var(--bg-subtle); color: var(--text);
+            font-family: inherit; font-size: 1rem;
+        }
+        .qa-form input:focus, .qa-form select:focus, .qa-form textarea:focus {
+            outline: 0; border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-soft);
+        }
+        .qa-form button[type=submit] {
+            padding: .95rem; background: var(--grad-gold); color: #2a1810; border: 0;
+            border-radius: 10px; font-family: inherit; font-weight: 700; font-size: 1.05rem;
+            cursor: pointer; transition: all .2s;
+        }
+        .qa-form button[type=submit]:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(184,148,31,.4); }
+        .qa-form button[type=submit]:disabled { opacity: .5; cursor: not-allowed; }
+        .qa-hint { font-size: .82rem; color: var(--text-muted); margin: .25rem 0 0; }
+        .qa-msg { padding: 1rem; border-radius: 10px; margin: 1rem 0 0; font-weight: 700; }
+        .qa-msg.success { background: rgba(90,122,58,.15); border: 1px solid #5a7a3a; color: #5a7a3a; }
+        .qa-msg.error { background: rgba(206,17,38,.1); border: 1px solid #ce1126; color: #ce1126; }
+        .qa-msg.info { background: var(--gold-soft); border: 1px solid var(--gold); color: var(--gold); }
+        .qa-tip { background: var(--bg-subtle); border-right: 4px solid var(--gold); padding: .85rem 1.1rem; border-radius: 6px; font-size: .85rem; line-height: 1.7; margin-top: 1.5rem; }
+        .qa-tip strong { color: var(--gold); }
+        a.back-link { color: var(--gold); text-decoration: none; font-weight: 700; }
+        a.back-link:hover { text-decoration: underline; }
+        .recent-list { margin-top: 2rem; }
+        .recent-list h3 { font-family: 'Aref Ruqaa', serif; color: var(--gold); font-size: 1.05rem; margin-bottom: .65rem; }
+        .recent-list ul { list-style: none; padding: 0; margin: 0; }
+        .recent-list li { padding: .65rem .85rem; background: var(--bg-subtle); border-radius: 8px; margin-bottom: .35rem; font-size: .85rem; }
+        .recent-list li b { color: var(--gold); }
+    </style>
+</head>
+<body>
+    <div class="qa-wrap">
+        <div class="qa-head">
+            <h1>⚡ إضافة كتاب سريعة</h1>
+            <a href="../admin.html" class="back-link">→ لوحة الإدارة</a>
+        </div>
+
+        <div class="qa-card">
+            <p class="qa-sub">أربعة حقول فقط والكتاب يدخل المكتبة — مثالي لإضافة كتبك الدينية فرديّاً.</p>
+
+            <form class="qa-form" id="qaForm">
+                <label>
+                    <span class="lbl">عنوان الكتاب <span class="req">*</span></span>
+                    <input type="text" id="qaTitle" required placeholder="مثال: العقيدة الواسطية">
+                </label>
+
+                <label>
+                    <span class="lbl">المؤلف <span class="req">*</span></span>
+                    <input type="text" id="qaAuthor" required placeholder="مثال: ابن تيمية">
+                </label>
+
+                <label>
+                    <span class="lbl">القسم <span class="req">*</span></span>
+                    <select id="qaCategory" required></select>
+                </label>
+
+                <label>
+                    <span class="lbl">رابط PDF أو archive.org</span>
+                    <input type="url" id="qaPdf" placeholder="https://archive.org/embed/... أو https://.../book.pdf">
+                    <p class="qa-hint">اتركه فارغًا إن لم يكن لديك رابط الآن (سيظهر بشارة “قريباً”)</p>
+                </label>
+
+                <label>
+                    <span class="lbl">رابط الغلاف (اختياري)</span>
+                    <input type="url" id="qaCover" placeholder="https://...cover.jpg">
+                </label>
+
+                <label>
+                    <span class="lbl">نبذة مختصرة (اختياري)</span>
+                    <textarea id="qaDesc" rows="3" placeholder="وصف قصير للكتاب..."></textarea>
+                </label>
+
+                <button type="submit" id="qaSaveBtn">➕ أضف إلى المكتبة</button>
+            </form>
+
+            <div id="qaMsg"></div>
+
+            <div class="qa-tip">
+                <strong>💡 ملاحظة:</strong> الكتب تُحفظ في <code>data/books-extra-3.json</code> في GitHub. بعد الحفظ Cloudflare يعيد بناء الموقع تلقائياً خلال دقيقة.
+            </div>
+        </div>
+
+        <div class="recent-list" id="recentList" style="display:none">
+            <h3>📚 مضاف في هذه الجلسة</h3>
+            <ul id="recentItems"></ul>
+        </div>
+    </div>
+
+    <script src="../js/config.js?v=12"></script>
+    <script src="../js/github-save.js?v=12"></script>
+    <script>
+        // تعبئة الأقسام
+        const cats = (typeof CONFIG !== 'undefined' && CONFIG.categoryOrder) || [];
+        const sel = document.getElementById('qaCategory');
+        cats.forEach(c => {
+            const o = new Option(c, c);
+            // اجعل "الدين والإسلاميات" هو الافتراضي
+            if (c === 'الدين والإسلاميات') o.selected = true;
+            sel.appendChild(o);
+        });
+
+        const msg = document.getElementById('qaMsg');
+        const saveBtn = document.getElementById('qaSaveBtn');
+        const recentList = document.getElementById('recentList');
+        const recentItems = document.getElementById('recentItems');
+        const sessionAdded = [];
+
+        document.getElementById('qaForm').addEventListener('submit', async e => {
+            e.preventDefault();
+            if (!GHSAVE.hasToken()) {
+                showMsg('⚠️ يلزم GitHub Token. اضبطه أولاً من لوحة الأدمن.', 'error');
+                return;
+            }
+            saveBtn.disabled = true;
+            showMsg('جارٍ الحفظ...', 'info');
+
+            const title = document.getElementById('qaTitle').value.trim();
+            const author = document.getElementById('qaAuthor').value.trim();
+            const category = document.getElementById('qaCategory').value;
+            const pdf = document.getElementById('qaPdf').value.trim();
+            const cover = document.getElementById('qaCover').value.trim();
+            const description = document.getElementById('qaDesc').value.trim();
+
+            try {
+                // جلب الملف
+                const token = GHSAVE.getToken();
+                const path = 'data/books-extra-3.json';
+                const apiBase = `https://api.github.com/repos/${GHSAVE.OWNER}/${GHSAVE.REPO}/contents/${path}`;
+                let current = { books: [] }, sha = null;
+                const r = await fetch(`${apiBase}?ref=${GHSAVE.BRANCH}`, { headers: { 'Authorization': 'Bearer ' + token } });
+                if (r.ok) {
+                    const meta = await r.json();
+                    sha = meta.sha;
+                    const raw = atob(meta.content.replace(/\s/g, ''));
+                    current = JSON.parse(decodeURIComponent(escape(raw)));
+                }
+                current.books = current.books || [];
+
+                // معرّف جديد فريد
+                const maxId = current.books.reduce((m, b) => Math.max(m, Number(b.id) || 0), 217);
+                const newBook = {
+                    id: String(maxId + 1),
+                    title, author, category,
+                    pages: 0,
+                    cover: cover,
+                    pdf: pdf,
+                    description: description,
+                    views: 0, downloads: 0,
+                    addedDate: new Date().toISOString().slice(0, 10),
+                    recommended: false
+                };
+                current.books.push(newBook);
+
+                // حفظ
+                const body = JSON.stringify(current, null, 2);
+                const content = btoa(unescape(encodeURIComponent(body)));
+                const r2 = await fetch(apiBase, {
+                    method: 'PUT',
+                    headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: `admin: quick-add "${title}"`, content, sha, branch: GHSAVE.BRANCH })
+                });
+                if (!r2.ok) throw new Error('GitHub ' + r2.status);
+
+                showMsg(`✅ تمّ إضافة «${title}»! ستظهر على الموقع خلال دقيقة.`, 'success');
+                sessionAdded.push({ title, author, category });
+                renderRecent();
+                document.getElementById('qaForm').reset();
+                document.getElementById('qaCategory').value = 'الدين والإسلاميات';
+            } catch (err) {
+                showMsg(`❌ فشل الحفظ: ${err.message}`, 'error');
+            } finally {
+                saveBtn.disabled = false;
+            }
+        });
+
+        function renderRecent() {
+            if (!sessionAdded.length) return;
+            recentList.style.display = 'block';
+            recentItems.innerHTML = sessionAdded.map(b =>
+                `<li><b>${esc(b.title)}</b> · ${esc(b.author)} · ${esc(b.category)}</li>`).join('');
+        }
+        function showMsg(text, kind) {
+            msg.innerHTML = `<div class="qa-msg ${kind || ''}">${esc(text)}</div>`;
+        }
+        function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    </script>
+</body>
+</html>
