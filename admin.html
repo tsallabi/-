@@ -5,27 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0a0e1a">
     <title>لوحة الإدارة — المكتبة الطيبة</title>
-    <link rel="stylesheet" href="css/style.css?v=4">
-    <link rel="stylesheet" href="css/admin.css?v=4">
+    <link rel="stylesheet" href="css/style.css?v=13">
+    <link rel="stylesheet" href="css/admin.css?v=13">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:wght@700&family=Aref+Ruqaa:wght@700&display=swap" rel="stylesheet">
     <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('taybaa-theme') || 'dark');</script>
+    <style>
+        .admin-tools { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin: 1.75rem 0 2.25rem; }
+        .admin-tool-card { display: flex; align-items: center; gap: 1rem; padding: 1.15rem 1.25rem; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 16px; color: var(--text); text-decoration: none; transition: all .2s; position: relative; overflow: hidden; }
+        .admin-tool-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, var(--gold-soft), transparent); opacity: 0; transition: opacity .2s; }
+        .admin-tool-card:hover { transform: translateY(-3px); border-color: var(--gold); box-shadow: var(--shadow-md); color: var(--text); text-decoration: none; }
+        .admin-tool-card:hover::before { opacity: 1; }
+        .admin-tool-card.recommended { border-color: var(--gold); background: linear-gradient(135deg, var(--bg-elevated), var(--gold-soft)); }
+        .admin-tool-card.recommended::after { content: '⭐ موصى به'; position: absolute; top: .35rem; left: .55rem; background: var(--grad-gold); color: #2a1810; padding: .15rem .5rem; border-radius: 999px; font-size: .65rem; font-weight: 800; font-family: 'Aref Ruqaa', sans-serif; }
+        .admin-tool-card.urgent { border-color: #ce1126; background: linear-gradient(135deg, var(--bg-elevated), rgba(206,17,38,.08)); }
+        .admin-tool-card.urgent::after { content: '🚨 ابدأ هنا'; position: absolute; top: .35rem; left: .55rem; background: linear-gradient(135deg,#ce1126,#8b1a1a); color: #fff; padding: .15rem .5rem; border-radius: 999px; font-size: .65rem; font-weight: 800; font-family: 'Aref Ruqaa', sans-serif; }
+        .admin-tool-card .tool-icon { width: 48px; height: 48px; border-radius: 12px; background: var(--grad-gold); display: grid; place-items: center; font-size: 1.7rem; flex-shrink: 0; position: relative; box-shadow: 0 4px 12px rgba(184,148,31,.35); }
+        .admin-tool-card.urgent .tool-icon { background: linear-gradient(135deg,#ce1126,#8b1a1a); }
+        .admin-tool-card .tool-info { position: relative; display: flex; flex-direction: column; }
+        .admin-tool-card .tool-info strong { font-size: 1rem; color: var(--gold); font-family: 'Aref Ruqaa', 'Cairo', serif; margin-bottom: .15rem; }
+        .admin-tool-card.urgent .tool-info strong { color: #ce1126; }
+        .admin-tool-card .tool-info span { font-size: .8rem; color: var(--text-muted); }
+        .admin-section-head { font-family: 'Aref Ruqaa', serif; color: var(--gold); font-size: 1.15rem; margin: 1.5rem 0 .5rem; display: flex; align-items: center; gap: .55rem; }
+        .admin-section-head .admin-sub { font-size: .8rem; color: var(--text-muted); font-family: 'Cairo', sans-serif; font-weight: 500; }
+        .workflow-tip { background: linear-gradient(135deg, var(--bg-elevated), var(--gold-soft)); border: 1px solid var(--gold); border-radius: 12px; padding: 1.1rem 1.4rem; margin: 1rem 0 0; font-size: .9rem; line-height: 1.85; }
+        .workflow-tip strong { color: var(--gold); font-family: 'Aref Ruqaa', serif; }
+        .workflow-tip ol { margin: .55rem 0; padding-inline-start: 1.5rem; }
+    </style>
 </head>
 <body>
     <header class="site-header" id="siteHeader">
         <div class="container header-inner">
             <a href="index.html" class="logo" aria-label="الصفحة الرئيسية">
                 <span class="logo-mark" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24">
-                        <path d="M4 19.5A2.5 2.5 0 016.5 17H20V3H6.5A2.5 2.5 0 004 5.5v14z"/>
-                        <path d="M4 19.5A2.5 2.5 0 016.5 22H20v-5"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20V3H6.5A2.5 2.5 0 004 5.5v14z"/><path d="M4 19.5A2.5 2.5 0 016.5 22H20v-5"/></svg>
                 </span>
-                <span class="logo-text">
-                    <span class="logo-title">المكتبة الطيبة</span>
-                    <span class="logo-tag">لوحة الإدارة</span>
-                </span>
+                <span class="logo-text"><span class="logo-title">المكتبة الطيبة</span><span class="logo-tag">لوحة الإدارة</span></span>
             </a>
             <div class="admin-header-actions">
                 <a href="index.html" class="link-btn">عرض الموقع ↗</a>
@@ -59,21 +75,42 @@
             <div class="admin-stat-card"><span class="stat-icon">⬇️</span><div><b id="totalDownloads">0</b><span>تحميل</span></div></div>
             <div class="admin-stat-card"><span class="stat-icon">📂</span><div><b id="totalCategories">0</b><span>قسم</span></div></div>
         </section>
+
+        <h2 class="admin-section-head">⚡ أدوات الإدارة <span class="admin-sub">— اتبع الترتيب الموصى به</span></h2>
+        <section class="admin-tools">
+            <a href="admin/audit.html" class="admin-tool-card urgent"><span class="tool-icon">🩺</span><span class="tool-info"><strong>فحص جميع الكتب</strong><span>تحقّق أيّ روابط تعمل فعلاً وامسح المعطّلة</span></span></a>
+            <a href="admin/fetch-pdfs.html" class="admin-tool-card"><span class="tool-icon">🌐</span><span class="tool-info"><strong>إثراء الكتب تلقائياً</strong><span>archive.org + Open Library + Gutenberg</span></span></a>
+            <a href="admin/quick-add.html" class="admin-tool-card recommended"><span class="tool-icon">⚡</span><span class="tool-info"><strong>إضافة كتاب سريعة</strong><span>4 حقول فقط — للكتب الدينية</span></span></a>
+            <a href="admin/books.html" class="admin-tool-card"><span class="tool-icon">🔍</span><span class="tool-info"><strong>بحث Google Books</strong><span>استيراد دفعة + تعديل الأغلفة</span></span></a>
+            <a href="admin/users.html" class="admin-tool-card"><span class="tool-icon">👤</span><span class="tool-info"><strong>إدارة المستخدمين</strong><span>أنشئ حسابات + صلاحية قسم الدين</span></span></a>
+            <a href="#" id="settingsBtn2" class="admin-tool-card"><span class="tool-icon">⚙️</span><span class="tool-info"><strong>إعدادات GitHub Token</strong><span>مطلوب مرّة واحدة فقط</span></span></a>
+        </section>
+
+        <div class="workflow-tip">
+            <strong>📋 الخطوات الموصى بها (مرّة واحدة):</strong>
+            <ol>
+                <li>⚙️ <strong>اضبط GitHub Token</strong> (دقيقة) — حفظ التغييرات يحتاجه.</li>
+                <li>🩺 <strong>افحص جميع الكتب</strong> (دقيقتان) — تكتشف أيّ روابط معطّلة.</li>
+                <li>🌐 <strong>إثراء تلقائياً</strong> (دقيقة) — يبحث عن بدائل في archive.org والمصادر الأخرى.</li>
+                <li>⚡ <strong>إضافة سريعة</strong> — لكتبك الخاصّة (الدين أو غيره) واحداً واحداً.</li>
+            </ol>
+        </div>
+
         <section class="admin-toolbar">
-            <div><h2>📚 إدارة الكتب</h2><p class="section-sub">أضف، عدّل، أو احذف الكتب.</p></div>
+            <div><h2>📚 جدول الكتب</h2><p class="section-sub">عدّل، احذف، أو أضف كتاباً (محرّر متقدّم 3 خطوات)</p></div>
             <div class="toolbar-actions">
                 <input type="search" id="adminSearch" placeholder="🔍 بحث في الكتب..." class="admin-search">
-                <button class="link-btn" id="settingsBtn" type="button">⚙️ إعدادات GitHub (v4)</button>
+                <button class="link-btn" id="settingsBtn" type="button">⚙️ Token</button>
                 <button class="btn btn-primary" id="addBookBtn" type="button">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M12 5v14M5 12h14"/></svg>
-                    أضف كتاباً
+                    إضافة متقدّمة
                 </button>
             </div>
         </section>
 
         <div class="admin-notice" id="storageNotice" hidden>
-            <strong>💾 الحفظ:</strong>
-            <span id="storageStatus">— لم يُضبط GitHub Token بعد</span>
+            <strong>💾 الحفظ في GitHub:</strong>
+            <span id="storageStatus">— لم يُضبط GitHub Token بعد.</span>
             <button class="link-btn" id="storageNoticeBtn" type="button">⚙️ اضبط الآن</button>
         </div>
 
@@ -116,94 +153,64 @@
                                 </datalist>
                             </div>
                             <div class="field"><label for="bookPages">عدد الصفحات</label><input type="number" id="bookPages" min="0"></div>
-                            <div class="field field-full"><label class="checkbox"><input type="checkbox" id="bookRecommended"><span>⭐ موصى به (يظهر في القسم المميز)</span></label></div>
+                            <div class="field field-full"><label class="checkbox"><input type="checkbox" id="bookRecommended"><span>⭐ موصى به</span></label></div>
                         </div>
                     </section>
                     <section class="step-panel" data-panel="2">
                         <div class="field">
                             <label>🖼️ صورة الغلاف</label>
                             <div class="upload-zone" id="coverUpload">
-                                <img id="coverPreview" alt="معاينة الغلاف" hidden>
-                                <div class="upload-placeholder">
-                                    <span class="upload-icon">🖼️</span>
-                                    <p><strong>اسحب صورة هنا</strong> أو اضغط للاختيار</p>
-                                    <small>JPG, PNG · يفضل 400×600 بكسل</small>
-                                </div>
+                                <img id="coverPreview" alt="" hidden>
+                                <div class="upload-placeholder"><span class="upload-icon">🖼️</span><p><strong>اسحب صورة هنا</strong></p></div>
                                 <input type="file" id="coverFile" accept="image/*" hidden>
                             </div>
-                            <p class="field-hint">أو الصق رابط الصورة:</p>
                             <input type="url" id="coverUrl" placeholder="https://...cover.jpg">
-                            <button type="button" class="btn-ai" id="aiGenCoverBtn">
-                                <span class="ai-icon">✨</span>
-                                ولّد غلافاً بالذكاء الاصطناعي
-                            </button>
-                            <p class="field-hint">يستخدم AI لتوليد غلاف من اسم الكتاب والمؤلف.</p>
+                            <button type="button" class="btn-ai" id="aiGenCoverBtn"><span class="ai-icon">✨</span>ولّد غلافاً بالذكاء الاصطناعي</button>
                         </div>
                         <div class="field">
                             <label>📄 ملف الكتاب</label>
                             <div class="upload-tabs">
                                 <button type="button" class="tab-btn active" data-tab="pdf">PDF</button>
-                                <button type="button" class="tab-btn" data-tab="docx">Word (.docx)</button>
-                                <button type="button" class="tab-btn" data-tab="url">رابط مباشر</button>
+                                <button type="button" class="tab-btn" data-tab="docx">Word</button>
+                                <button type="button" class="tab-btn" data-tab="url">رابط</button>
                             </div>
                             <div class="tab-panel active" data-tab-panel="pdf">
                                 <div class="upload-zone" id="pdfUpload">
-                                    <div class="upload-placeholder">
-                                        <span class="upload-icon">📄</span>
-                                        <p><strong>اسحب ملف PDF هنا</strong> أو اضغط للاختيار</p>
-                                        <small id="pdfFileName">لم يتم اختيار ملف</small>
-                                    </div>
+                                    <div class="upload-placeholder"><span class="upload-icon">📄</span><p>اسحب ملف PDF</p><small id="pdfFileName">لم يتم اختيار ملف</small></div>
                                     <input type="file" id="pdfFile" accept="application/pdf,.pdf" hidden>
                                 </div>
                             </div>
                             <div class="tab-panel" data-tab-panel="docx">
                                 <div class="upload-zone" id="docxUpload">
-                                    <div class="upload-placeholder">
-                                        <span class="upload-icon">📝</span>
-                                        <p><strong>اسحب ملف Word (.docx)</strong> أو اضغط للاختيار</p>
-                                        <small id="docxFileName">لم يتم اختيار ملف</small>
-                                    </div>
-                                    <input type="file" id="docxFile" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
+                                    <div class="upload-placeholder"><span class="upload-icon">📝</span><p>اسحب Word</p><small id="docxFileName">لم يتم اختيار ملف</small></div>
+                                    <input type="file" id="docxFile" accept=".docx" hidden>
                                 </div>
                                 <div class="docx-preview-wrap" id="docxPreviewWrap" hidden>
-                                    <p class="field-hint">📖 معاينة الكتاب بعد التنسيق:</p>
                                     <div class="docx-preview book-preview" id="docxPreview"></div>
                                     <div class="preview-actions">
-                                        <button type="button" class="link-btn" id="downloadHtmlBtn">⬇️ تحميل HTML</button>
-                                        <button type="button" class="link-btn" id="downloadPdfBtn">⬇️ تحميل PDF</button>
+                                        <button type="button" class="link-btn" id="downloadHtmlBtn">⬇️ HTML</button>
+                                        <button type="button" class="link-btn" id="downloadPdfBtn">⬇️ PDF</button>
                                     </div>
                                 </div>
-                                <p class="field-hint">💡 من Google Docs: <strong>File → Download → Microsoft Word (.docx)</strong></p>
                             </div>
                             <div class="tab-panel" data-tab-panel="url">
                                 <input type="url" id="pdfUrl" placeholder="https://...book.pdf">
-                                <p class="field-hint">رابط مباشر لملف PDF (مثلاً من Google Drive أو archive.org)</p>
                             </div>
                         </div>
                     </section>
                     <section class="step-panel" data-panel="3">
                         <div class="field">
-                            <label for="bookDescription">📌 نبذة مختصرة *</label>
-                            <textarea id="bookDescription" rows="3" placeholder="نبذة موجزة..."></textarea>
-                            <button type="button" class="btn-ai" id="aiGenDescBtn">
-                                <span class="ai-icon">✨</span>
-                                اكتب نبذة تلقائياً بالذكاء الاصطناعي
-                            </button>
+                            <label for="bookDescription">📌 نبذة *</label>
+                            <textarea id="bookDescription" rows="3"></textarea>
+                            <button type="button" class="btn-ai" id="aiGenDescBtn"><span class="ai-icon">✨</span>اكتب نبذة AI</button>
                         </div>
                         <div class="field">
                             <label for="bookIntro">📝 المقدمة</label>
-                            <textarea id="bookIntro" rows="6" placeholder="مقدمة الكتاب..."></textarea>
+                            <textarea id="bookIntro" rows="6"></textarea>
                             <div class="ai-buttons-row">
-                                <button type="button" class="btn-ai" id="aiGenIntroBtn">
-                                    <span class="ai-icon">✨</span>
-                                    اكتب مقدمة تلقائياً
-                                </button>
-                                <button type="button" class="btn-ai" id="aiEnhanceIntroBtn">
-                                    <span class="ai-icon">🪄</span>
-                                    حسّن الصياغة وصحّح الأخطاء
-                                </button>
+                                <button type="button" class="btn-ai" id="aiGenIntroBtn"><span class="ai-icon">✨</span>مقدمة AI</button>
+                                <button type="button" class="btn-ai" id="aiEnhanceIntroBtn"><span class="ai-icon">🪄</span>حسّن</button>
                             </div>
-                            <p class="field-hint">💡 إذا رفعت ملف Word سيتم استخراج المقدمة تلقائياً.</p>
                         </div>
                     </section>
                 </form>
@@ -213,7 +220,7 @@
                 <div class="modal-foot-spacer"></div>
                 <button type="button" class="link-btn" data-close>إلغاء</button>
                 <button type="button" class="btn btn-primary" id="nextStepBtn">التالي ←</button>
-                <button type="button" class="btn btn-primary" id="saveBookBtn" hidden>💾 حفظ الكتاب</button>
+                <button type="button" class="btn btn-primary" id="saveBookBtn" hidden>💾 حفظ</button>
             </footer>
         </div>
     </div>
@@ -229,31 +236,26 @@
                 <div class="field">
                     <label for="ghTokenInput">🔑 GitHub Personal Access Token</label>
                     <input type="password" id="ghTokenInput" placeholder="github_pat_... أو ghp_...">
-                    <p class="field-hint">يُحفظ على جهازك فقط، لا يُرسل لأي مكان غير GitHub.</p>
+                    <p class="field-hint">يُحفظ على جهازك فقط.</p>
                 </div>
-
                 <div class="admin-notice" style="background: var(--primary-soft); border-color: var(--primary)">
                     <strong>📝 كيفية الحصول على Token:</strong>
                     <ol style="margin: .65rem 0; padding-inline-start: 1.5rem; line-height: 1.9">
-                        <li>افتح: <a href="https://github.com/settings/personal-access-tokens/new" target="_blank">github.com/settings/personal-access-tokens/new</a></li>
+                        <li><a href="https://github.com/settings/personal-access-tokens/new" target="_blank">github.com/settings/personal-access-tokens/new</a></li>
                         <li><strong>Token name</strong>: TAYBAA-LIBRARY-admin</li>
-                        <li><strong>Expiration</strong>: 1 year (سنة)</li>
-                        <li><strong>Repository access</strong>: Only select repositories ← اختر <code>TAYBAA-LIBRARY</code></li>
-                        <li>تحت <strong>Repository permissions</strong>:
-                            <ul style="margin: .25rem 0"><li><strong>Contents</strong>: Read and write</li></ul>
-                        </li>
-                        <li>اضغط <strong>Generate token</strong></li>
-                        <li>انسخ Token والصقه أعلاه ⬆️</li>
+                        <li><strong>Expiration</strong>: 1 year</li>
+                        <li><strong>Repository access</strong>: Only select → <code>TAYBAA-LIBRARY</code></li>
+                        <li><strong>Repository permissions → Contents</strong>: Read and write</li>
+                        <li>Generate token → انسخ والصق ⬆️</li>
                     </ol>
                 </div>
-
                 <p id="ghTestResult" class="field-hint" style="margin-top: .75rem"></p>
             </div>
             <footer class="admin-modal-foot">
                 <button type="button" class="link-btn" id="ghRemoveBtn" hidden>🗑️ احذف Token</button>
                 <div class="modal-foot-spacer"></div>
                 <button type="button" class="link-btn" data-close-gh>إلغاء</button>
-                <button type="button" class="btn btn-primary" id="ghSaveBtn">💾 احفظ Token</button>
+                <button type="button" class="btn btn-primary" id="ghSaveBtn">💾 احفظ</button>
             </footer>
         </div>
     </div>
@@ -261,9 +263,17 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
-    <script src="js/config.js?v=4"></script>
-    <script src="js/data.js?v=4"></script>
-    <script src="js/github-save.js?v=4"></script>
-    <script src="js/admin.js?v=4"></script>
+    <script src="js/config.js?v=13"></script>
+    <script src="js/user-system.js?v=13"></script>
+    <script src="js/data.js?v=13"></script>
+    <script src="js/github-save.js?v=13"></script>
+    <script src="js/admin.js?v=13"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const newBtn = document.getElementById('settingsBtn2');
+            const originalBtn = document.getElementById('settingsBtn');
+            if (newBtn && originalBtn) newBtn.addEventListener('click', e => { e.preventDefault(); originalBtn.click(); });
+        });
+    </script>
 </body>
 </html>
