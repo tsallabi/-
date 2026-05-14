@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#0a0e1a">
-    <title>المكتبة الطيبة — اقرأ بحرية</title>
-    <meta name="description" content="مكتبة إلكترونية حديثة: تصفح الكتب أونلاين أو حمّلها على جهازك بضغطة زر.">
-    <link rel="stylesheet" href="css/style.css?v=5">
+    <meta name="theme-color" content="#0a0e16">
+    <title>المكتبة الطيبة — أكبر مكتبة عربية أونلاين · من قلب ليبيا</title>
+    <meta name="description" content="دار نشر المكتبة الطيبة · أضخم مكتبة إلكترونية للكتب العربية في تطوير الذات وريادة الأعمال وعلم النفس والإدارة. من ليبيا إلى الوطن العربي.">
+    <link rel="stylesheet" href="css/style.css?v=6">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:wght@700&family=Aref+Ruqaa:wght@700&display=swap" rel="stylesheet">
     <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('taybaa-theme') || 'dark');</script>
 </head>
 <body>
+    <div class="flag-strip" aria-hidden="true"></div>
     <header class="site-header" id="siteHeader">
         <div class="container header-inner">
             <a href="index.html" class="logo" aria-label="الصفحة الرئيسية">
@@ -51,9 +52,13 @@
                 <span class="hero-orb orb-3"></span>
             </div>
             <div class="container hero-inner">
-                <span class="hero-badge">📚 مكتبة مفتوحة للجميع</span>
-                <h1 class="hero-title">اقرأ ما يُلهمك.<br><span class="hero-grad">حمّل ما تحب.</span></h1>
-                <p class="hero-subtitle">بدون تسجيل · بدون تعقيد · مجاناً للجميع</p>
+                <span class="hero-badge"><span class="flag-emoji">🇱🇾</span> من ليبيا · إلى الوطن العربي</span>
+                <h1 class="hero-title">
+                    أكبر مكتبة عربية أونلاين<br>
+                    <span class="hero-grad">من قلب ليبيا</span>
+                </h1>
+                <p class="hero-subtitle">تطوير الذات · ريادة الأعمال · القيادة · علم النفس · الإدارة · الفكر والأدب</p>
+                <p class="hero-tagline">دار نشر المكتبة الطيبة · علم بلا حدود</p>
 
                 <div class="hero-stats" id="heroStats">
                     <div class="stat"><b id="statBooks">0</b><span>كتاب</span></div>
@@ -67,8 +72,8 @@
             <div class="container">
                 <header class="section-head">
                     <div>
-                        <h2 id="categoriesTitle">📂 الأقسام</h2>
-                        <p class="section-sub">اختر القسم الذي يهمّك</p>
+                        <h2 id="categoriesTitle"><span class="gold-icon">◆</span> الأقسام</h2>
+                        <p class="section-sub">تصفّح الكتب حسب موضوعك المفضّل</p>
                     </div>
                 </header>
                 <div class="categories-grid" id="categoriesGrid"></div>
@@ -90,8 +95,8 @@
             <div class="container">
                 <header class="section-head">
                     <div>
-                        <h2>📈 الأكثر قراءة</h2>
-                        <p class="section-sub">أحبّها القراء أكثر</p>
+                        <h2><span class="gold-icon">◆</span> الأكثر قراءة</h2>
+                        <p class="section-sub">أحبّها القرّاء أكثر من غيرها</p>
                     </div>
                 </header>
                 <div class="books-grid" id="popularBooks"></div>
@@ -102,8 +107,8 @@
             <div class="container">
                 <header class="section-head">
                     <div>
-                        <h2>✨ الأحدث</h2>
-                        <p class="section-sub">إضافات جديدة على الرفوف</p>
+                        <h2><span class="gold-icon">◆</span> الأحدث</h2>
+                        <p class="section-sub">إضافات جديدة على رفوف المكتبة</p>
                     </div>
                 </header>
                 <div class="books-grid" id="newBooks"></div>
@@ -114,8 +119,8 @@
             <div class="container">
                 <header class="section-head">
                     <div>
-                        <h2>⭐ موصى به</h2>
-                        <p class="section-sub">اختيارات مميزة لك</p>
+                        <h2><span class="gold-icon">◆</span> موصى به</h2>
+                        <p class="section-sub">اختيارات فريدة من قلب التراث والمعرفة</p>
                     </div>
                 </header>
                 <div class="books-grid" id="recommendedBooks"></div>
@@ -126,15 +131,16 @@
     <footer class="site-footer">
         <div class="container footer-inner">
             <div class="footer-brand">
-                <strong>المكتبة الطيبة</strong>
-                <span>نشر العلم. مجاناً.</span>
+                <strong>دار نشر المكتبة الطيبة</strong>
+                <span>نشر العلم · مجاناً للجميع</span>
+                <span class="footer-identity">🇱🇾 من ليبيا · إلى كل قارئ في الوطن العربي</span>
             </div>
-            <p class="footer-copy">© <span id="year"></span> TAYBAA-LIBRARY · مشروع مفتوح للقراء</p>
+            <p class="footer-copy">© <span id="year"></span> TAYBAA-LIBRARY · مشروع مفتوح للقرّاء</p>
         </div>
     </footer>
 
-    <script src="js/config.js?v=5"></script>
-    <script src="js/data.js?v=5"></script>
-    <script src="js/app.js?v=5"></script>
+    <script src="js/config.js?v=6"></script>
+    <script src="js/data.js?v=6"></script>
+    <script src="js/app.js?v=6"></script>
 </body>
 </html>
