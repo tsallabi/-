@@ -30,6 +30,7 @@
 
     let books;
     try { books = await DATA.loadBooks(); } catch (err) { console.error(err); return showNotFound(); }
+    books = DATA.filterForViewer(books);
 
     const book = DATA.findById(books, id);
     if (!book) return showNotFound();
@@ -56,9 +57,7 @@
                 COUNTER.increment(book.id, 'downloads');
                 els.downloads.textContent = (Number(els.downloads.textContent) + 1);
             });
-        } else {
-            els.downloadBtn.style.display = 'none';
-        }
+        } else { els.downloadBtn.style.display = 'none'; }
     } else {
         els.readBtn.style.opacity = '.5';
         els.readBtn.style.pointerEvents = 'none';
@@ -75,27 +74,33 @@
         if (typeof live.downloads === 'number') els.downloads.textContent = live.downloads;
     }
 
-    function renderCoverFrame(book) {
+    async function renderCoverFrame(book) {
         if (!els.coverFrame) return;
-        const icon = (typeof CONFIG !== 'undefined' && CONFIG.categoryIcons && CONFIG.categoryIcons[book.category]) || (CONFIG && CONFIG.defaultCategoryIcon) || '📚';
-        const publisher = (typeof CONFIG !== 'undefined' && CONFIG.publisherShort) || 'دار المكتبة الطيبة';
-        const fallback = `
-            <div class="book-cover-fallback" aria-hidden="true">
-                <div class="cf-top"><span class="cf-icon">${icon}</span></div>
-                <div class="cf-mid"><h3 class="cf-title">${escapeHTML(book.title)}</h3></div>
-                <div class="cf-bottom">
-                    <p class="cf-author">${escapeHTML(book.author || 'مؤلف غير معروف')}</p>
-                    <p class="cf-publisher">${escapeHTML(publisher)}</p>
-                </div>
-            </div>`;
-        const img = book.cover
-            ? `<img class="book-cover" src="${escapeAttr(book.cover)}" alt="${escapeAttr(book.title)}" loading="lazy" onerror="this.remove();">`
-            : '';
-        els.coverFrame.innerHTML = fallback + img;
+        const icon = (CONFIG.categoryIcons && CONFIG.categoryIcons[book.category]) || CONFIG.defaultCategoryIcon || '📚';
+        const publisher = CONFIG.publisherShort || 'دار المكتبة الطيبة';
+        els.coverFrame.innerHTML = `<div class="book-cover-fallback" aria-hidden="true">
+            <div class="cf-top"><span class="cf-icon">${icon}</span></div>
+            <div class="cf-mid"><h3 class="cf-title">${escapeHTML(book.title)}</h3></div>
+            <div class="cf-bottom">
+                <p class="cf-author">${escapeHTML(book.author || 'مؤلف غير معروف')}</p>
+                <p class="cf-publisher">${escapeHTML(publisher)}</p>
+            </div></div>`;
+        if (typeof COVER !== 'undefined') {
+            try {
+                const url = await COVER.resolve(book);
+                if (url) {
+                    const img = document.createElement('img');
+                    img.className = 'book-cover';
+                    img.alt = book.title;
+                    img.onerror = function() { this.remove(); };
+                    img.src = url;
+                    els.coverFrame.appendChild(img);
+                }
+            } catch (_) {}
+        }
     }
 
     function escapeHTML(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
-    function escapeAttr(s) { return escapeHTML(s); }
     function showNotFound() { els.loading.hidden = true; els.notFound.hidden = false; }
 
     function initThemeToggle() {
