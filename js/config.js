@@ -1,4 +1,4 @@
-/* المكتبة الطيبة — ملف الإعدادات */
+/* المكتبة الطيبة — إعدادات */
 
 const CONFIG = {
     siteName: 'المكتبة الطيبة',
@@ -10,22 +10,33 @@ const CONFIG = {
     sheetId: '',
     sheetName: 'books',
 
+    /* ☄️ Firebase Authentication — لدخول جوجل وفيسبوك والإيميل
+       خطوات التفعيل:
+       1) https://console.firebase.google.com → أنشئ مشروعاً
+       2) Authentication → Sign-in method → فعّل Google + Facebook + Email/Password
+       3) Project Settings → General → Your apps → Web (</>) → Register app
+       4) انسخ الـ firebaseConfig إلى أدناه واضبط enabled: true
+       5) لفيسبوك: https://developers.facebook.com → أنشئ تطبيقاً → أدخل
+          App ID و App Secret في Firebase Console */
     firebase: {
         enabled: false,
-        config: { apiKey: '', authDomain: '', projectId: '', storageBucket: '', messagingSenderId: '', appId: '' }
+        config: {
+            apiKey: '',
+            authDomain: '',
+            projectId: '',
+            storageBucket: '',
+            messagingSenderId: '',
+            appId: ''
+        }
     },
 
     admin: { password: 'taybaa2026', allowedEmails: [] },
 
-    // كلمة سرّ القسم الخاص لفتح كتب الدين والإسلاميات
     vipPassword: 'taybaa-vip-2026',
-
     enableUniqueViewCount: true,
 
-    // الأقسام المخفية عن القارئ العادي
     hiddenCategories: ['الدين والإسلاميات', 'Islamic Studies (English)'],
 
-    // ترتيب عرض الأقسام: الإدارة والتطوير أولاً، الدين أخيراً
     categoryOrder: [
         'تطوير الذات والنجاح',
         'التحفيز والإلهام',
@@ -69,7 +80,7 @@ const CONFIG = {
         'التاريخ والتراث': '📜',
         'العلوم والمعرفة': '🔬',
         'التعليم والدراسة': '🎓',
-        'الشعر': '✒️',
+        'الشعر': '✍️',
         'كتب الأطفال': '🧸',
         'التطوير الذاتي': '💼',
         'الدين والإسلاميات': '🕌',

@@ -1,4 +1,4 @@
-/* نظام المستخدمين: تسجيل دخول + مفضّلة + موقع آخر صفحة قراءة */
+/* نظام المستخدمين: تسجيل دخول محلي + دخول خارجي + مفضّلة + موقع آخر صفحة قراءة */
 
 const USER = (function() {
     const SESSION_KEY = 'taybaa-user-session';
@@ -14,12 +14,27 @@ const USER = (function() {
     async function loadUsers(force) {
         if (usersCache && !force) return usersCache;
         try {
-            const res = await fetch('data/users.json?t=' + Date.now());
+            const res = await fetch(pathRoot() + 'data/users.json?t=' + Date.now());
             if (!res.ok) { usersCache = []; return []; }
             const data = await res.json();
             usersCache = data.users || [];
         } catch (_) { usersCache = []; }
         return usersCache;
+    }
+
+    function pathRoot() {
+        return /\/admin(\/|\.html)/.test(location.pathname) ? '../' : '';
+    }
+
+    async function loadFirebasePermissions(email) {
+        if (!email) return [];
+        try {
+            const res = await fetch(pathRoot() + 'data/firebase-permissions.json?t=' + Date.now());
+            if (!res.ok) return [];
+            const data = await res.json();
+            const entry = (data.users || []).find(u => (u.email || '').toLowerCase() === email.toLowerCase());
+            return entry ? (entry.allowedCategories || []) : [];
+        } catch { return []; }
     }
 
     async function login(username, password) {
@@ -34,13 +49,34 @@ const USER = (function() {
         const session = {
             username: user.username,
             displayName: user.displayName || user.username,
+            allowedCategories: Array.isArray(user.allowedCategories) ? user.allowedCategories : [],
+            source: 'local',
             loginAt: new Date().toISOString()
         };
-        localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+        setSession(session);
         return session;
     }
 
-    function logout() { localStorage.removeItem(SESSION_KEY); }
+    /* تثبيت جلسة جاهزة من مزوّد خارجي (مثل Firebase) */
+    async function setSession(session) {
+        if (!session) { logout(); return; }
+        // للحسابات الخارجية: اجلب صلاحياتها إن وجدت، وإلا اترك الأصلي
+        if (session.source === 'firebase' && session.email && !session.allowedCategories?.length) {
+            try {
+                const perms = await loadFirebasePermissions(session.email);
+                if (perms.length) session.allowedCategories = perms;
+            } catch (_) {}
+        }
+        if (!Array.isArray(session.allowedCategories)) session.allowedCategories = [];
+        localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    }
+
+    function logout() {
+        localStorage.removeItem(SESSION_KEY);
+        if (typeof FBAUTH !== 'undefined' && FBAUTH.isConfigured()) {
+            try { FBAUTH.signOut(); } catch (_) {}
+        }
+    }
 
     function current() {
         try { return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); }
@@ -49,10 +85,10 @@ const USER = (function() {
 
     function isLoggedIn() { return !!current(); }
 
-    return { login, logout, current, isLoggedIn, sha256, loadUsers };
+    return { login, logout, current, isLoggedIn, sha256, loadUsers, setSession };
 })();
 
-/* المفضّلة بحسب الحساب (أو مجهول إن لم يسجل دخول) */
+/* المفضّلة بحسب الحساب */
 const FAVS = (function() {
     function key() {
         const u = USER.current();
@@ -68,9 +104,7 @@ const FAVS = (function() {
         const a = getAll(); const s = String(id);
         if (!a.includes(s)) { a.push(s); save(a); }
     }
-    function remove(id) {
-        save(getAll().filter(x => x !== String(id)));
-    }
+    function remove(id) { save(getAll().filter(x => x !== String(id))); }
     function toggle(id) {
         if (has(id)) { remove(id); return false; }
         else { add(id); return true; }
@@ -78,20 +112,17 @@ const FAVS = (function() {
     return { getAll, has, add, remove, toggle };
 })();
 
-/* موقع آخر صفحة قراءة لكل كتاب */
+/* موقع آخر صفحة قراءة */
 const READING = (function() {
     function userPrefix() {
         const u = USER.current();
         return u ? u.username : 'anon';
     }
-    function key(bookId) {
-        return `taybaa-read-${userPrefix()}-${bookId}`;
-    }
+    function key(bookId) { return `taybaa-read-${userPrefix()}-${bookId}`; }
     function setPage(bookId, page) {
         if (!bookId) return;
         try {
-            localStorage.setItem(key(bookId),
-                JSON.stringify({ page: Number(page) || 1, ts: Date.now() }));
+            localStorage.setItem(key(bookId), JSON.stringify({ page: Number(page) || 1, ts: Date.now() }));
         } catch (_) {}
     }
     function getPage(bookId) {
