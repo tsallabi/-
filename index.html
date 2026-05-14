@@ -6,11 +6,36 @@
     <meta name="theme-color" content="#1a0f08">
     <title>المكتبة الطيبة — أكبر مكتبة عربية أونلاين · واحة المعرفة في ليبيا</title>
     <meta name="description" content="دار نشر المكتبة الطيبة · واحة المعرفة في صحراء الجهل. تطوير الذات · ريادة الأعمال · الإدارة.">
-    <link rel="stylesheet" href="css/style.css?v=7">
+    <link rel="stylesheet" href="css/style.css?v=8">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:wght@700&family=Aref+Ruqaa:wght@700&display=swap" rel="stylesheet">
     <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('taybaa-theme') || 'dark');</script>
+    <style>
+        /* شارة "قريباً" على بطاقات الكتب التي بلا ملف بعد */
+        .soon-badge {
+            position: absolute; top: .65rem; left: .65rem;
+            z-index: 4;
+            background: linear-gradient(135deg, #b8941f, #d4af37);
+            color: #2a1810;
+            padding: .25rem .6rem;
+            border-radius: 999px;
+            font-size: .68rem; font-weight: 800;
+            font-family: 'Aref Ruqaa', 'Cairo', serif;
+            box-shadow: 0 3px 10px rgba(0,0,0,.35);
+            letter-spacing: .03em;
+            pointer-events: none;
+        }
+        .book-card.coming-soon .book-cover-frame::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: rgba(26,15,8,.30);
+            z-index: 3;
+            pointer-events: none;
+        }
+        .book-card.coming-soon { opacity: .9; }
+        .book-card.coming-soon:hover { opacity: 1; }
+    </style>
 </head>
 <body>
     <div class="flag-strip" aria-hidden="true"></div>
@@ -25,20 +50,15 @@
                                 <stop offset="100%" stop-color="#d4af37"/>
                             </radialGradient>
                         </defs>
-                        <!-- Sun -->
                         <circle cx="32" cy="14" r="6" fill="url(#sun)"/>
-                        <!-- Palm trunk -->
                         <path d="M30.5 30 Q31.5 40 30.5 50" stroke="#3a2412" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-                        <!-- Palm fronds (5) -->
                         <path d="M31 30 Q22 25 16 30" stroke="#3d5a26" stroke-width="2.6" fill="none" stroke-linecap="round"/>
                         <path d="M31 30 Q40 25 46 30" stroke="#3d5a26" stroke-width="2.6" fill="none" stroke-linecap="round"/>
                         <path d="M31 30 Q23 23 20 18" stroke="#5a7a3a" stroke-width="2.4" fill="none" stroke-linecap="round"/>
                         <path d="M31 30 Q39 23 42 18" stroke="#5a7a3a" stroke-width="2.4" fill="none" stroke-linecap="round"/>
                         <path d="M31 30 Q31 23 31 18" stroke="#3d5a26" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-                        <!-- Coconuts -->
                         <circle cx="28" cy="30" r="1.2" fill="#3a2412"/>
                         <circle cx="34" cy="30" r="1.2" fill="#3a2412"/>
-                        <!-- Dunes -->
                         <path d="M0 52 Q12 47 24 52 T48 52 T64 52 L64 64 L0 64 Z" fill="#8b5a2b"/>
                         <path d="M0 56 Q14 52 28 56 T52 56 T64 56 L64 64 L0 64 Z" fill="#6b4423" opacity=".7"/>
                     </svg>
@@ -73,21 +93,12 @@
                 <span class="hero-orb orb-2"></span>
                 <span class="hero-orb orb-3"></span>
             </div>
-            <!-- Oasis: large palm tree centered above the dunes silhouette -->
             <svg class="hero-oasis" viewBox="0 0 200 220" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
                 <defs>
-                    <linearGradient id="trunk" x1="0" x2="0" y1="0" y2="1">
-                        <stop offset="0" stop-color="#5a3a1a"/>
-                        <stop offset="1" stop-color="#3a2412"/>
-                    </linearGradient>
-                    <linearGradient id="frond" x1="0" x2="1" y1="0" y2="1">
-                        <stop offset="0" stop-color="#3d5a26"/>
-                        <stop offset="1" stop-color="#5a7a3a"/>
-                    </linearGradient>
+                    <linearGradient id="trunk" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#5a3a1a"/><stop offset="1" stop-color="#3a2412"/></linearGradient>
+                    <linearGradient id="frond" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#3d5a26"/><stop offset="1" stop-color="#5a7a3a"/></linearGradient>
                 </defs>
-                <!-- Trunk -->
                 <path d="M97 95 Q103 130 100 200 Q98 205 100 210" stroke="url(#trunk)" stroke-width="7" fill="none" stroke-linecap="round"/>
-                <!-- Fronds: 7 large -->
                 <path d="M100 95 Q70 85 35 90 Q60 75 100 80" fill="url(#frond)"/>
                 <path d="M100 95 Q130 85 165 90 Q140 75 100 80" fill="url(#frond)"/>
                 <path d="M100 95 Q75 70 50 50 Q80 60 100 80" fill="url(#frond)"/>
@@ -95,7 +106,6 @@
                 <path d="M100 95 Q90 55 95 25 Q105 55 100 80" fill="url(#frond)"/>
                 <path d="M100 95 Q60 100 30 115 Q70 95 100 85" fill="url(#frond)" opacity=".85"/>
                 <path d="M100 95 Q140 100 170 115 Q130 95 100 85" fill="url(#frond)" opacity=".85"/>
-                <!-- Coconut bunch -->
                 <circle cx="95" cy="96" r="3" fill="#3a2412"/>
                 <circle cx="100" cy="99" r="3" fill="#3a2412"/>
                 <circle cx="104" cy="96" r="3" fill="#3a2412"/>
@@ -118,7 +128,6 @@
             </div>
         </section>
 
-        <!-- 1. Self-Development & Management (featured first) -->
         <section class="section highlight" id="managementSection">
             <div class="container">
                 <header class="section-head">
@@ -131,7 +140,6 @@
             </div>
         </section>
 
-        <!-- 2. Entrepreneurship, Sales, Marketing, Finance -->
         <section class="section" id="entrepreneurshipSection">
             <div class="container">
                 <header class="section-head">
@@ -144,7 +152,6 @@
             </div>
         </section>
 
-        <!-- 3. Categories -->
         <section class="section" aria-labelledby="categoriesTitle">
             <div class="container">
                 <header class="section-head">
@@ -216,9 +223,9 @@
         </div>
     </footer>
 
-    <script src="js/config.js?v=7"></script>
-    <script src="js/cover-resolver.js?v=7"></script>
-    <script src="js/data.js?v=7"></script>
-    <script src="js/app.js?v=7"></script>
+    <script src="js/config.js?v=8"></script>
+    <script src="js/cover-resolver.js?v=8"></script>
+    <script src="js/data.js?v=8"></script>
+    <script src="js/app.js?v=8"></script>
 </body>
 </html>
