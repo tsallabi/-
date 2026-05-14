@@ -1,0 +1,15 @@
+{
+  "name": "taybaa-library-scripts",
+  "version": "1.0.0",
+  "description": "Bulk import & scraping scripts for TAYBAA-LIBRARY",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "import:archive": "node bulk-import-archive.mjs",
+    "import:shamela": "node shamela-scraper.mjs",
+    "import:all": "bash bulk-all.sh"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

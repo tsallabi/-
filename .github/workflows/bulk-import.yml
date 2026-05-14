@@ -1,0 +1,62 @@
+name: 📚 Bulk Import Arabic Books
+
+on:
+  workflow_dispatch:
+    inputs:
+      category:
+        description: 'القسم (Category)'
+        required: true
+        type: choice
+        options:
+          - 'تطوير الذات والنجاح'
+          - 'التحفيز والإلهام'
+          - 'القيادة والإدارة'
+          - 'إدارة الأعمال'
+          - 'ريادة الأعمال'
+          - 'فن البيع'
+          - 'التسويق'
+          - 'الإدارة المالية'
+          - 'المال والاستثمار'
+          - 'علم النفس'
+          - 'الفلسفة والفكر'
+          - 'الأدب والروايات'
+          - 'التاريخ والتراث'
+          - 'العلوم والمعرفة'
+          - 'الدين والإسلاميات'
+          - 'كتب الأطفال'
+          - 'الشعر'
+      count:
+        description: 'عدد الكتب المراد جلبها (How many books)'
+        required: true
+        default: '50'
+        type: string
+
+jobs:
+  bulk-import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: claude/online-library-design-ROC6E
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run bulk importer
+        run: node scripts/bulk-import-archive.mjs "${{ inputs.category }}" "${{ inputs.count }}"
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/books-extra-3.json
+          git diff --staged --quiet && echo "ℹ️ no changes" || {
+            git commit -m "feat: bulk import «${{ inputs.category }}» (${{ inputs.count }} requested)"
+            git push
+          }
