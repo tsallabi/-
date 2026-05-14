@@ -1,4 +1,4 @@
-/* طبقة البيانات — JSON / Sheets / Firestore + فلتر VIP */
+/* طبقة البيانات — JSON / Sheets / Firestore + فلتر الصلاحيات */
 
 const DATA = (function() {
     let cachedBooks = null;
@@ -12,9 +12,6 @@ const DATA = (function() {
 
     const VIP_KEY = 'taybaa-vip-unlocked';
 
-    // حدود معرّفات الكتب التي تم توليدها بروابط archive.org مخترعة (غير صالحة).
-    // تلقائياً: يتم تفريغ حقل pdf لهذه المعرّفات حتى تظهر على الموقع بشارة "قريباً"
-    // بدلاً من فتح قارئ معطّل على أرشيفـأورغ.
     const FAKE_PDF_ID_MIN = 116;
     const FAKE_PDF_ID_MAX = 217;
 
@@ -38,11 +35,23 @@ const DATA = (function() {
     }
     function lockVIP() { try { localStorage.removeItem(VIP_KEY); } catch (_) {} }
 
+    /* صلاحية الاطلاع على قسم مقيّد (الدين والإسلاميات) */
+    function userCanAccessCategory(category) {
+        if (!category) return true;
+        const hidden = new Set(CONFIG.hiddenCategories || []);
+        if (!hidden.has(category)) return true;     // قسم عام
+        if (isVIP()) return true;                    // VIP — للحالات الطارئة
+        if (typeof USER === 'undefined') return false;
+        const u = USER.current();
+        if (!u) return false;
+        const allowed = Array.isArray(u.allowedCategories) ? u.allowedCategories : [];
+        return allowed.includes(category);
+    }
+
     function filterForViewer(books) {
-        if (isVIP()) return books;
         const hidden = new Set(CONFIG.hiddenCategories || []);
         if (!hidden.size) return books;
-        return books.filter(b => !hidden.has(b.category));
+        return books.filter(b => userCanAccessCategory(b.category));
     }
 
     async function initFirebase() {
@@ -153,7 +162,6 @@ const DATA = (function() {
         let pdf = String(get('pdf', 'pdfUrl', 'رابط_pdf', 'الكتاب', 'ملف')).trim();
         const id = String(get('id', 'ID', 'المعرف') || '').trim();
         const numId = Number(id);
-        // تفريغ روابط archive.org الوهمية التي اخترعها المولّد.
         if (pdf && /^https?:\/\/archive\.org\/embed\//.test(pdf) && numId >= FAKE_PDF_ID_MIN && numId <= FAKE_PDF_ID_MAX) {
             pdf = '';
         }
@@ -226,6 +234,6 @@ const DATA = (function() {
     return {
         loadBooks, search, byCategory, topPopular, newest, recommended, findById,
         categoriesWithCounts, totals, saveBook, deleteBook, uploadFile, initFirebase,
-        isVIP, unlockVIP, lockVIP, filterForViewer
+        isVIP, unlockVIP, lockVIP, filterForViewer, userCanAccessCategory
     };
 })();
