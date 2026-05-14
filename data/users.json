@@ -1,0 +1,12 @@
+{
+  "users": [
+    {
+      "username": "demo",
+      "passwordHash": "d3ad9315b7be5dd53b31a273b3b3aba5defe700808305aa16a3062b76658a791",
+      "displayName": "قارئ تجريبي",
+      "createdAt": "2026-05-14",
+      "active": true,
+      "note": "كلمة السر: demo123 — احذف هذا الحساب بعد التجربة"
+    }
+  ]
+}

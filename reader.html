@@ -73,16 +73,25 @@
             font-family: 'Aref Ruqaa', 'Cairo', serif;
             color: var(--rdr-gold); margin: 0 0 1rem;
         }
-        .reader-message a {
-            color: var(--rdr-gold); text-decoration: underline;
-        }
+        .reader-message a { color: var(--rdr-gold); text-decoration: underline; }
         .reader-loading {
             display: inline-block; width: 24px; height: 24px;
             border: 3px solid var(--rdr-border); border-top-color: var(--rdr-gold);
             border-radius: 50%; animation: spin .8s linear infinite;
             margin-inline-end: .55rem; vertical-align: middle;
         }
+        .resume-toast {
+            position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+            background: rgba(58,36,18,.95); color: var(--rdr-gold);
+            border: 1px solid var(--rdr-gold);
+            padding: .75rem 1.25rem; border-radius: 10px;
+            font-family: 'Aref Ruqaa', 'Cairo', serif;
+            font-size: .9rem; z-index: 50;
+            box-shadow: 0 10px 30px rgba(0,0,0,.5);
+            animation: slideUp .4s ease-out;
+        }
         @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes slideUp { from { transform: translate(-50%, 20px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
         @media (max-width: 600px) {
             .reader-title { font-size: .85rem; }
             .reader-bar a, .reader-bar button { padding: .45rem .7rem; font-size: .8rem; }
@@ -108,12 +117,14 @@
         </div>
     </div>
 
+    <script src="js/user-system.js?v=10"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.js"></script>
     <script>
         (function() {
             const params = new URLSearchParams(location.search);
             const pdfUrl = params.get('pdf');
             const title = params.get('title') || 'قراءة';
+            const bookId = params.get('bookId') || params.get('id');
             document.getElementById('readerTitle').textContent = title;
             document.title = title + ' — المكتبة الطيبة';
 
@@ -133,15 +144,9 @@
 
             if (!pdfUrl) { showError('لم يتم تحديد كتاب.'); return; }
 
-            // جاعل رابط archive.org/embed → رابط PDF مباشر لفتحه داخلياً بـ PDF.js
-            // ملاحظة: archive.org لديه قيود CORS تمنع التحميل المباشر دون وسيط.
-            // لذلك نستخدم cors.archive.org أو وسيط مفتوح.
             let directPdf = pdfUrl;
             const m = /archive\.org\/(?:embed|details)\/([^/?#]+)/.exec(pdfUrl);
             if (m) {
-                // لا يمكن فتح أرشيف دوت أورغ داخلياً بسبب CORS،
-                // لكن الروابط المباشرة (download) تعمل بعض الأحيان.
-                // سنجرّب عبر وسيط archive.org العام:
                 directPdf = `https://archive.org/download/${m[1]}/${m[1]}.pdf`;
             }
 
@@ -153,21 +158,24 @@
 
             let pdfDoc = null, currentPage = 1, totalPages = 0, rendering = false;
 
-            pdfjsLib.getDocument({
-                url: directPdf,
-                withCredentials: false,
-                disableAutoFetch: true,
-                disableStream: false
-            }).promise.then(doc => {
+            pdfjsLib.getDocument({ url: directPdf, withCredentials: false }).promise.then(doc => {
                 pdfDoc = doc;
                 totalPages = doc.numPages;
                 msg.style.display = 'none';
                 canvas.hidden = false;
+
+                // استئناف القراءة من آخر صفحة
+                let startPage = 1;
+                if (bookId && typeof READING !== 'undefined') {
+                    startPage = Math.min(READING.getPage(bookId), totalPages);
+                    if (startPage > 1) showResumeToast(startPage);
+                }
+                currentPage = startPage;
                 updateNavButtons();
-                renderPage(1);
+                renderPage(currentPage);
             }).catch(err => {
                 console.error(err);
-                showError(`تعذّر تحميل الكتاب من هذا المصدر.<br>ملف PDF غير متاح أو غير مسموح بتحميله.`);
+                showError('تعذّر تحميل الكتاب من هذا المصدر.<br>ملف PDF غير متاح أو غير مسموح بتحميله.');
             });
 
             function renderPage(num) {
@@ -183,10 +191,9 @@
                     rendering = false;
                     pageInfo.textContent = `${num} / ${totalPages}`;
                     updateNavButtons();
-                }).catch(err => {
-                    rendering = false;
-                    console.error(err);
-                });
+                    // حفظ موقع القراءة
+                    if (bookId && typeof READING !== 'undefined') READING.setPage(bookId, num);
+                }).catch(err => { rendering = false; console.error(err); });
             }
             function updateNavButtons() {
                 prevBtn.disabled = currentPage >= totalPages;
@@ -199,10 +206,17 @@
                 if (currentPage > 1) { currentPage--; renderPage(currentPage); }
             });
             document.addEventListener('keydown', e => {
-                if (e.key === 'ArrowRight') { prevBtn.click(); }
-                else if (e.key === 'ArrowLeft') { nextBtn.click(); }
+                if (e.key === 'ArrowRight') prevBtn.click();
+                else if (e.key === 'ArrowLeft') nextBtn.click();
             });
 
+            function showResumeToast(page) {
+                const t = document.createElement('div');
+                t.className = 'resume-toast';
+                t.textContent = `📖 استئنفناك من الصفحة ${page}`;
+                document.body.appendChild(t);
+                setTimeout(() => t.remove(), 4000);
+            }
             function showError(htmlMsg) {
                 canvas.hidden = true;
                 msg.innerHTML = `

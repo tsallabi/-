@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المستخدمين — المكتبة الطيبة</title>
+    <link rel="stylesheet" href="../css/style.css?v=10">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Aref+Ruqaa:wght@700&display=swap" rel="stylesheet">
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('taybaa-theme') || 'dark');</script>
+    <style>
+        body { padding: 2rem 1rem; }
+        .um-wrap { max-width: 720px; margin: 0 auto; }
+        .um-wrap h1 { font-family: 'Aref Ruqaa', 'Cairo', serif; color: var(--gold); margin-bottom: .5rem; }
+        .um-wrap .sub { color: var(--text-muted); margin-bottom: 2rem; }
+        .um-card { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 16px; padding: 1.75rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-md); }
+        .um-card h2 { font-family: 'Aref Ruqaa', 'Cairo', serif; color: var(--gold); margin: 0 0 1rem; font-size: 1.2rem; }
+        .um-form { display: grid; gap: .8rem; }
+        .um-form label { display: block; }
+        .um-form .label-text { display: block; font-weight: 600; margin-bottom: .35rem; font-size: .95rem; }
+        .um-form input { width: 100%; padding: .7rem 1rem; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-subtle); color: var(--text); font-family: inherit; font-size: 1rem; }
+        .um-form input:focus { outline: 0; border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-soft); }
+        .um-form button { padding: .85rem; background: var(--grad-gold); color: #2a1810; border: 0; border-radius: 10px; font-family: inherit; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all .2s; }
+        .um-form button:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(184,148,31,.4); }
+        .um-result { margin-top: 1rem; padding: 1rem; background: var(--bg-subtle); border-radius: 10px; font-family: monospace; font-size: .85rem; white-space: pre-wrap; word-break: break-all; direction: ltr; text-align: left; max-height: 200px; overflow: auto; }
+        .um-list { list-style: none; padding: 0; margin: 0; }
+        .um-list li { padding: .85rem 1rem; border: 1px solid var(--border); border-radius: 10px; margin-bottom: .5rem; display: flex; justify-content: space-between; align-items: center; background: var(--bg-subtle); }
+        .um-list .uname { font-weight: 700; color: var(--gold); }
+        .um-list .udate { font-size: .8rem; color: var(--text-muted); }
+        .um-success { color: #5a7a3a; font-weight: 700; }
+        .um-error { color: #ce1126; font-weight: 700; }
+        .um-step { padding: .8rem 1rem; background: var(--bg-subtle); border-right: 4px solid var(--gold); border-radius: 6px; margin: .5rem 0; font-size: .9rem; }
+        a.back-link { color: var(--gold); text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: .35rem; margin-bottom: 1.5rem; }
+        a.back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="um-wrap">
+        <a href="../admin.html" class="back-link">→ عودة للوحة الإدارة</a>
+        <h1>👤 إدارة المستخدمين</h1>
+        <p class="sub">أنشئ حسابات للقرّاء ليتمكّنوا من حفظ كتبهم في المفضّلة ومتابعة القراءة.</p>
+
+        <div class="um-card">
+            <h2>إنشاء حساب جديد</h2>
+            <form class="um-form" id="createForm">
+                <label><span class="label-text">اسم المستخدم (إنجليزي، بدون مسافات)</span>
+                    <input type="text" id="newUsername" pattern="[a-zA-Z0-9_-]+" required placeholder="ahmed"></label>
+                <label><span class="label-text">الاسم المعروض (عربي)</span>
+                    <input type="text" id="newDisplay" required placeholder="أحمد الجبلّي"></label>
+                <label><span class="label-text">كلمة السر (8 حروف فأكثر)</span>
+                    <input type="password" id="newPassword" minlength="8" required placeholder="••••••••"></label>
+                <button type="submit">أضف حساباً إلى المكتبة</button>
+            </form>
+            <div id="createResult"></div>
+        </div>
+
+        <div class="um-card">
+            <h2>📄 المستخدمون الحاليّون</h2>
+            <ul class="um-list" id="usersList"><li>جارٍ التحميل...</li></ul>
+        </div>
+
+        <div class="um-card">
+            <h2>✏️ إعداد GitHub</h2>
+            <p>لإضافة المستخدمين إلى الملف، تحتاج GitHub Personal Access Token بصلاحية الكتابة.</p>
+            <div class="um-step">في صفحة <a href="../admin.html">الأدمن الرئيسية</a> → أدخل الـ PAT مرّة واحدة (يُحفظ في localStorage فقط، غير مرئي على أحد).</div>
+        </div>
+    </div>
+
+    <script src="../js/config.js?v=10"></script>
+    <script src="../js/github-save.js?v=10"></script>
+    <script src="../js/user-system.js?v=10"></script>
+    <script>
+        (async function() {
+            const FILE = 'data/users.json';
+
+            async function loadCurrentUsers() {
+                try {
+                    const res = await fetch('../data/users.json?t=' + Date.now());
+                    if (!res.ok) return [];
+                    const data = await res.json();
+                    return data.users || [];
+                } catch { return []; }
+            }
+
+            function renderUsers(users) {
+                const ul = document.getElementById('usersList');
+                if (!users.length) {
+                    ul.innerHTML = '<li><em>لا يوجد مستخدمون بعد.</em></li>';
+                    return;
+                }
+                ul.innerHTML = users.map(u =>
+                    `<li>
+                        <div>
+                            <span class="uname">${esc(u.displayName || u.username)}</span> · @${esc(u.username)}
+                        </div>
+                        <span class="udate">${esc(u.createdAt || '')}</span>
+                    </li>`
+                ).join('');
+            }
+
+            async function refresh() {
+                const users = await loadCurrentUsers();
+                renderUsers(users);
+                return users;
+            }
+
+            let users = await refresh();
+
+            document.getElementById('createForm').addEventListener('submit', async e => {
+                e.preventDefault();
+                const username = document.getElementById('newUsername').value.trim();
+                const display = document.getElementById('newDisplay').value.trim();
+                const password = document.getElementById('newPassword').value;
+                const resultEl = document.getElementById('createResult');
+                resultEl.innerHTML = '<p>جارٍ الحفظ...</p>';
+
+                // فحص التكرار
+                if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
+                    resultEl.innerHTML = '<p class="um-error">اسم المستخدم مستخدم بالفعل.</p>';
+                    return;
+                }
+
+                const passwordHash = await USER.sha256(password);
+                const newUser = {
+                    username,
+                    passwordHash,
+                    displayName: display,
+                    createdAt: new Date().toISOString().slice(0, 10),
+                    active: true
+                };
+
+                if (!GHSAVE.hasToken()) {
+                    resultEl.innerHTML = `
+                        <p class="um-error">⚠️ لم يتم تعريف GitHub Token.</p>
+                        <p>انسخ الأسطر التالية وأضفها يدوياً إلى <code>data/users.json</code>:</p>
+                        <pre class="um-result">${esc(JSON.stringify(newUser, null, 2))}</pre>`;
+                    return;
+                }
+
+                try {
+                    // Read current users.json from GitHub
+                    const path = 'data/users.json';
+                    const ghOwner = GHSAVE.OWNER, ghRepo = GHSAVE.REPO, ghBranch = GHSAVE.BRANCH;
+                    const ghPath = path;
+
+                    const token = GHSAVE.getToken();
+                    const getRes = await fetch(`https://api.github.com/repos/${ghOwner}/${ghRepo}/contents/${ghPath}?ref=${ghBranch}`, {
+                        headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' }
+                    });
+                    let currentSha = null, currentData = { users: [] };
+                    if (getRes.ok) {
+                        const meta = await getRes.json();
+                        currentSha = meta.sha;
+                        const raw = atob(meta.content.replace(/\s/g, ''));
+                        currentData = JSON.parse(decodeURIComponent(escape(raw)));
+                    }
+                    currentData.users = currentData.users || [];
+                    currentData.users.push(newUser);
+                    const newText = JSON.stringify(currentData, null, 2);
+                    const content = btoa(unescape(encodeURIComponent(newText)));
+
+                    const putRes = await fetch(`https://api.github.com/repos/${ghOwner}/${ghRepo}/contents/${ghPath}`, {
+                        method: 'PUT',
+                        headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: `admin: add user ${username}`, content, sha: currentSha, branch: ghBranch })
+                    });
+                    if (!putRes.ok) throw new Error('GH ' + putRes.status);
+                    resultEl.innerHTML = `<p class="um-success">✅ تمّ إنشاء الحساب! تستطيع إخبار المستخدم ببياناته الآن.</p>`;
+                    document.getElementById('createForm').reset();
+                    users = await refresh();
+                } catch (err) {
+                    resultEl.innerHTML = `<p class="um-error">❌ فشل الحفظ: ${esc(err.message)}</p>`;
+                }
+            });
+
+            function esc(s) {
+                return String(s ?? '').replace(/[&<>"']/g, c =>
+                    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+            }
+        })();
+    </script>
+</body>
+</html>
