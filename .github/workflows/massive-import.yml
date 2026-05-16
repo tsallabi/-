@@ -1,0 +1,209 @@
+name: Massive Arabic Book Import
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_count:
+        description: 'Target number of NEW books to import'
+        required: false
+        default: '5500'
+  push:
+    branches:
+      - 'claude/online-library-design-ROC6E'
+    paths:
+      - '.triggers/massive-import.txt'
+
+jobs:
+  import:
+    name: Import Arabic Books → 8000
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    permissions:
+      contents: write
+
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      NODE_NO_WARNINGS: '1'
+
+    steps:
+      - name: Checkout deploy branch
+        uses: actions/checkout@v4
+        with:
+          ref: claude/online-library-design-ROC6E
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install script dependencies
+        working-directory: scripts
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install --no-package-lock || true
+          fi
+
+      - name: Count books before import
+        id: baseline
+        run: |
+          count=$(node -e "
+            const fs = require('fs');
+            let total = 0;
+            for (const f of ['data/books-sample.json','data/books-extra-1.json','data/books-extra-2.json','data/books-extra-3.json']) {
+              try { total += JSON.parse(fs.readFileSync(f,'utf8')).books.length; } catch {}
+            }
+            console.log(total);
+          ")
+          echo "before=$count" >> "$GITHUB_OUTPUT"
+          echo "=== BASELINE: $count books ==="
+
+      - name: '[1/7] archive-uploaders.mjs'
+        working-directory: scripts
+        run: node archive-uploaders.mjs 3000
+        continue-on-error: true
+
+      - name: Count after archive-uploaders
+        run: |
+          node -e "const fs=require('fs');let t=0;for(const f of ['data/books-sample.json','data/books-extra-1.json','data/books-extra-2.json','data/books-extra-3.json'])try{t+=JSON.parse(fs.readFileSync(f,'utf8')).books.length}catch{};console.log('=== PROGRESS after archive-uploaders: '+t+' books ===')"
+
+      - name: '[2/7a] bulk: تطوير الذات والنجاح'
+        working-directory: scripts
+        run: node bulk-import-archive.mjs "تطوير الذات والنجاح" 300
+        continue-on-error: true
+
+      - name: '[2/7b] bulk: الدين والإسلاميات'
+        working-directory: scripts
+        run: node bulk-import-archive.mjs "الدين والإسلاميات" 300
+        continue-on-error: true
+
+      - name: '[2/7c] bulk: الأدب والروايات'
+        working-directory: scripts
+        run: node bulk-import-archive.mjs "الأدب والروايات" 300
+        continue-on-error: true
+
+      - name: '[2/7d] bulk: التاريخ والتراث'
+        working-directory: scripts
+        run: node bulk-import-archive.mjs "التاريخ والتراث" 300
+        continue-on-error: true
+
+      - name: '[2/7e] bulk: علم النفس'
+        working-directory: scripts
+        run: node bulk-import-archive.mjs "علم النفس" 300
+        continue-on-error: true
+
+      - name: '[2/7f] bulk: الفلسفة والفكر'
+        working-directory: scripts
+        run: node bulk-import-archive.mjs "الفلسفة والفكر" 300
+        continue-on-error: true
+
+      - name: '[2/7g] bulk: العلوم والمعرفة'
+        working-directory: scripts
+        run: node bulk-import-archive.mjs "العلوم والمعرفة" 300
+        continue-on-error: true
+
+      - name: '[2/7h] bulk: التحفيز والإلهام'
+        working-directory: scripts
+        run: node bulk-import-archive.mjs "التحفيز والإلهام" 300
+        continue-on-error: true
+
+      - name: '[2/7i] bulk: القيادة والإدارة'
+        working-directory: scripts
+        run: node bulk-import-archive.mjs "القيادة والإدارة" 300
+        continue-on-error: true
+
+      - name: '[2/7j] bulk: الشعر'
+        working-directory: scripts
+        run: node bulk-import-archive.mjs "الشعر" 300
+        continue-on-error: true
+
+      - name: Count after bulk-import (10 categories)
+        run: |
+          node -e "const fs=require('fs');let t=0;for(const f of ['data/books-sample.json','data/books-extra-1.json','data/books-extra-2.json','data/books-extra-3.json'])try{t+=JSON.parse(fs.readFileSync(f,'utf8')).books.length}catch{};console.log('=== PROGRESS after bulk-import: '+t+' books ===')"
+
+      - name: '[3/7] waqfeya-import.mjs'
+        working-directory: scripts
+        run: node waqfeya-import.mjs 2000
+        continue-on-error: true
+
+      - name: '[4/7] shamela-via-archive.mjs'
+        working-directory: scripts
+        run: node shamela-via-archive.mjs 1000
+        continue-on-error: true
+
+      - name: '[5/7] openiti-import.mjs'
+        working-directory: scripts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node openiti-import.mjs 500
+        continue-on-error: true
+
+      - name: '[6/7] hindawi-import.mjs'
+        working-directory: scripts
+        run: node hindawi-import.mjs 500
+        continue-on-error: true
+
+      - name: '[7/7] openlibrary-import.mjs'
+        working-directory: scripts
+        run: node openlibrary-import.mjs 500
+        continue-on-error: true
+
+      - name: Commit imported books (rebase-and-retry)
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add data/books-extra-3.json data/books-sample.json \
+                  data/books-extra-1.json data/books-extra-2.json \
+                  data/shamela-books.json 2>/dev/null || true
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit — all books already present."
+            exit 0
+          fi
+
+          AFTER=$(node -e "const fs=require('fs');let t=0;for(const f of ['data/books-sample.json','data/books-extra-1.json','data/books-extra-2.json','data/books-extra-3.json'])try{t+=JSON.parse(fs.readFileSync(f,'utf8')).books.length}catch{};console.log(t)")
+          BEFORE="${{ steps.baseline.outputs.before }}"
+          ADDED=$((AFTER - BEFORE))
+
+          git commit -m "feat(import): add ${ADDED} Arabic books (${BEFORE} → ${AFTER} total)"
+
+          for attempt in 1 2 3 4 5; do
+            echo "=== Push attempt $attempt/5 ==="
+            if git push origin claude/online-library-design-ROC6E; then
+              echo "✅ Push succeeded on attempt $attempt."
+              break
+            fi
+            echo "Push failed — fetching and rebasing..."
+            git fetch origin claude/online-library-design-ROC6E
+            if ! git rebase origin/claude/online-library-design-ROC6E; then
+              git checkout --theirs data/ 2>/dev/null || true
+              git add data/
+              git rebase --continue || git rebase --skip
+            fi
+            if [ "$attempt" -eq 5 ]; then
+              echo "❌ All 5 push attempts failed."
+              exit 1
+            fi
+            sleep $((attempt * 5))
+          done
+
+      - name: Import summary
+        if: always()
+        run: |
+          BEFORE="${{ steps.baseline.outputs.before }}"
+          AFTER=$(node -e "const fs=require('fs');let t=0;for(const f of ['data/books-sample.json','data/books-extra-1.json','data/books-extra-2.json','data/books-extra-3.json'])try{t+=JSON.parse(fs.readFileSync(f,'utf8')).books.length}catch{};console.log(t)")
+          ADDED=$((AFTER - BEFORE))
+          echo ""
+          echo "╔══════════════════════════════════════════╗"
+          echo "║       المكتبة الطيبة — Import Report    ║"
+          echo "╠══════════════════════════════════════════╣"
+          echo "║  Books before : $BEFORE"
+          echo "║  Books after  : $AFTER"
+          echo "║  Net added    : $ADDED"
+          echo "║  Grand target : 8000"
+          echo "║  Remaining    : $((8000 - AFTER))"
+          echo "╚══════════════════════════════════════════╝"

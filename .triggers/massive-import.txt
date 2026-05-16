@@ -1,0 +1,16 @@
+trigger: 2026-05-16T14:55:00Z
+purpose: Massive Arabic book import — target 8,000 verified books
+sources:
+  - archive.org uploaders (3000 quota)
+  - bulk categories × 10 (300 each = 3000 quota)
+  - Waqfeya (2000 quota)
+  - Shamela-via-archive (1000 quota)
+  - OpenITI (500)
+  - Hindawi (500)
+  - Open Library (500)
+baseline: ~2950 books (post-audit)
+target: 8000
+notes: |
+  Importers run sequentially. Each writes to books-extra-3.json with
+  its own dedup logic. Final commit uses rebase-and-retry so concurrent
+  audit or hero updates don't lose work.
