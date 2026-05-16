@@ -3,10 +3,10 @@ name: Download Arch of Marcus Aurelius image
 on:
   workflow_dispatch:
     inputs:
-      flickr_url:
-        description: 'Flickr photo page URL (optional override)'
+      source_url:
+        description: 'Source URL (Google Photos share, Flickr photo page, or direct .jpg)'
         required: false
-        default: 'https://www.flickr.com/photos/libdas_gallery/906095697'
+        default: 'https://photos.app.goo.gl/7AR82c8LNf1rPHy47'
   push:
     branches:
       - 'claude/online-library-design-ROC6E'
@@ -36,7 +36,8 @@ jobs:
 
       - name: Download + process image
         env:
-          FLICKR_URL: ${{ github.event.inputs.flickr_url || 'https://www.flickr.com/photos/libdas_gallery/906095697' }}
+          SOURCE_URL: ${{ github.event.inputs.source_url || 'https://photos.app.goo.gl/7AR82c8LNf1rPHy47' }}
+          FLICKR_URL: 'https://www.flickr.com/photos/libdas_gallery/906095697'
         run: |
           python << 'PYEOF'
           import os, re, sys, json, urllib.parse
@@ -47,107 +48,151 @@ jobs:
           UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0 Safari/537.36'
           HEADERS = {'User-Agent': UA, 'Accept': 'text/html,application/xhtml+xml,*/*'}
 
-          flickr_url = os.environ['FLICKR_URL']
-          print(f'Target: {flickr_url}')
+          source_url = os.environ.get('SOURCE_URL', '').strip()
+          flickr_url = os.environ.get('FLICKR_URL', '').strip()
+          print(f'Primary source: {source_url}')
+          print(f'Flickr fallback: {flickr_url}')
 
           image_bytes = None
           source = None
 
-          # Strategy 1: Flickr oEmbed
-          try:
-              oembed = f'https://www.flickr.com/services/oembed?url={urllib.parse.quote(flickr_url, safe=":/")}&format=json'
-              r = requests.get(oembed, headers=HEADERS, timeout=20)
-              print(f'oEmbed status: {r.status_code}')
-              if r.status_code == 200:
-                  data = r.json()
-                  print(f'oEmbed keys: {list(data.keys())}')
-                  # Try to walk up sizes: prefer biggest
-                  for k in ('url', 'thumbnail_url', 'web_page'):
-                      if k in data:
-                          print(f'  {k}: {data[k]}')
-                  img_url = data.get('url')
-                  if img_url:
-                      # try to bump to larger size (_b = 1024, _c = 800)
-                      bigger = re.sub(r'_[mzcbnto]\\.jpg$', '_b.jpg', img_url)
-                      for candidate in [bigger, img_url]:
-                          try:
-                              ir = requests.get(candidate, headers=HEADERS, timeout=30)
-                              if ir.status_code == 200 and len(ir.content) > 20_000:
-                                  image_bytes = ir.content
-                                  source = candidate
-                                  print(f'OK oEmbed: {candidate} ({len(ir.content)} bytes)')
-                                  break
-                          except Exception as e:
-                              print(f'  failed {candidate}: {e}')
-          except Exception as e:
-              print(f'oEmbed strategy failed: {e}')
-
-          # Strategy 2: scrape the photo page for og:image
-          if not image_bytes:
+          def try_download(url, min_size=20_000):
               try:
-                  r = requests.get(flickr_url, headers=HEADERS, timeout=30, allow_redirects=True)
-                  print(f'Page status: {r.status_code}, length: {len(r.text)}')
+                  ir = requests.get(url, headers=HEADERS, timeout=45, allow_redirects=True)
+                  if ir.status_code == 200 and len(ir.content) > min_size and ir.headers.get('content-type', '').startswith('image/'):
+                      return ir.content
+                  print(f'  HTTP {ir.status_code}, type={ir.headers.get("content-type")}, size={len(ir.content)}')
+              except Exception as e:
+                  print(f'  err: {e}')
+              return None
+
+          # Strategy 0: direct .jpg/.png URL
+          if not image_bytes and re.search(r'\.(jpe?g|png|webp)(\?.*)?$', source_url, re.I):
+              print('Strategy: direct image URL')
+              b = try_download(source_url, 30_000)
+              if b:
+                  image_bytes = b
+                  source = source_url
+
+          # Strategy 1: Google Photos share link
+          if not image_bytes and ('photos.app.goo.gl' in source_url or 'photos.google.com' in source_url):
+              print('Strategy: Google Photos share')
+              try:
+                  r = requests.get(source_url, headers=HEADERS, timeout=30, allow_redirects=True)
+                  print(f'  resolved to: {r.url}')
+                  print(f'  status: {r.status_code}, length: {len(r.text)}')
                   if r.status_code == 200:
                       html = r.text
-                      # og:image meta tag
-                      m = re.search(r'<meta\\s+property="og:image"\\s+content="([^"]+)"', html)
-                      if m:
-                          og_url = m.group(1)
-                          print(f'og:image: {og_url}')
-                          bigger = re.sub(r'_[mzcbntoq]\\.jpg', '_b.jpg', og_url)
-                          for candidate in [bigger, og_url]:
-                              try:
-                                  ir = requests.get(candidate, headers=HEADERS, timeout=30)
-                                  if ir.status_code == 200 and len(ir.content) > 20_000:
-                                      image_bytes = ir.content
-                                      source = candidate
-                                      print(f'OK og:image: {candidate} ({len(ir.content)} bytes)')
-                                      break
-                              except Exception as e:
-                                  print(f'  failed {candidate}: {e}')
-                      # JSON photo model embedded in page (modern Flickr)
+                      # og:image (most reliable)
+                      og_m = re.search(r'<meta\s+property="og:image"\s+content="([^"]+)"', html)
+                      if og_m:
+                          og_url = og_m.group(1).replace('&amp;', '&')
+                          print(f'  og:image: {og_url}')
+                          # Upgrade resolution: lh3.googleusercontent.com URLs end with =w####-h####-no-nu or similar
+                          # Strip size params, ask for biggest
+                          for variant in [
+                              re.sub(r'=[^=]+$', '=w2400-no', og_url),
+                              re.sub(r'=[^=]+$', '=w1920-no', og_url),
+                              og_url,
+                          ]:
+                              print(f'  try: {variant}')
+                              b = try_download(variant, 50_000)
+                              if b:
+                                  image_bytes = b
+                                  source = variant
+                                  break
+                      # twitter:image fallback
                       if not image_bytes:
-                          for m in re.finditer(r'"displayUrl":"(//live\\.staticflickr\\.com/[^"]+)"', html):
-                              cand = 'https:' + m.group(1).replace('\\/', '/')
-                              print(f'displayUrl found: {cand}')
-                              try:
-                                  ir = requests.get(cand, headers=HEADERS, timeout=30)
-                                  if ir.status_code == 200 and len(ir.content) > 20_000:
-                                      image_bytes = ir.content
-                                      source = cand
-                                      print(f'OK displayUrl: {cand}')
-                                      break
-                              except Exception as e:
-                                  print(f'  failed {cand}: {e}')
+                          tw_m = re.search(r'<meta\s+(?:name|property)="twitter:image"\s+content="([^"]+)"', html)
+                          if tw_m:
+                              tw_url = tw_m.group(1).replace('&amp;', '&')
+                              print(f'  twitter:image: {tw_url}')
+                              b = try_download(re.sub(r'=[^=]+$', '=w2400-no', tw_url), 50_000)
+                              if b:
+                                  image_bytes = b
+                                  source = tw_url
+                      # lh3.googleusercontent.com URLs in HTML body (sometimes the page embeds direct refs)
+                      if not image_bytes:
+                          for m in re.finditer(r'(https://lh3\.googleusercontent\.com/[A-Za-z0-9_\-]{20,}=[wh0-9\-no]+)', html):
+                              cand = m.group(1)
+                              print(f'  body match: {cand}')
+                              b = try_download(re.sub(r'=[^=]+$', '=w2400-no', cand), 50_000)
+                              if b:
+                                  image_bytes = b
+                                  source = cand
+                                  break
               except Exception as e:
-                  print(f'Page scrape failed: {e}')
+                  print(f'  Google Photos strategy failed: {e}')
 
-          # Strategy 3: Wikimedia fallback (Arch of Marcus Aurelius)
+          # Strategy 2: Flickr (oEmbed + scrape)
+          if not image_bytes and flickr_url:
+              print('Strategy: Flickr')
+              try:
+                  oembed = f'https://www.flickr.com/services/oembed?url={urllib.parse.quote(flickr_url, safe=":/")}&format=json'
+                  r = requests.get(oembed, headers=HEADERS, timeout=20)
+                  print(f'  oEmbed status: {r.status_code}')
+                  if r.status_code == 200:
+                      data = r.json()
+                      print(f'  keys: {list(data.keys())}')
+                      img_url = data.get('url')
+                      if img_url:
+                          bigger = re.sub(r'_[mzcbnto]\.jpg$', '_b.jpg', img_url)
+                          for cand in [bigger, img_url]:
+                              b = try_download(cand)
+                              if b:
+                                  image_bytes = b
+                                  source = cand
+                                  break
+              except Exception as e:
+                  print(f'  oEmbed err: {e}')
+              if not image_bytes:
+                  try:
+                      r = requests.get(flickr_url, headers=HEADERS, timeout=30, allow_redirects=True)
+                      print(f'  page status: {r.status_code}')
+                      if r.status_code == 200:
+                          html = r.text
+                          m = re.search(r'<meta\s+property="og:image"\s+content="([^"]+)"', html)
+                          if m:
+                              og = m.group(1)
+                              bigger = re.sub(r'_[mzcbntoq]\.jpg', '_b.jpg', og)
+                              for cand in [bigger, og]:
+                                  b = try_download(cand)
+                                  if b:
+                                      image_bytes = b
+                                      source = cand
+                                      break
+                          if not image_bytes:
+                              for m in re.finditer(r'"displayUrl":"(//live\.staticflickr\.com/[^"]+)"', html):
+                                  cand = 'https:' + m.group(1).replace('\\/', '/')
+                                  b = try_download(cand)
+                                  if b:
+                                      image_bytes = b
+                                      source = cand
+                                      break
+                  except Exception as e:
+                      print(f'  page scrape err: {e}')
+
+          # Strategy 3: Wikimedia Commons fallback (always available)
           if not image_bytes:
-              print('Falling back to Wikimedia Commons...')
+              print('Strategy: Wikimedia Commons')
               wiki_candidates = [
                   'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Tripoli_Arch_of_Marcus_Aurelius.jpg/1600px-Tripoli_Arch_of_Marcus_Aurelius.jpg',
                   'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Arch_of_Marcus_Aurelius_Tripoli.jpg/1600px-Arch_of_Marcus_Aurelius_Tripoli.jpg',
                   'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Arch_of_Marcus_Aurelius_in_Tripoli.jpg/1600px-Arch_of_Marcus_Aurelius_in_Tripoli.jpg',
               ]
               for c in wiki_candidates:
-                  try:
-                      ir = requests.get(c, headers=HEADERS, timeout=30)
-                      if ir.status_code == 200 and len(ir.content) > 30_000:
-                          image_bytes = ir.content
-                          source = c
-                          print(f'OK Wikimedia: {c}')
-                          break
-                  except Exception as e:
-                      print(f'  failed {c}: {e}')
-              # Wikimedia API search
+                  b = try_download(c, 50_000)
+                  if b:
+                      image_bytes = b
+                      source = c
+                      break
               if not image_bytes:
                   try:
                       api = 'https://commons.wikimedia.org/w/api.php'
                       params = {
                           'action': 'query', 'format': 'json',
                           'generator': 'search', 'gsrsearch': 'Arch of Marcus Aurelius Tripoli',
-                          'gsrnamespace': '6', 'gsrlimit': '5',
+                          'gsrnamespace': '6', 'gsrlimit': '8',
                           'prop': 'imageinfo', 'iiprop': 'url',
                           'iiurlwidth': '1600',
                       }
@@ -158,58 +203,51 @@ jobs:
                           ii = (p.get('imageinfo') or [{}])[0]
                           url = ii.get('thumburl') or ii.get('url')
                           if url:
-                              try:
-                                  ir = requests.get(url, headers=HEADERS, timeout=30)
-                                  if ir.status_code == 200 and len(ir.content) > 30_000:
-                                      image_bytes = ir.content
-                                      source = url
-                                      print(f'OK Wikimedia API: {url}')
-                                      break
-                              except Exception:
-                                  pass
+                              b = try_download(url, 50_000)
+                              if b:
+                                  image_bytes = b
+                                  source = url
+                                  break
                   except Exception as e:
-                      print(f'Wikimedia API failed: {e}')
+                      print(f'  Wikimedia API err: {e}')
 
           if not image_bytes:
               print('ERROR: all download strategies failed')
               sys.exit(1)
 
           print(f'Final source: {source}')
-          print(f'Bytes downloaded: {len(image_bytes)}')
+          print(f'Bytes: {len(image_bytes)}')
 
           os.makedirs('assets', exist_ok=True)
           img = Image.open(BytesIO(image_bytes)).convert('RGB')
           print(f'Original size: {img.size}')
 
-          # Hero: 1600x1100, crop to fill
           def fit(im, w, h):
               src_w, src_h = im.size
               target_ratio = w / h
               src_ratio = src_w / src_h
               if src_ratio > target_ratio:
-                  # source is wider, crop sides
                   new_w = int(src_h * target_ratio)
                   x0 = (src_w - new_w) // 2
                   im = im.crop((x0, 0, x0 + new_w, src_h))
               else:
                   new_h = int(src_w / target_ratio)
-                  y0 = max(0, int(src_h * 0.2))  # bias slightly to upper area
+                  y0 = max(0, int(src_h * 0.2))
                   y0 = min(y0, src_h - new_h)
                   im = im.crop((0, y0, src_w, y0 + new_h))
               return im.resize((w, h), Image.LANCZOS)
 
           hero = fit(img, 1600, 1100)
           hero.save('assets/marcus-arch-hero.jpg', quality=88, optimize=True, progressive=True)
-          print(f'Wrote hero: {os.path.getsize(\"assets/marcus-arch-hero.jpg\")} bytes')
+          print(f'Wrote hero: {os.path.getsize("assets/marcus-arch-hero.jpg")} bytes')
 
           mobile = fit(img, 800, 600)
           mobile.save('assets/marcus-arch-mobile.jpg', quality=85, optimize=True, progressive=True)
-          print(f'Wrote mobile: {os.path.getsize(\"assets/marcus-arch-mobile.jpg\")} bytes')
+          print(f'Wrote mobile: {os.path.getsize("assets/marcus-arch-mobile.jpg")} bytes')
 
-          # Write a tiny source-credit file
           with open('assets/marcus-arch-hero.source.txt', 'w', encoding='utf-8') as f:
               f.write(f'Source: {source}\n')
-              f.write(f'Requested via: {flickr_url}\n')
+              f.write(f'Requested via: {source_url}\n')
 
           print('DONE')
           PYEOF
