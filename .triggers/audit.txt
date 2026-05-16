@@ -1,0 +1,8 @@
+trigger: 2026-05-16T14:40:00Z
+purpose: re-run audit after rebase-and-retry push fix
+prev_run: https://github.com/tsallabi/TAYBAA-LIBRARY/actions/runs/25962610902
+prev_result: 2950 valid / 510 broken — push rejected due to race condition
+notes: |
+  Workflow now retries up to 5 times with git rebase on the dev branch
+  before each retry, so concurrent commits to claude/online-library-design-ROC6E
+  won't lose the audit results again.
