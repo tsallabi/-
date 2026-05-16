@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#FAF6EE">
+    <meta name="theme-color" content="#2a4a7f">
     <title>المكتبة الطيبة — من طرابلس إلى العالم العربي</title>
-    <meta name="description" content="أكبر مكتبة عربيّة أونلاين — من ليبيا إلى الوطن العربي">
 
-    <link rel="stylesheet" href="css/design-system.css?v=16">
-    <link rel="stylesheet" href="css/homepage-v2.css?v=16">
+    <link rel="stylesheet" href="css/design-system.css?v=17">
+    <link rel="stylesheet" href="css/homepage-v2.css?v=17">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,220 +16,196 @@
     <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('taybaa-theme') || 'light');</script>
 
     <style>
-        /* ═══════════════════════════════════════════════════════════
-           HERO "قوس طرابلس" — Inspired by the Arch of Marcus Aurelius
-           ═══════════════════════════════════════════════════════════ */
-
-        .hero-tripoli {
+        .hero-arch {
             position: relative;
-            min-height: 95vh;
+            min-height: 96vh;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: clamp(2rem, 6vw, 5rem) clamp(1rem, 5vw, 3rem);
+            justify-content: flex-end;
+            padding: 0 0 3rem;
             overflow: hidden;
             isolation: isolate;
             background: linear-gradient(180deg,
-                #1a2a3f 0%,
-                #4a3556 25%,
-                #c97a5b 55%,
-                #f4b58a 75%,
+                #2a4a7f 0%,
+                #4a5a8a 25%,
+                #6a6a8a 45%,
+                #b88068 65%,
+                #e5b58a 80%,
+                #f0d8b0 95%,
                 #faf6ee 100%);
         }
 
-        /* النجوم الخافتة (للسماء الليليّة) */
-        .hero-tripoli::before {
+        /* غيوم رقيقة في السماء */
+        .hero-arch::before {
             content: '';
             position: absolute;
             inset: 0;
             background-image:
-                radial-gradient(2px 2px at 20% 15%, #fff, transparent),
-                radial-gradient(1px 1px at 70% 10%, #fff, transparent),
-                radial-gradient(1px 1px at 40% 20%, rgba(255,255,255,.6), transparent),
-                radial-gradient(2px 2px at 85% 25%, rgba(255,255,255,.7), transparent),
-                radial-gradient(1px 1px at 60% 8%, #fff, transparent);
-            opacity: .8;
-            animation: twinkle 4s ease-in-out infinite;
+                radial-gradient(ellipse 200px 30px at 15% 18%, rgba(255,255,255,.25), transparent),
+                radial-gradient(ellipse 180px 25px at 70% 12%, rgba(255,255,255,.30), transparent),
+                radial-gradient(ellipse 220px 35px at 45% 22%, rgba(255,255,255,.20), transparent),
+                radial-gradient(ellipse 150px 22px at 85% 28%, rgba(255,255,255,.22), transparent),
+                radial-gradient(2px 2px at 25% 12%, rgba(255,255,255,.7), transparent),
+                radial-gradient(1.5px 1.5px at 55% 8%, rgba(255,255,255,.6), transparent),
+                radial-gradient(2px 2px at 80% 15%, rgba(255,255,255,.8), transparent);
             pointer-events: none;
             z-index: 0;
+            animation: clouds-drift 60s linear infinite;
         }
 
-        @keyframes twinkle {
-            0%, 100% { opacity: .7; }
-            50% { opacity: 1; }
+        @keyframes clouds-drift {
+            from { background-position: 0 0; }
+            to { background-position: -400px 0; }
         }
 
-        /* الأرض / الرصيف الحجري */
-        .hero-tripoli::after {
-            content: '';
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            height: 80px;
-            background: linear-gradient(180deg, transparent, rgba(58,42,28,.3) 50%, rgba(58,42,28,.6) 100%);
-            background-image:
-                linear-gradient(180deg, transparent, rgba(58,42,28,.3) 50%, rgba(58,42,28,.6) 100%),
-                radial-gradient(circle at 30% 50%, rgba(184,153,104,.15), transparent 30%),
-                radial-gradient(circle at 70% 50%, rgba(184,153,104,.10), transparent 30%);
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        /* المشهد المعماري */
-        .tripoli-scene {
+        .hero-arch-scene {
             position: relative;
-            width: min(900px, 96vw);
-            height: clamp(280px, 45vh, 420px);
+            width: 100%;
+            max-width: 1400px;
             margin: 0 auto;
-            z-index: 2;
+            z-index: 1;
             display: flex;
             justify-content: center;
             align-items: flex-end;
+            line-height: 0;
         }
 
-        .tripoli-svg {
+        .arch-svg {
             width: 100%;
-            height: 100%;
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,.35));
+            height: auto;
+            filter: drop-shadow(0 12px 24px rgba(0,0,0,.3));
             opacity: 0;
-            animation: scene-rise 1.4s cubic-bezier(.25,.8,.25,1) .2s forwards;
+            animation: fade-up-scene 1.5s cubic-bezier(.25,.8,.25,1) .3s forwards;
         }
 
-        @keyframes scene-rise {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* عناصر داخل الـSVG تتحرّك */
-        .palm-fronds {
-            transform-origin: 90px 250px;
-            animation: palm-sway 6s ease-in-out infinite;
-        }
-
-        @keyframes palm-sway {
-            0%, 100% { transform: rotate(-1deg); }
-            50% { transform: rotate(1deg); }
+        @keyframes fade-up-scene {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: none; }
         }
 
         .minaret-light {
-            animation: minaret-glow 3s ease-in-out infinite;
+            animation: glow-pulse 3s ease-in-out infinite;
         }
 
-        @keyframes minaret-glow {
-            0%, 100% { opacity: .5; }
+        @keyframes glow-pulse {
+            0%, 100% { opacity: .55; }
             50% { opacity: 1; }
         }
 
-        .arch-stroke {
-            stroke-dasharray: 1200;
-            stroke-dashoffset: 1200;
-            animation: inscribe 2s cubic-bezier(.25,.8,.25,1) .5s forwards;
+        .palm-fronds-anim {
+            transform-origin: 110px 280px;
+            animation: palm-sway 7s ease-in-out infinite;
         }
 
-        @keyframes inscribe {
-            to { stroke-dashoffset: 0; }
+        @keyframes palm-sway {
+            0%, 100% { transform: rotate(-1.2deg); }
+            50% { transform: rotate(1.5deg); }
         }
 
-        /* النصّ الفوقي */
-        .tripoli-content {
-            position: relative;
-            z-index: 3;
+        /* نصّ فوق المشهد */
+        .hero-arch-content {
+            position: absolute;
+            top: 8%;
+            left: 0; right: 0;
             text-align: center;
-            max-width: 720px;
-            margin: 0 auto;
-            padding-top: 2rem;
-            color: #faf6ee;
+            z-index: 3;
+            padding: 0 1rem;
         }
 
-        .tripoli-eyebrow {
+        .hero-eyebrow {
             font-family: 'Reem Kufi', sans-serif;
-            font-size: .78rem;
+            font-size: .8rem;
             letter-spacing: .35em;
-            color: #f4b58a;
+            color: rgba(255,245,220,.95);
             text-transform: uppercase;
             margin-bottom: 1rem;
-            opacity: 0;
-            animation: rise-fade 600ms cubic-bezier(.25,.8,.25,1) 1s forwards;
-        }
-
-        .tripoli-wordmark {
-            font-family: 'Reem Kufi', sans-serif;
-            font-weight: 700;
-            font-size: clamp(2.5rem, 6vw, 4rem);
-            line-height: 1.1;
-            color: #faf6ee;
-            margin: 0;
-            text-shadow: 0 2px 30px rgba(0,0,0,.4);
+            text-shadow: 0 2px 8px rgba(0,0,0,.4);
             opacity: 0;
             animation: rise-fade 600ms cubic-bezier(.25,.8,.25,1) 1.2s forwards;
         }
-        .tripoli-wordmark .accent {
-            color: #f4b58a;
+
+        .hero-wordmark {
+            font-family: 'Reem Kufi', sans-serif;
+            font-weight: 700;
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            line-height: 1;
+            color: #FAF6EE;
+            margin: 0;
+            text-shadow: 0 4px 24px rgba(0,0,0,.5), 0 2px 6px rgba(0,0,0,.3);
+            opacity: 0;
+            animation: rise-fade 600ms cubic-bezier(.25,.8,.25,1) 1.4s forwards;
+        }
+        .hero-wordmark .accent {
+            color: #f4d59a;
             font-family: 'Amiri', serif;
             font-style: italic;
         }
 
-        .tripoli-rule {
+        .hero-rule {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 1rem;
-            margin: 1.25rem auto;
-            width: 50%;
-            opacity: 0;
-            animation: rise-fade 600ms cubic-bezier(.25,.8,.25,1) 1.4s forwards;
-        }
-        .tripoli-rule::before, .tripoli-rule::after {
-            content: ''; flex: 1; height: 1px;
-            background: linear-gradient(to right, transparent, #b89968, transparent);
-        }
-        .tripoli-rule span {
-            width: 8px; height: 8px;
-            border: 1px solid #b89968;
-            transform: rotate(45deg);
-        }
-
-        .tripoli-tagline {
-            font-family: 'Amiri', serif;
-            font-style: italic;
-            font-size: clamp(1.05rem, 2vw, 1.3rem);
-            color: #faf6ee;
-            max-width: 42ch;
-            margin: 0 auto 1.5rem;
-            opacity: .92;
-            text-shadow: 0 1px 10px rgba(0,0,0,.5);
+            margin: 1rem auto;
+            width: clamp(180px, 30vw, 280px);
             opacity: 0;
             animation: rise-fade 600ms cubic-bezier(.25,.8,.25,1) 1.6s forwards;
         }
+        .hero-rule::before, .hero-rule::after {
+            content: ''; flex: 1; height: 1px;
+            background: linear-gradient(to right, transparent, #d4af37, transparent);
+        }
+        .hero-rule span {
+            width: 9px; height: 9px;
+            border: 1px solid #d4af37;
+            transform: rotate(45deg);
+        }
 
-        .tripoli-origin {
+        @keyframes rise-fade {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: none; }
+        }
+
+        /* نصّ بعد المشهد */
+        .hero-arch-footer {
+            position: relative;
+            z-index: 4;
+            background: var(--bg);
+            padding: 3rem 1rem 2rem;
+            text-align: center;
+        }
+
+        .hero-tagline {
+            font-family: 'Amiri', serif;
+            font-style: italic;
+            font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+            color: var(--text);
+            max-width: 56ch;
+            margin: 0 auto 1.5rem;
+            line-height: 1.7;
+        }
+
+        .hero-origin {
             display: inline-flex;
             align-items: center;
-            gap: .5rem;
+            gap: .75rem;
             font-family: 'Aref Ruqaa', serif;
-            color: #f4b58a;
-            font-size: .9rem;
+            color: var(--text-muted);
+            font-size: .95rem;
             margin-bottom: 2rem;
-            opacity: 0;
-            animation: rise-fade 600ms cubic-bezier(.25,.8,.25,1) 1.8s forwards;
         }
-        .tripoli-origin::before, .tripoli-origin::after {
-            content: '◆';
-            color: #b89968;
-            font-size: .7em;
-            opacity: .7;
+        .hero-origin::before, .hero-origin::after {
+            content: '◆'; color: var(--gold-line); font-size: .7em;
         }
 
-        .tripoli-actions {
+        .hero-actions {
             display: flex;
             gap: 1rem;
             justify-content: center;
             flex-wrap: wrap;
-            opacity: 0;
-            animation: rise-fade 600ms cubic-bezier(.25,.8,.25,1) 2s forwards;
         }
 
-        .tripoli-cta {
+        .arch-cta {
             display: inline-flex;
             align-items: center;
             gap: .5rem;
@@ -239,7 +214,7 @@
             font-size: 1rem;
             padding: 1rem 2.25rem;
             background: #B1373F;
-            color: #faf6ee;
+            color: #FAF6EE;
             text-decoration: none;
             border: none;
             cursor: pointer;
@@ -247,7 +222,7 @@
             transition: all 380ms cubic-bezier(.4,0,.2,1);
             border-radius: 2px;
         }
-        .tripoli-cta::after {
+        .arch-cta::after {
             content: '';
             position: absolute;
             inset: 0;
@@ -257,46 +232,38 @@
             z-index: -1;
             border-radius: 2px;
         }
-        .tripoli-cta:hover {
+        .arch-cta:hover {
             transform: translate(-2px, -2px);
-            box-shadow: 0 12px 32px -8px rgba(0,0,0,.4);
+            box-shadow: 0 10px 28px -8px rgba(177,55,63,.4);
         }
-        .tripoli-cta:hover::after {
-            transform: translate(3px, 3px);
-        }
+        .arch-cta:hover::after { transform: translate(3px, 3px); }
 
-        .tripoli-ghost {
+        .arch-ghost {
             display: inline-flex;
             align-items: center;
             gap: .5rem;
             font-family: 'Reem Kufi', sans-serif;
             font-size: .95rem;
-            color: #faf6ee;
-            background: rgba(250,246,238,.1);
-            border: 1px solid rgba(250,246,238,.3);
+            color: var(--text);
+            background: transparent;
+            border: 1px solid var(--border-strong);
             padding: 1rem 1.75rem;
             text-decoration: none;
             cursor: pointer;
             transition: all 380ms cubic-bezier(.4,0,.2,1);
             border-radius: 2px;
         }
-        .tripoli-ghost:hover {
-            background: rgba(250,246,238,.2);
-            border-color: rgba(250,246,238,.5);
-        }
-
-        @keyframes rise-fade {
-            from { opacity: 0; transform: translateY(14px); }
-            to { opacity: 1; transform: none; }
+        .arch-ghost:hover {
+            background: var(--bg-subtle);
+            border-color: var(--gold-line);
         }
 
         @media (max-width: 640px) {
-            .tripoli-scene { height: 240px; }
-            .tripoli-rule { width: 70%; }
+            .hero-arch-content { top: 5%; }
         }
 
         @media (prefers-reduced-motion: reduce) {
-            .hero-tripoli *, .hero-tripoli *::before, .hero-tripoli *::after {
+            .hero-arch *, .hero-arch *::before {
                 animation-duration: .01ms !important;
                 animation-iteration-count: 1 !important;
             }
@@ -317,205 +284,354 @@
             <div style="flex:1;"></div>
             <input class="input input-search" type="search" placeholder="ابحث عن كتاب، مؤلف، أو موضوع..." style="max-width:340px;" id="searchInput">
             <a href="favorites.html" class="btn btn-ghost" title="مفضّلتي">♥</a>
-            <button class="btn btn-ghost" id="themeBtn" title="تبديل الوضع" type="button">🌙</button>
+            <button class="btn btn-ghost" id="themeBtn" type="button">🌙</button>
         </div>
     </header>
 
     <main>
-        <!-- ═══════ قوس طرابلس — مستوحى من قوس ماركوس أوريليوس ═══════ -->
-        <section class="hero-tripoli" aria-labelledby="wordmark">
+        <section class="hero-arch" aria-labelledby="wordmark">
+            <!-- النصّ فوق -->
+            <div class="hero-arch-content">
+                <p class="hero-eyebrow">منذ ١٤٤٧ هـ · من طرابلس الغرب</p>
+                <h1 id="wordmark" class="hero-wordmark">
+                    المكتبة <span class="accent">الطيبة</span>
+                </h1>
+                <div class="hero-rule" aria-hidden="true"><span></span></div>
+            </div>
 
-            <!-- المشهد المعماري -->
-            <div class="tripoli-scene" aria-hidden="true">
-                <svg class="tripoli-svg" viewBox="0 0 900 420" preserveAspectRatio="xMidYEnd meet">
+            <!-- المشهد المعماري المُصحّح -->
+            <div class="hero-arch-scene" aria-hidden="true">
+                <svg class="arch-svg" viewBox="0 0 1400 600" preserveAspectRatio="xMidYEnd meet">
                     <defs>
-                        <linearGradient id="stone" x1="0" x2="0" y1="0" y2="1">
-                            <stop offset="0" stop-color="#d4b888"/>
-                            <stop offset=".5" stop-color="#a88547"/>
+                        <!-- حجارة القوس -->
+                        <linearGradient id="stone-main" x1="0" x2="0" y1="0" y2="1">
+                            <stop offset="0" stop-color="#e8d4a8"/>
+                            <stop offset=".4" stop-color="#c8a572"/>
+                            <stop offset="1" stop-color="#9a7440"/>
+                        </linearGradient>
+                        <linearGradient id="stone-shadow" x1="0" x2="0" y1="0" y2="1">
+                            <stop offset="0" stop-color="#b89865"/>
                             <stop offset="1" stop-color="#6b4423"/>
                         </linearGradient>
-                        <linearGradient id="stone-light" x1="0" x2="0" y1="0" y2="1">
-                            <stop offset="0" stop-color="#e8d4a8"/>
-                            <stop offset="1" stop-color="#b89865"/>
+                        <linearGradient id="stone-bright" x1="0" x2="0" y1="0" y2="1">
+                            <stop offset="0" stop-color="#f4e2b8"/>
+                            <stop offset="1" stop-color="#d4b888"/>
                         </linearGradient>
-                        <linearGradient id="palm-trunk" x1="0" x2="0" y1="0" y2="1">
-                            <stop offset="0" stop-color="#6b4423"/>
-                            <stop offset="1" stop-color="#3a2412"/>
+                        <!-- داخل القوس (مظلم) -->
+                        <linearGradient id="arch-inside" x1="0" x2="0" y1="0" y2="1">
+                            <stop offset="0" stop-color="#3a2412"/>
+                            <stop offset=".6" stop-color="#5a3a1a"/>
+                            <stop offset="1" stop-color="#8b5a2b"/>
                         </linearGradient>
-                        <linearGradient id="palm-frond" x1="0" x2="1" y1="0" y2="1">
-                            <stop offset="0" stop-color="#3d5a26"/>
-                            <stop offset="1" stop-color="#5a7a3a"/>
+                        <!-- مباني -->
+                        <linearGradient id="bldg-yellow" x1="0" x2="0" y1="0" y2="1">
+                            <stop offset="0" stop-color="#e8d088"/>
+                            <stop offset="1" stop-color="#c8a460"/>
                         </linearGradient>
-                        <linearGradient id="minaret-grad" x1="0" x2="0" y1="0" y2="1">
-                            <stop offset="0" stop-color="#e8d4a8"/>
-                            <stop offset="1" stop-color="#a88547"/>
+                        <linearGradient id="bldg-white" x1="0" x2="0" y1="0" y2="1">
+                            <stop offset="0" stop-color="#faf0d8"/>
+                            <stop offset="1" stop-color="#d4c0a0"/>
+                        </linearGradient>
+                        <!-- نباتات -->
+                        <linearGradient id="leaves" x1="0" x2="0" y1="0" y2="1">
+                            <stop offset="0" stop-color="#5a7a3a"/>
+                            <stop offset="1" stop-color="#3d5a26"/>
                         </linearGradient>
                     </defs>
 
-                    <!-- نخلة على اليسار -->
-                    <g class="palm-tree">
-                        <!-- جذع -->
-                        <path d="M88 380 Q92 320 88 250 Q85 240 90 230"
-                              stroke="url(#palm-trunk)" stroke-width="7" fill="none" stroke-linecap="round"/>
-                        <!-- نقش الجذع -->
-                        <g stroke="#3a2412" stroke-width="1.2" stroke-linecap="round" opacity=".6" fill="none">
-                            <path d="M85 270 Q90 272 92 270"/>
-                            <path d="M85 290 Q90 292 92 290"/>
-                            <path d="M85 310 Q90 312 91 310"/>
-                            <path d="M85 330 Q90 332 91 330"/>
-                            <path d="M85 350 Q90 352 91 350"/>
+                    <!-- ═══ المباني الخلفيّة (طرابلس القديمة) ═══ -->
+                    <g class="background-buildings" opacity=".85">
+                        <!-- مبنى أصفر يسار -->
+                        <rect x="180" y="380" width="180" height="180" fill="url(#bldg-yellow)"/>
+                        <rect x="180" y="375" width="180" height="8" fill="#a88547"/>
+                        <!-- نوافذ -->
+                        <g fill="#5a3a1a">
+                            <rect x="200" y="410" width="22" height="32"/>
+                            <rect x="240" y="410" width="22" height="32"/>
+                            <rect x="280" y="410" width="22" height="32"/>
+                            <rect x="320" y="410" width="22" height="32"/>
+                            <rect x="200" y="460" width="22" height="32"/>
+                            <rect x="240" y="460" width="22" height="32"/>
+                            <rect x="280" y="460" width="22" height="32"/>
+                            <rect x="320" y="460" width="22" height="32"/>
+                            <rect x="200" y="510" width="22" height="32"/>
+                            <rect x="240" y="510" width="22" height="32"/>
+                            <rect x="280" y="510" width="22" height="32"/>
+                            <rect x="320" y="510" width="22" height="32"/>
                         </g>
-                        <!-- سعف -->
-                        <g class="palm-fronds">
-                            <path d="M90 230 Q60 220 30 225 Q55 210 90 218" fill="url(#palm-frond)"/>
-                            <path d="M90 230 Q120 220 150 225 Q125 210 90 218" fill="url(#palm-frond)"/>
-                            <path d="M90 230 Q65 200 40 180 Q70 195 90 217" fill="url(#palm-frond)"/>
-                            <path d="M90 230 Q115 200 140 180 Q110 195 90 217" fill="url(#palm-frond)"/>
-                            <path d="M90 230 Q82 195 85 168 Q90 195 90 217" fill="url(#palm-frond)"/>
-                            <path d="M90 230 Q98 195 95 168 Q90 195 90 217" fill="url(#palm-frond)"/>
-                            <!-- ثمار تمر ذهبيّة -->
-                            <circle cx="83" cy="232" r="2" fill="#d4af37"/>
-                            <circle cx="88" cy="229" r="2" fill="#b8941f"/>
-                            <circle cx="93" cy="232" r="2" fill="#d4af37"/>
-                        </g>
-                    </g>
-
-                    <!-- ═══ القوس الرئيسي (مستوحى من قوس ماركوس) ═══ -->
-                    <g class="main-arch">
-                        <!-- الأرضيّة -->
-                        <rect x="280" y="370" width="340" height="20" fill="#6b4423"/>
-
-                        <!-- العمود الأيسر -->
-                        <rect x="288" y="180" width="50" height="200" fill="url(#stone)"/>
-                        <rect x="282" y="180" width="62" height="12" fill="url(#stone-light)"/>
-                        <rect x="282" y="370" width="62" height="14" fill="url(#stone-light)"/>
-
-                        <!-- العمود الأيمن -->
-                        <rect x="562" y="180" width="50" height="200" fill="url(#stone)"/>
-                        <rect x="556" y="180" width="62" height="12" fill="url(#stone-light)"/>
-                        <rect x="556" y="370" width="62" height="14" fill="url(#stone-light)"/>
-
-                        <!-- نقوش حجريّة على الأعمدة -->
-                        <g stroke="#5a3a1a" stroke-width=".8" opacity=".3" fill="none">
-                            <line x1="295" y1="220" x2="335" y2="220"/>
-                            <line x1="295" y1="260" x2="335" y2="260"/>
-                            <line x1="295" y1="300" x2="335" y2="300"/>
-                            <line x1="295" y1="340" x2="335" y2="340"/>
-                            <line x1="569" y1="220" x2="609" y2="220"/>
-                            <line x1="569" y1="260" x2="609" y2="260"/>
-                            <line x1="569" y1="300" x2="609" y2="300"/>
-                            <line x1="569" y1="340" x2="609" y2="340"/>
+                        <!-- إطارات النوافذ بيضاء -->
+                        <g fill="none" stroke="#fff" stroke-width="2" opacity=".9">
+                            <rect x="200" y="410" width="22" height="32"/>
+                            <rect x="240" y="410" width="22" height="32"/>
+                            <rect x="280" y="410" width="22" height="32"/>
+                            <rect x="320" y="410" width="22" height="32"/>
+                            <rect x="200" y="460" width="22" height="32"/>
+                            <rect x="240" y="460" width="22" height="32"/>
+                            <rect x="280" y="460" width="22" height="32"/>
+                            <rect x="320" y="460" width="22" height="32"/>
                         </g>
 
-                        <!-- القوس -->
-                        <path d="M288 180 L338 180 Q450 30 562 180 L612 180 L612 70 L288 70 Z"
-                              fill="url(#stone)"/>
-
-                        <!-- داخل القوس (السماء/المنظر) -->
-                        <path d="M348 180 Q450 50 552 180 Z" fill="#1a2a3f" opacity=".95"/>
-
-                        <!-- نقش الحلقة الداخليّة للقوس -->
-                        <path class="arch-stroke"
-                              d="M348 180 Q450 50 552 180"
-                              stroke="#d4af37" stroke-width="2" fill="none" opacity=".7"/>
-
-                        <!-- الحجارة الزخرفيّة الكلاسيكيّة (cornice) -->
-                        <rect x="280" y="58" width="340" height="14" fill="url(#stone-light)"/>
-                        <rect x="280" y="40" width="340" height="20" fill="url(#stone)"/>
-
-                        <!-- نقوش رومانيّة على الكورنيش -->
-                        <g stroke="#5a3a1a" stroke-width="1" opacity=".4" fill="none">
-                            <path d="M290 48 L610 48"/>
-                            <path d="M290 52 L610 52"/>
-                            <!-- زخارف نباتيّة بسيطة -->
-                            <circle cx="320" cy="50" r="2" fill="#d4af37" opacity=".5"/>
-                            <circle cx="360" cy="50" r="2" fill="#d4af37" opacity=".5"/>
-                            <circle cx="400" cy="50" r="2" fill="#d4af37" opacity=".5"/>
-                            <circle cx="450" cy="50" r="2" fill="#d4af37" opacity=".5"/>
-                            <circle cx="500" cy="50" r="2" fill="#d4af37" opacity=".5"/>
-                            <circle cx="540" cy="50" r="2" fill="#d4af37" opacity=".5"/>
-                            <circle cx="580" cy="50" r="2" fill="#d4af37" opacity=".5"/>
+                        <!-- مبنى أبيض يمين -->
+                        <rect x="1050" y="350" width="200" height="210" fill="url(#bldg-white)"/>
+                        <rect x="1050" y="345" width="200" height="9" fill="#a88547"/>
+                        <g fill="#5a3a1a">
+                            <rect x="1070" y="385" width="24" height="34"/>
+                            <rect x="1110" y="385" width="24" height="34"/>
+                            <rect x="1150" y="385" width="24" height="34"/>
+                            <rect x="1190" y="385" width="24" height="34"/>
+                            <rect x="1070" y="440" width="24" height="34"/>
+                            <rect x="1110" y="440" width="24" height="34"/>
+                            <rect x="1150" y="440" width="24" height="34"/>
+                            <rect x="1190" y="440" width="24" height="34"/>
+                            <rect x="1070" y="495" width="24" height="34"/>
+                            <rect x="1110" y="495" width="24" height="34"/>
+                            <rect x="1150" y="495" width="24" height="34"/>
+                            <rect x="1190" y="495" width="24" height="34"/>
                         </g>
-
-                        <!-- الحجارة الكبيرة (Ashlar masonry) - نقش الكتل -->
-                        <g stroke="#5a3a1a" stroke-width=".5" opacity=".25" fill="none">
-                            <!-- Left column blocks -->
-                            <line x1="288" y1="220" x2="338" y2="220"/>
-                            <line x1="288" y1="260" x2="338" y2="260"/>
-                            <line x1="288" y1="300" x2="338" y2="300"/>
-                            <line x1="288" y1="340" x2="338" y2="340"/>
-                            <line x1="312" y1="200" x2="312" y2="370"/>
-                            <!-- Right column blocks -->
-                            <line x1="562" y1="220" x2="612" y2="220"/>
-                            <line x1="562" y1="260" x2="612" y2="260"/>
-                            <line x1="562" y1="300" x2="612" y2="300"/>
-                            <line x1="562" y1="340" x2="612" y2="340"/>
-                            <line x1="586" y1="200" x2="586" y2="370"/>
+                        <g fill="none" stroke="#fff" stroke-width="2" opacity=".9">
+                            <rect x="1070" y="385" width="24" height="34"/>
+                            <rect x="1110" y="385" width="24" height="34"/>
+                            <rect x="1150" y="385" width="24" height="34"/>
+                            <rect x="1190" y="385" width="24" height="34"/>
                         </g>
                     </g>
 
-                    <!-- المئذنة العثمانيّة خلف القوس على اليمين -->
-                    <g class="minaret">
-                        <!-- البرج -->
-                        <rect x="720" y="200" width="22" height="180" fill="url(#minaret-grad)"/>
-                        <!-- الشرفة -->
-                        <rect x="714" y="195" width="34" height="8" fill="url(#stone-light)"/>
-                        <rect x="714" y="160" width="34" height="6" fill="url(#stone-light)"/>
-                        <!-- الجزء العلوي (السقف المخروطي) -->
-                        <path d="M714 165 L731 130 L748 165 Z" fill="url(#stone)"/>
-                        <!-- القمّة -->
-                        <line x1="731" y1="130" x2="731" y2="105" stroke="#a88547" stroke-width="2"/>
-                        <circle cx="731" cy="105" r="4" fill="#d4af37"/>
+                    <!-- ═══ المئذنة العثمانيّة (خلف القوس) ═══ -->
+                    <g class="minaret" transform="translate(750, 0)">
+                        <!-- البرج الأساسي -->
+                        <rect x="-12" y="220" width="24" height="200" fill="url(#stone-bright)"/>
+                        <!-- نقش الحجارة -->
+                        <g stroke="#a88547" stroke-width=".5" opacity=".4">
+                            <line x1="-12" y1="260" x2="12" y2="260"/>
+                            <line x1="-12" y1="300" x2="12" y2="300"/>
+                            <line x1="-12" y1="340" x2="12" y2="340"/>
+                            <line x1="-12" y1="380" x2="12" y2="380"/>
+                        </g>
+                        <!-- الشرفة الأولى -->
+                        <rect x="-20" y="215" width="40" height="8" fill="url(#stone-bright)"/>
+                        <rect x="-18" y="212" width="36" height="3" fill="#a88547"/>
+                        <!-- الجزء الأوسط (أرفع) -->
+                        <rect x="-9" y="160" width="18" height="55" fill="url(#stone-bright)"/>
+                        <!-- الشرفة الثانية -->
+                        <rect x="-16" y="155" width="32" height="6" fill="url(#stone-bright)"/>
+                        <rect x="-14" y="152" width="28" height="3" fill="#a88547"/>
+                        <!-- الجزء العلوي -->
+                        <rect x="-7" y="110" width="14" height="45" fill="url(#stone-bright)"/>
+                        <!-- السقف المخروطي -->
+                        <path d="M-10 110 L0 75 L10 110 Z" fill="url(#stone-main)"/>
+                        <!-- الإبرة -->
+                        <line x1="0" y1="75" x2="0" y2="50" stroke="#a88547" stroke-width="1.5"/>
+                        <circle cx="0" cy="50" r="3" fill="#d4af37"/>
                         <!-- الهلال -->
-                        <path d="M731 100 Q738 100 736 96 Q731 102 731 100" fill="#d4af37"/>
+                        <path d="M0 45 Q5 45 4 41 Q0 47 0 45" fill="#d4af37"/>
                         <!-- ضوء المئذنة -->
-                        <circle class="minaret-light" cx="731" cy="180" r="6" fill="#fff" opacity=".7"/>
-                        <circle class="minaret-light" cx="731" cy="180" r="12" fill="#fff" opacity=".3"/>
+                        <circle class="minaret-light" cx="0" cy="180" r="5" fill="#fff" opacity=".7"/>
+                        <circle class="minaret-light" cx="0" cy="180" r="12" fill="#fff" opacity=".25"/>
                     </g>
 
-                    <!-- مباني صغيرة على اليمين الأبعد -->
-                    <g opacity=".7">
-                        <rect x="800" y="280" width="40" height="100" fill="#6b4423"/>
-                        <rect x="810" y="290" width="6" height="10" fill="#3a2412"/>
-                        <rect x="822" y="290" width="6" height="10" fill="#3a2412"/>
-                        <rect x="810" y="310" width="6" height="10" fill="#3a2412"/>
-                        <rect x="822" y="310" width="6" height="10" fill="#3a2412"/>
+                    <!-- ═══════════════════════════════════════════════════════
+                         قوس ماركوس أوريليوس (Quadrifrons - cubic Roman arch)
+                         ═══════════════════════════════════════════════════════ -->
+                    <g class="marcus-arch" transform="translate(700, 0)">
+
+                        <!-- الكتلة العلويّة (Attic Story) -->
+                        <rect x="-150" y="180" width="300" height="80" fill="url(#stone-main)"/>
+                        <!-- نقش الحجارة العلويّة -->
+                        <g stroke="#8b6630" stroke-width=".8" opacity=".5" fill="none">
+                            <line x1="-150" y1="220" x2="150" y2="220"/>
+                            <line x1="-100" y1="180" x2="-100" y2="260"/>
+                            <line x1="-50" y1="180" x2="-50" y2="260"/>
+                            <line x1="0" y1="180" x2="0" y2="260"/>
+                            <line x1="50" y1="180" x2="50" y2="260"/>
+                            <line x1="100" y1="180" x2="100" y2="260"/>
+                        </g>
+
+                        <!-- الكورنيش الأوسط (Cornice) -->
+                        <rect x="-155" y="260" width="310" height="12" fill="url(#stone-bright)"/>
+                        <rect x="-160" y="272" width="320" height="6" fill="url(#stone-shadow)"/>
+
+                        <!-- زخارف على الكورنيش (Roman dentil molding) -->
+                        <g fill="#8b6630" opacity=".7">
+                            <rect x="-145" y="264" width="4" height="6"/>
+                            <rect x="-130" y="264" width="4" height="6"/>
+                            <rect x="-115" y="264" width="4" height="6"/>
+                            <rect x="-100" y="264" width="4" height="6"/>
+                            <rect x="-85" y="264" width="4" height="6"/>
+                            <rect x="-70" y="264" width="4" height="6"/>
+                            <rect x="-55" y="264" width="4" height="6"/>
+                            <rect x="-40" y="264" width="4" height="6"/>
+                            <rect x="-25" y="264" width="4" height="6"/>
+                            <rect x="-10" y="264" width="4" height="6"/>
+                            <rect x="5" y="264" width="4" height="6"/>
+                            <rect x="20" y="264" width="4" height="6"/>
+                            <rect x="35" y="264" width="4" height="6"/>
+                            <rect x="50" y="264" width="4" height="6"/>
+                            <rect x="65" y="264" width="4" height="6"/>
+                            <rect x="80" y="264" width="4" height="6"/>
+                            <rect x="95" y="264" width="4" height="6"/>
+                            <rect x="110" y="264" width="4" height="6"/>
+                            <rect x="125" y="264" width="4" height="6"/>
+                        </g>
+
+                        <!-- الكتلة الرئيسيّة (Main Block) -->
+                        <rect x="-150" y="278" width="300" height="260" fill="url(#stone-main)"/>
+
+                        <!-- نقش الحجارة الكبيرة (Ashlar masonry) -->
+                        <g stroke="#8b6630" stroke-width=".8" opacity=".4" fill="none">
+                            <!-- صفوف أفقيّة -->
+                            <line x1="-150" y1="318" x2="150" y2="318"/>
+                            <line x1="-150" y1="358" x2="150" y2="358"/>
+                            <line x1="-150" y1="398" x2="150" y2="398"/>
+                            <line x1="-150" y1="438" x2="150" y2="438"/>
+                            <line x1="-150" y1="478" x2="150" y2="478"/>
+                            <line x1="-150" y1="518" x2="150" y2="518"/>
+                            <!-- أعمدة (الأطراف فقط، لإظهار الـpilasters) -->
+                            <line x1="-110" y1="278" x2="-110" y2="538"/>
+                            <line x1="110" y1="278" x2="110" y2="538"/>
+                            <!-- حجارة أصغر داخل المنطقة المسطّحة -->
+                            <line x1="-80" y1="278" x2="-80" y2="290"/>
+                            <line x1="-30" y1="278" x2="-30" y2="290"/>
+                            <line x1="30" y1="278" x2="30" y2="290"/>
+                            <line x1="80" y1="278" x2="80" y2="290"/>
+                        </g>
+
+                        <!-- العمود المسطّح الأيسر (Pilaster) -->
+                        <rect x="-148" y="278" width="38" height="260" fill="url(#stone-main)"/>
+                        <line x1="-110" y1="278" x2="-110" y2="538" stroke="#8b6630" stroke-width="1" opacity=".5"/>
+                        <!-- تاج العمود الأيسر (Capital) -->
+                        <rect x="-152" y="290" width="46" height="14" fill="url(#stone-bright)"/>
+                        <!-- قاعدة العمود الأيسر (Base) -->
+                        <rect x="-152" y="510" width="46" height="14" fill="url(#stone-shadow)"/>
+                        <rect x="-156" y="524" width="54" height="14" fill="url(#stone-main)"/>
+
+                        <!-- العمود المسطّح الأيمن (Pilaster) -->
+                        <rect x="110" y="278" width="38" height="260" fill="url(#stone-main)"/>
+                        <line x1="110" y1="278" x2="110" y2="538" stroke="#8b6630" stroke-width="1" opacity=".5"/>
+                        <rect x="106" y="290" width="46" height="14" fill="url(#stone-bright)"/>
+                        <rect x="106" y="510" width="46" height="14" fill="url(#stone-shadow)"/>
+                        <rect x="102" y="524" width="54" height="14" fill="url(#stone-main)"/>
+
+                        <!-- ═══ القوس نفسه (Arch Opening) ═══ -->
+                        <!-- الفراغ المظلم داخل القوس -->
+                        <path d="M-100 538 L-100 410 Q-100 320 0 320 Q100 320 100 410 L100 538 Z"
+                              fill="url(#arch-inside)"/>
+
+                        <!-- إطار القوس (Voussoirs - keystone arch) -->
+                        <path d="M-105 410 Q-105 315 0 315 Q105 315 105 410 L100 410 Q100 320 0 320 Q-100 320 -100 410 Z"
+                              fill="url(#stone-bright)"/>
+
+                        <!-- المفتاح الأوسط (Keystone) -->
+                        <path d="M-12 315 L-6 305 L6 305 L12 315 L8 320 L-8 320 Z" fill="url(#stone-bright)"/>
+                        <rect x="-8" y="305" width="16" height="6" fill="url(#stone-shadow)" opacity=".5"/>
+
+                        <!-- خطوط الفسيفساء الحجريّة على القوس -->
+                        <g stroke="#8b6630" stroke-width="1" opacity=".6" fill="none">
+                            <line x1="-100" y1="410" x2="-105" y2="410"/>
+                            <line x1="-95" y1="370" x2="-100" y2="365"/>
+                            <line x1="-80" y1="340" x2="-85" y2="335"/>
+                            <line x1="-55" y1="320" x2="-60" y2="315"/>
+                            <line x1="-25" y1="316" x2="-28" y2="311"/>
+                            <line x1="25" y1="316" x2="28" y2="311"/>
+                            <line x1="55" y1="320" x2="60" y2="315"/>
+                            <line x1="80" y1="340" x2="85" y2="335"/>
+                            <line x1="95" y1="370" x2="100" y2="365"/>
+                            <line x1="100" y1="410" x2="105" y2="410"/>
+                        </g>
+
+                        <!-- إطار سفلي (Plinth) - الأرضيّة -->
+                        <rect x="-160" y="538" width="320" height="22" fill="url(#stone-shadow)"/>
+                        <rect x="-165" y="558" width="330" height="6" fill="url(#stone-main)"/>
+
+                        <!-- نقوش تزيينيّة على الكتلة الرئيسيّة (لمحة Victory reliefs) -->
+                        <g opacity=".25">
+                            <circle cx="-130" cy="380" r="3" fill="#8b6630"/>
+                            <circle cx="130" cy="380" r="3" fill="#8b6630"/>
+                            <circle cx="-130" cy="460" r="3" fill="#8b6630"/>
+                            <circle cx="130" cy="460" r="3" fill="#8b6630"/>
+                        </g>
                     </g>
 
-                    <!-- مباني على اليسار الأبعد -->
-                    <g opacity=".6">
-                        <rect x="190" y="300" width="70" height="80" fill="#8b5a2b"/>
-                        <rect x="200" y="315" width="8" height="12" fill="#3a2412"/>
-                        <rect x="215" y="315" width="8" height="12" fill="#3a2412"/>
-                        <rect x="200" y="335" width="8" height="12" fill="#3a2412"/>
-                        <rect x="215" y="335" width="8" height="12" fill="#3a2412"/>
+                    <!-- ═══ النخلة (يسار) ═══ -->
+                    <g class="palm-tree" transform="translate(80, 0)">
+                        <!-- الجذع -->
+                        <path d="M30 560 Q34 480 30 380 Q27 360 32 340"
+                              stroke="#5a3a1a" stroke-width="9" fill="none" stroke-linecap="round"/>
+                        <!-- نقش الجذع -->
+                        <g stroke="#3a2412" stroke-width="1.5" opacity=".7" fill="none">
+                            <path d="M27 410 Q33 412 36 410"/>
+                            <path d="M27 435 Q33 437 36 435"/>
+                            <path d="M27 460 Q33 462 36 460"/>
+                            <path d="M27 485 Q33 487 36 485"/>
+                            <path d="M27 510 Q33 512 36 510"/>
+                            <path d="M27 535 Q33 537 36 535"/>
+                        </g>
+                        <!-- السعف -->
+                        <g class="palm-fronds-anim">
+                            <path d="M30 340 Q-10 325 -40 335 Q-5 310 30 325" fill="url(#leaves)"/>
+                            <path d="M30 340 Q70 325 100 335 Q65 310 30 325" fill="url(#leaves)"/>
+                            <path d="M30 340 Q-15 295 -45 270 Q5 290 30 322" fill="url(#leaves)"/>
+                            <path d="M30 340 Q75 295 105 270 Q55 290 30 322" fill="url(#leaves)"/>
+                            <path d="M30 340 Q20 285 25 250 Q30 285 30 322" fill="url(#leaves)"/>
+                            <path d="M30 340 Q40 285 35 250 Q30 285 30 322" fill="url(#leaves)"/>
+                            <!-- ثمار التمر -->
+                            <circle cx="22" cy="343" r="2.5" fill="#d4af37"/>
+                            <circle cx="28" cy="340" r="2.5" fill="#b8941f"/>
+                            <circle cx="34" cy="340" r="2.5" fill="#d4af37"/>
+                            <circle cx="40" cy="343" r="2.5" fill="#b8941f"/>
+                        </g>
                     </g>
 
-                    <!-- الرصيف الحجري في الواجهة -->
-                    <g opacity=".4">
-                        <path d="M380 400 L520 400 L530 420 L370 420 Z" fill="#5a3a1a"/>
-                        <line x1="400" y1="408" x2="500" y2="408" stroke="#3a2412" stroke-width=".5"/>
-                        <line x1="395" y1="415" x2="505" y2="415" stroke="#3a2412" stroke-width=".5"/>
+                    <!-- ═══ النباتات في الواجهة (يسار) ═══ -->
+                    <g class="foreground-plants-left">
+                        <!-- شجيرات -->
+                        <ellipse cx="450" cy="585" rx="55" ry="22" fill="url(#leaves)"/>
+                        <ellipse cx="380" cy="590" rx="40" ry="18" fill="#5a7a3a" opacity=".8"/>
+                        <!-- زهور -->
+                        <circle cx="430" cy="572" r="3" fill="#B1373F"/>
+                        <circle cx="445" cy="568" r="3" fill="#f4d59a"/>
+                        <circle cx="465" cy="570" r="3" fill="#B1373F"/>
+                        <circle cx="475" cy="565" r="3" fill="#f4d59a"/>
+                        <circle cx="490" cy="568" r="3" fill="#B1373F"/>
+                    </g>
+
+                    <!-- ═══ النباتات في الواجهة (يمين) ═══ -->
+                    <g class="foreground-plants-right">
+                        <ellipse cx="970" cy="585" rx="55" ry="22" fill="url(#leaves)"/>
+                        <ellipse cx="1040" cy="590" rx="40" ry="18" fill="#5a7a3a" opacity=".8"/>
+                        <circle cx="950" cy="572" r="3" fill="#f4d59a"/>
+                        <circle cx="965" cy="568" r="3" fill="#B1373F"/>
+                        <circle cx="985" cy="570" r="3" fill="#f4d59a"/>
+                        <circle cx="995" cy="565" r="3" fill="#B1373F"/>
+                        <circle cx="1010" cy="568" r="3" fill="#f4d59a"/>
+                    </g>
+
+                    <!-- ═══ الرصيف الحجري في الواجهة ═══ -->
+                    <g class="stone-path" opacity=".55">
+                        <polygon points="540,570 860,570 880,600 520,600" fill="#9a7440"/>
+                        <!-- خطوط البلاط -->
+                        <g stroke="#5a3a1a" stroke-width=".8" opacity=".6">
+                            <line x1="560" y1="580" x2="840" y2="580"/>
+                            <line x1="550" y1="590" x2="850" y2="590"/>
+                            <line x1="620" y1="570" x2="615" y2="600"/>
+                            <line x1="700" y1="570" x2="700" y2="600"/>
+                            <line x1="780" y1="570" x2="785" y2="600"/>
+                        </g>
                     </g>
                 </svg>
             </div>
+        </section>
 
-            <!-- النصّ الفوقي -->
-            <div class="tripoli-content">
-                <p class="tripoli-eyebrow">منذ ١٤٤٧ هـ · من طرابلس الغرب</p>
-                <h1 id="wordmark" class="tripoli-wordmark">
-                    المكتبة <span class="accent">الطيبة</span>
-                </h1>
-                <div class="tripoli-rule" aria-hidden="true"><span></span></div>
-                <p class="tripoli-tagline">
-                    من تحت قوس طرابلس، حيث الحضارات تتعانق منذ ألفي عام،
-                    نفتح أبواب المعرفة لكلّ قارئ عربيّ.
-                </p>
-                <p class="tripoli-origin">🇱🇾 من ليبيا · إلى الوطن العربيّ</p>
-                <div class="tripoli-actions">
-                    <a href="#shelves" class="tripoli-cta">📚 ادخل المكتبة</a>
-                    <button class="tripoli-ghost" id="surpriseBtn" type="button">🎲 فاجئني بكتاب</button>
-                </div>
+        <!-- ═══════ النصّ ═══════ -->
+        <section class="hero-arch-footer">
+            <p class="hero-tagline">
+                من تحت <strong style="color:var(--indian-red,#B1373F);font-style:normal;">قوس طرابلس</strong>،
+                حيث الحضارات تتعانق منذ ألفي عام،
+                نفتح أبواب المعرفة لكلّ قارئ عربيّ.
+            </p>
+            <p class="hero-origin">🇱🇾 من ليبيا · إلى الوطن العربيّ</p>
+            <div class="hero-actions">
+                <a href="#shelves" class="arch-cta">📚 ادخل المكتبة</a>
+                <button class="arch-ghost" id="surpriseBtn" type="button">🎲 فاجئني بكتاب</button>
             </div>
         </section>
 
@@ -591,8 +707,8 @@
         </div>
     </footer>
 
-    <script src="js/user-system.js?v=16"></script>
-    <script src="js/homepage-v2.js?v=16"></script>
+    <script src="js/user-system.js?v=17"></script>
+    <script src="js/homepage-v2.js?v=17"></script>
     <script>
         document.getElementById('themeBtn')?.addEventListener('click', () => {
             const c = document.documentElement.getAttribute('data-theme') || 'light';
@@ -604,7 +720,7 @@
             if (e.key === 'Enter' && e.target.value.trim()) location.href = 'index.html?q=' + encodeURIComponent(e.target.value);
         });
         document.getElementById('year').textContent = new Date().getFullYear();
-        document.querySelector('.tripoli-cta')?.addEventListener('click', e => {
+        document.querySelector('.arch-cta')?.addEventListener('click', e => {
             const href = e.currentTarget.getAttribute('href');
             if (href?.startsWith('#')) { e.preventDefault(); document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' }); }
         });
