@@ -1,0 +1,969 @@
+/**
+ * reader-luxury.js — المكتبة الطيبة Wave 2
+ * Luxury reading sanctuary features · RTL Arabic · v=23
+ *
+ * Features:
+ *  1. 4-colour text highlights (localStorage)
+ *  2. Sticky notes with Markdown preview (localStorage)
+ *  3. Bookmarks with thumbnail (localStorage)
+ *  4. 4 reading themes (cycle)
+ *  5. Focus mode (F)
+ *  6. Keyboard shortcuts overlay (?)
+ *  7. Reading progress bar
+ *  8. Reading time tracker
+ *  9. Zoom control
+ * 10. RTL Arabic typography
+ */
+
+(function() {
+  'use strict';
+
+  /* ─── Constants ────────────────────────────────────────────── */
+  const THEMES = [
+    { id: 'parchment', label: 'رق طبيعي',  dot: '#B89968' },
+    { id: 'sepia',     label: 'سيبيا حنين', dot: '#c4a97a' },
+    { id: 'dark',      label: 'حبر ليلي',   dot: '#4a5068' },
+    { id: 'oled',      label: 'سواد عميق',  dot: '#222' }
+  ];
+
+  const HL_COLORS = [
+    { id: 'yellow', hex: '#FBE16C', label: 'أصفر مخطوطات — مهم',      alpha: 'rgba(251,225,108,.5)'  },
+    { id: 'green',  hex: '#9CCBA0', label: 'أخضر نعنع — للحفظ',       alpha: 'rgba(156,203,160,.5)'  },
+    { id: 'blue',   hex: '#9CC2E3', label: 'أزرق سماوي — تساؤل',     alpha: 'rgba(156,194,227,.5)'  },
+    { id: 'red',    hex: '#E3786B', label: 'أحمر فاقع — اعتراض',     alpha: 'rgba(227,120,107,.5)'  }
+  ];
+
+  const PDFJS_SRC    = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+  const PDFJS_WORKER = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+  /* ─── State ────────────────────────────────────────────────── */
+  let pdfDoc     = null;
+  let currentPage = 1;
+  let totalPages  = 0;
+  let scale       = 1.5;
+  let rendering   = false;
+  let bookId      = '';
+  let bookTitle   = '';
+  let bookAuthor  = '';
+  let themeIdx    = 0;
+  let focusMode   = false;
+  let pendingSelection = null;  // { text, rects } for highlight
+  let pendingNoteCtx  = null;  // same but for note
+  let readingSeconds  = 0;
+  let readingTimer    = null;
+  let currentPdfPage  = null;  // pdf page object for thumbnails
+  let sidebarOpen     = false;
+  let activeSideTab   = 'bookmarks';
+
+  /* ─── DOM refs (populated in init) ────────────────────────── */
+  let canvas, ctx, textLayerDiv, pdfWrapper;
+  let progressBar, barTitle, barAuthor, pageInput, totalPagesEl;
+  let prevBtn, nextBtn, zoomInBtn, zoomOutBtn, zoomLabel;
+  let themeBtn, bookmarkBtn, hlToggleBtn, notesToggleBtn, focusBtn;
+  let sidebarPanel, sidebarTabs, sidebarPanes;
+  let hlPalette, noteModal, noteTextarea, shortcutsOverlay;
+  let readingTimeBadge, focusHint;
+  let readerMessage, msgText, statusLine;
+
+  /* ─── localStorage helpers ─────────────────────────────────── */
+  function lsGet(key, def) {
+    try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; }
+    catch { return def; }
+  }
+  function lsSet(key, val) {
+    try { localStorage.setItem(key, JSON.stringify(val)); } catch(_) {}
+  }
+
+  /* ─── Bookmarks ────────────────────────────────────────────── */
+  function bmKey()    { return `taybaa-bm-${bookId}`; }
+  function bmGetAll() { return lsGet(bmKey(), []); }
+  function bmHas(p)   { return bmGetAll().some(b => b.page === p); }
+  function bmAdd(p, thumb) {
+    const bms = bmGetAll();
+    if (bmHas(p)) return;
+    bms.push({ page: p, thumb, ts: Date.now() });
+    lsSet(bmKey(), bms);
+  }
+  function bmRemove(p) {
+    lsSet(bmKey(), bmGetAll().filter(b => b.page !== p));
+  }
+  function bmToggle(p) {
+    if (bmHas(p)) { bmRemove(p); return false; }
+    else { const t = getThumbDataURL(); bmAdd(p, t); return true; }
+  }
+
+  function getThumbDataURL() {
+    if (!canvas) return '';
+    try {
+      const th = document.createElement('canvas');
+      const sc = 38 / canvas.width;
+      th.width  = 38;
+      th.height = Math.round(canvas.height * sc);
+      th.getContext('2d').drawImage(canvas, 0, 0, th.width, th.height);
+      return th.toDataURL('image/jpeg', .6);
+    } catch { return ''; }
+  }
+
+  /* ─── Highlights ───────────────────────────────────────────── */
+  function hlKey()    { return `taybaa-hl-${bookId}`; }
+  function hlGetAll() { return lsGet(hlKey(), []); }
+  function hlAdd(entry) {
+    const all = hlGetAll();
+    all.push(entry);
+    lsSet(hlKey(), all);
+  }
+  function hlRemove(id) {
+    lsSet(hlKey(), hlGetAll().filter(h => h.id !== id));
+  }
+
+  /* ─── Notes ────────────────────────────────────────────────── */
+  function noteKey()    { return `taybaa-notes-${bookId}`; }
+  function noteGetAll() { return lsGet(noteKey(), []); }
+  function noteAdd(entry) {
+    const all = noteGetAll();
+    all.push(entry);
+    lsSet(noteKey(), all);
+  }
+  function noteRemove(id) {
+    lsSet(noteKey(), noteGetAll().filter(n => n.id !== id));
+  }
+
+  /* ─── Reading time ─────────────────────────────────────────── */
+  function rtKey() { return `taybaa-reading-time-${bookId}`; }
+  function rtGet() { return lsGet(rtKey(), 0); }
+  function rtAdd(secs) { lsSet(rtKey(), rtGet() + secs); }
+  function rtFmt(secs) {
+    const mins = Math.floor(secs / 60);
+    if (mins < 1) return 'أقل من دقيقة';
+    return `${mins} دقيقة`;
+  }
+
+  function startReadingTimer() {
+    if (readingTimer) return;
+    const tick = 10; // every 10s
+    let acc = 0;
+    readingTimer = setInterval(() => {
+      if (document.hidden) return;
+      acc += tick;
+      readingSeconds = rtGet() + tick;
+      rtAdd(tick);
+      updateTimeBadge();
+    }, tick * 1000);
+  }
+
+  function updateTimeBadge() {
+    const secs = rtGet();
+    if (secs < 60) return;
+    if (readingTimeBadge) {
+      readingTimeBadge.textContent = `قضيت ${rtFmt(secs)} في هذا الكتاب`;
+      readingTimeBadge.classList.add('visible');
+    }
+  }
+
+  /* ─── Theme ─────────────────────────────────────────────────── */
+  function applyTheme(idx) {
+    themeIdx = ((idx % THEMES.length) + THEMES.length) % THEMES.length;
+    const t = THEMES[themeIdx];
+    document.documentElement.dataset.theme =
+      t.id === 'parchment' ? '' : t.id;
+    lsSet('taybaa-reader-theme', themeIdx);
+    if (themeBtn) {
+      const dot = themeBtn.querySelector('.theme-dot');
+      if (dot) dot.style.background = t.dot;
+      themeBtn.title = t.label;
+    }
+  }
+
+  /* ─── Progress bar ─────────────────────────────────────────── */
+  function updateProgress() {
+    if (!progressBar || !totalPages) return;
+    const pct = totalPages > 1 ? ((currentPage - 1) / (totalPages - 1)) * 100 : 100;
+    progressBar.style.width = pct + '%';
+    const tip = `صفحة ${currentPage} من ${totalPages}`;
+    progressBar.parentElement.setAttribute('data-tip', tip);
+    progressBar.parentElement.title = tip;
+  }
+
+  /* ─── Page navigation ──────────────────────────────────────── */
+  function goToPage(num) {
+    if (!pdfDoc || rendering) return;
+    num = Math.max(1, Math.min(totalPages, num));
+    currentPage = num;
+    renderPage(num);
+  }
+
+  /* ─── Render ────────────────────────────────────────────────── */
+  function renderPage(num) {
+    if (!pdfDoc || rendering) return;
+    rendering = true;
+
+    pdfDoc.getPage(num).then(page => {
+      currentPdfPage = page;
+      const vp = page.getViewport({ scale });
+      canvas.width  = vp.width;
+      canvas.height = vp.height;
+
+      // size wrapper
+      if (pdfWrapper) {
+        pdfWrapper.style.width  = vp.width  + 'px';
+        pdfWrapper.style.height = vp.height + 'px';
+      }
+
+      const renderCtx = { canvasContext: ctx, viewport: vp };
+      return page.render(renderCtx).promise.then(() => ({ page, vp }));
+    }).then(({ page, vp }) => {
+      rendering = false;
+      updatePageUI();
+      updateProgress();
+
+      // Save progress
+      if (bookId && typeof READING !== 'undefined') READING.setPage(bookId, num);
+
+      // Text layer
+      buildTextLayer(page, vp);
+
+      // Re-draw highlights for this page
+      drawHighlightsForPage(num);
+
+      // Note markers for this page
+      drawNoteMarkersForPage(num);
+
+      // Refresh bookmark icon state
+      updateBookmarkBtn();
+    }).catch(err => {
+      rendering = false;
+      console.error('PDF render error:', err);
+    });
+  }
+
+  function buildTextLayer(page, viewport) {
+    if (!textLayerDiv) return;
+    textLayerDiv.innerHTML = '';
+    textLayerDiv.style.width  = viewport.width  + 'px';
+    textLayerDiv.style.height = viewport.height + 'px';
+
+    page.getTextContent().then(tc => {
+      if (typeof pdfjsLib === 'undefined') return;
+      pdfjsLib.renderTextLayer({
+        textContentSource: tc,
+        container: textLayerDiv,
+        viewport,
+        textDivs: []
+      });
+    });
+  }
+
+  /* ─── Highlights rendering ─────────────────────────────────── */
+  function drawHighlightsForPage(pageNum) {
+    // Remove existing overlays
+    if (pdfWrapper) {
+      pdfWrapper.querySelectorAll('.hl-overlay').forEach(el => el.remove());
+    }
+    const items = hlGetAll().filter(h => h.page === pageNum);
+    items.forEach(h => renderHlOverlay(h));
+  }
+
+  function renderHlOverlay(h) {
+    if (!pdfWrapper || !canvas) return;
+    const color = HL_COLORS.find(c => c.id === h.colorId);
+    if (!color) return;
+
+    const scaleX = canvas.width  / h.vpWidth;
+    const scaleY = canvas.height / h.vpHeight;
+
+    (h.rects || []).forEach(r => {
+      const div = document.createElement('div');
+      div.className = 'hl-overlay';
+      div.dataset.hlId = h.id;
+      div.style.left   = (r.x * scaleX) + 'px';
+      div.style.top    = (r.y * scaleY) + 'px';
+      div.style.width  = (r.w * scaleX) + 'px';
+      div.style.height = (r.h * scaleY) + 'px';
+      div.style.background = color.alpha;
+      pdfWrapper.appendChild(div);
+    });
+  }
+
+  /* ─── Note markers ─────────────────────────────────────────── */
+  function drawNoteMarkersForPage(pageNum) {
+    if (pdfWrapper) pdfWrapper.querySelectorAll('.note-marker').forEach(el => el.remove());
+    const notes = noteGetAll().filter(n => n.page === pageNum);
+    notes.forEach(n => renderNoteMarker(n));
+  }
+
+  function renderNoteMarker(n) {
+    if (!pdfWrapper || !canvas) return;
+    const scaleX = canvas.width  / (n.vpWidth  || canvas.width);
+    const scaleY = canvas.height / (n.vpHeight || canvas.height);
+    const marker = document.createElement('div');
+    marker.className = 'note-marker';
+    marker.textContent = '◆';
+    marker.title = n.text.slice(0, 60);
+    marker.style.right = Math.max(0, (n.x || 10) * scaleX) + 'px';
+    marker.style.top   = (n.y || 20) * scaleY + 'px';
+    marker.addEventListener('click', e => {
+      e.stopPropagation();
+      showNotePopup(n, marker);
+    });
+    pdfWrapper.appendChild(marker);
+  }
+
+  function showNotePopup(note, anchor) {
+    // Remove existing popups
+    document.querySelectorAll('.note-popup').forEach(el => el.remove());
+    const popup = document.createElement('div');
+    popup.className = 'note-popup lux-toast';
+    popup.style.cssText = 'max-width:280px;white-space:pre-wrap;font-family:Amiri,Cairo,serif;font-size:.88rem;pointer-events:auto;cursor:default;';
+    popup.innerHTML = simpleMarkdown(note.text);
+    const del = document.createElement('button');
+    del.textContent = 'حذف الملاحظة';
+    del.style.cssText = 'display:block;margin-top:.6rem;background:none;border:1px solid #B1373F;color:#B1373F;border-radius:8px;padding:.3rem .7rem;cursor:pointer;font-family:Cairo,sans-serif;font-size:.78rem;';
+    del.onclick = () => { noteRemove(note.id); popup.remove(); drawNoteMarkersForPage(currentPage); refreshSidebarNotes(); };
+    popup.appendChild(del);
+    document.body.appendChild(popup);
+    // position near anchor
+    const r = anchor.getBoundingClientRect();
+    popup.style.position = 'fixed';
+    popup.style.top  = (r.bottom + 6) + 'px';
+    popup.style.right = (window.innerWidth - r.right) + 'px';
+    popup.style.left  = 'auto';
+    popup.style.transform = 'none';
+    popup.style.bottom = 'auto';
+    popup.style.animation = 'luxToastIn .3s ease both';
+    setTimeout(() => { document.addEventListener('click', () => popup.remove(), { once: true }); }, 100);
+  }
+
+  /* ─── Highlight palette ────────────────────────────────────── */
+  function showHlPalette(x, y) {
+    if (!hlPalette) return;
+    hlPalette.style.top  = y + 'px';
+    hlPalette.style.right = 'auto';
+    hlPalette.style.left  = x + 'px';
+    hlPalette.classList.add('visible');
+  }
+  function hideHlPalette() {
+    if (hlPalette) hlPalette.classList.remove('visible');
+    pendingSelection = null;
+  }
+
+  function captureSelection() {
+    const sel = window.getSelection();
+    if (!sel || sel.isCollapsed || !sel.toString().trim()) return null;
+    const text = sel.toString().trim();
+    const rects = [];
+    if (!pdfWrapper) return null;
+    const wrapRect = pdfWrapper.getBoundingClientRect();
+
+    for (let i = 0; i < sel.rangeCount; i++) {
+      const range = sel.getRangeAt(i);
+      const boxes = Array.from(range.getClientRects());
+      boxes.forEach(b => {
+        if (b.width < 2 || b.height < 2) return;
+        rects.push({
+          x: b.left - wrapRect.left,
+          y: b.top  - wrapRect.top,
+          w: b.width,
+          h: b.height
+        });
+      });
+    }
+    if (!rects.length) return null;
+    return { text, rects };
+  }
+
+  /* ─── Apply highlight ──────────────────────────────────────── */
+  function applyHighlight(colorId) {
+    if (!pendingSelection) return;
+    const { text, rects } = pendingSelection;
+    const entry = {
+      id: Date.now() + '-' + Math.random().toString(36).slice(2,7),
+      page: currentPage,
+      colorId,
+      text,
+      rects,
+      vpWidth:  canvas ? canvas.width  : 800,
+      vpHeight: canvas ? canvas.height : 1100,
+      ts: Date.now()
+    };
+    hlAdd(entry);
+    renderHlOverlay(entry);
+    window.getSelection()?.removeAllRanges();
+    hideHlPalette();
+    refreshSidebarHighlights();
+    showToast('تم التظليل');
+  }
+
+  /* ─── Open note modal ──────────────────────────────────────── */
+  function openNoteModal(ctx) {
+    pendingNoteCtx = ctx;
+    if (!noteModal || !noteTextarea) return;
+    noteTextarea.value = '';
+    noteModal.classList.add('visible');
+    noteTextarea.focus();
+    hideHlPalette();
+  }
+
+  function saveNote() {
+    if (!noteTextarea || !pendingNoteCtx) return;
+    const text = noteTextarea.value.trim();
+    if (!text) { closeNoteModal(); return; }
+    const sel = pendingNoteCtx;
+    // position: first rect or center
+    const pos = sel.rects && sel.rects[0]
+      ? { x: sel.rects[0].x, y: sel.rects[0].y }
+      : { x: 20, y: 100 };
+    const entry = {
+      id: Date.now() + '-' + Math.random().toString(36).slice(2,7),
+      page: currentPage,
+      text,
+      x: pos.x,
+      y: pos.y,
+      vpWidth:  canvas ? canvas.width  : 800,
+      vpHeight: canvas ? canvas.height : 1100,
+      selectedText: sel.text || '',
+      ts: Date.now()
+    };
+    noteAdd(entry);
+    renderNoteMarker(entry);
+    closeNoteModal();
+    refreshSidebarNotes();
+    showToast('تمت إضافة الملاحظة');
+  }
+
+  function closeNoteModal() {
+    if (noteModal) noteModal.classList.remove('visible');
+    pendingNoteCtx = null;
+    window.getSelection()?.removeAllRanges();
+  }
+
+  /* ─── Simple Markdown renderer ─────────────────────────────── */
+  function simpleMarkdown(text) {
+    return text
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g,'<em>$1</em>')
+      .replace(/`(.+?)`/g,'<code>$1</code>')
+      .replace(/\n/g,'<br>');
+  }
+
+  /* ─── Bookmarks ─────────────────────────────────────────────── */
+  function updateBookmarkBtn() {
+    if (!bookmarkBtn) return;
+    const has = bmHas(currentPage);
+    bookmarkBtn.classList.toggle('active', has);
+    bookmarkBtn.title = has ? 'إزالة الإشارة المرجعية' : 'إضافة إشارة مرجعية';
+  }
+
+  function toggleBookmark() {
+    const added = bmToggle(currentPage);
+    updateBookmarkBtn();
+    refreshSidebarBookmarks();
+    showToast(added ? 'تمت إضافة الإشارة المرجعية' : 'تمت إزالة الإشارة المرجعية');
+  }
+
+  /* ─── Sidebar ────────────────────────────────────────────────── */
+  function toggleSidebar(tab) {
+    if (!sidebarPanel) return;
+    const isMobile = window.innerWidth < 640;
+    if (sidebarOpen && activeSideTab === tab) {
+      // close
+      sidebarOpen = false;
+      if (isMobile) sidebarPanel.classList.remove('open');
+      else sidebarPanel.classList.add('collapsed');
+    } else {
+      sidebarOpen = true;
+      activeSideTab = tab;
+      if (isMobile) { sidebarPanel.classList.add('open'); sidebarPanel.classList.remove('collapsed'); }
+      else sidebarPanel.classList.remove('collapsed');
+      switchSideTab(tab);
+    }
+  }
+
+  function switchSideTab(tab) {
+    activeSideTab = tab;
+    if (!sidebarTabs || !sidebarPanes) return;
+    sidebarTabs.forEach(bt => bt.classList.toggle('active', bt.dataset.tab === tab));
+    sidebarPanes.forEach(pn => pn.classList.toggle('active', pn.dataset.pane === tab));
+    if (tab === 'bookmarks')  refreshSidebarBookmarks();
+    if (tab === 'notes')      refreshSidebarNotes();
+    if (tab === 'highlights') refreshSidebarHighlights();
+  }
+
+  function refreshSidebarBookmarks() {
+    const pane = document.querySelector('.sidebar-pane[data-pane="bookmarks"]');
+    if (!pane) return;
+    const bms = bmGetAll().sort((a,b) => a.page - b.page);
+    if (!bms.length) {
+      pane.innerHTML = '<div class="empty-state"><span class="empty-icon">🔖</span>لا توجد إشارات مرجعية بعد.<br>اضغط B لإضافة الصفحة الحالية.</div>';
+      return;
+    }
+    pane.innerHTML = bms.map(b => `
+      <div class="bookmark-item" data-page="${b.page}">
+        <div class="bookmark-thumb">${b.thumb ? `<img src="${b.thumb}" style="width:100%;height:100%;object-fit:cover;" alt="">` : ''}</div>
+        <div class="bookmark-info">
+          <div class="bookmark-page">صفحة ${b.page}</div>
+          <div class="bookmark-date">${fmtDate(b.ts)}</div>
+        </div>
+        <button class="bookmark-del" data-page="${b.page}" title="حذف" aria-label="حذف الإشارة">✕</button>
+      </div>`).join('');
+    pane.querySelectorAll('.bookmark-item').forEach(el => {
+      el.addEventListener('click', e => {
+        if (e.target.classList.contains('bookmark-del')) return;
+        goToPage(+el.dataset.page);
+      });
+    });
+    pane.querySelectorAll('.bookmark-del').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        bmRemove(+btn.dataset.page);
+        updateBookmarkBtn();
+        refreshSidebarBookmarks();
+      });
+    });
+  }
+
+  function refreshSidebarNotes() {
+    const pane = document.querySelector('.sidebar-pane[data-pane="notes"]');
+    if (!pane) return;
+    const notes = noteGetAll().sort((a,b) => a.page - b.page);
+    if (!notes.length) {
+      pane.innerHTML = '<div class="empty-state"><span class="empty-icon">✏️</span>لا توجد ملاحظات بعد.<br>حدّد نصاً ثم اضغط ✏️ لإضافة ملاحظة.</div>';
+      return;
+    }
+    pane.innerHTML = notes.map(n => `
+      <div class="note-item" data-page="${n.page}" data-id="${n.id}">
+        <div class="note-header">
+          <span class="note-diamond">◆</span>
+          <span class="note-page">صفحة ${n.page}</span>
+          <button class="note-del" data-id="${n.id}" title="حذف" aria-label="حذف الملاحظة">✕</button>
+        </div>
+        <div class="note-content">${simpleMarkdown(n.text.slice(0,200))}</div>
+      </div>`).join('');
+    pane.querySelectorAll('.note-item').forEach(el => {
+      el.addEventListener('click', e => { if (e.target.classList.contains('note-del')) return; goToPage(+el.dataset.page); });
+    });
+    pane.querySelectorAll('.note-del').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        noteRemove(btn.dataset.id);
+        drawNoteMarkersForPage(currentPage);
+        refreshSidebarNotes();
+      });
+    });
+  }
+
+  function refreshSidebarHighlights() {
+    const pane = document.querySelector('.sidebar-pane[data-pane="highlights"]');
+    if (!pane) return;
+    const items = hlGetAll().sort((a,b) => a.page - b.page || a.ts - b.ts);
+    if (!items.length) {
+      pane.innerHTML = '<div class="empty-state"><span class="empty-icon">🖊</span>لا توجد تظليلات بعد.<br>حدّد أي نص في الكتاب لتظليله.</div>';
+      return;
+    }
+    pane.innerHTML = items.map(h => {
+      const color = HL_COLORS.find(c => c.id === h.colorId) || HL_COLORS[0];
+      return `
+        <div class="hl-item" data-page="${h.page}" data-id="${h.id}">
+          <span class="hl-swatch" style="background:${color.hex}"></span>
+          <span class="hl-text">${escHtml(h.text.slice(0,120))}</span>
+          <span class="hl-page">ص${h.page}</span>
+          <button class="hl-del" data-id="${h.id}" title="حذف">✕</button>
+        </div>`;
+    }).join('');
+    pane.querySelectorAll('.hl-item').forEach(el => {
+      el.addEventListener('click', e => { if (e.target.classList.contains('hl-del')) return; goToPage(+el.dataset.page); });
+    });
+    pane.querySelectorAll('.hl-del').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        hlRemove(btn.dataset.id);
+        drawHighlightsForPage(currentPage);
+        refreshSidebarHighlights();
+      });
+    });
+  }
+
+  /* ─── Focus mode ────────────────────────────────────────────── */
+  function toggleFocusMode() {
+    focusMode = !focusMode;
+    document.body.classList.toggle('focus-mode', focusMode);
+    if (focusMode && focusHint) {
+      focusHint.classList.add('visible');
+      setTimeout(() => focusHint && focusHint.classList.remove('visible'), 3000);
+    }
+  }
+
+  /* ─── Keyboard shortcuts ────────────────────────────────────── */
+  function handleKey(e) {
+    // Don't interfere with inputs
+    if (['INPUT','TEXTAREA'].includes(e.target.tagName)) return;
+
+    // Close overlays first
+    if (e.key === 'Escape') {
+      if (shortcutsOverlay && shortcutsOverlay.classList.contains('visible')) { shortcutsOverlay.classList.remove('visible'); return; }
+      if (noteModal && noteModal.classList.contains('visible')) { closeNoteModal(); return; }
+      if (focusMode) { toggleFocusMode(); return; }
+      hideHlPalette();
+      return;
+    }
+
+    if (e.key === '?' || e.key === '/') {
+      if (shortcutsOverlay) shortcutsOverlay.classList.toggle('visible');
+      return;
+    }
+
+    switch (e.key) {
+      case 'ArrowRight': case 'ArrowUp':
+        e.preventDefault(); goToPage(currentPage - 1); break; // RTL: right = prev
+      case 'ArrowLeft': case 'ArrowDown':
+        e.preventDefault(); goToPage(currentPage + 1); break;
+      case '+': case '=':
+        e.preventDefault(); changeZoom(+0.25); break;
+      case '-':
+        e.preventDefault(); changeZoom(-0.25); break;
+      case 'f': case 'F':
+        toggleFocusMode(); break;
+      case 't': case 'T':
+        applyTheme(themeIdx + 1); break;
+      case 'b': case 'B':
+        toggleBookmark(); break;
+    }
+  }
+
+  /* ─── Zoom ───────────────────────────────────────────────────── */
+  function changeZoom(delta) {
+    scale = Math.max(0.75, Math.min(4, scale + delta));
+    if (zoomLabel) zoomLabel.textContent = Math.round(scale * 100) + '%';
+    lsSet('taybaa-reader-zoom', scale);
+    renderPage(currentPage);
+  }
+
+  /* ─── Page UI update ─────────────────────────────────────────── */
+  function updatePageUI() {
+    if (pageInput) pageInput.value = currentPage;
+    if (totalPagesEl) totalPagesEl.textContent = totalPages;
+    if (prevBtn) prevBtn.disabled = currentPage <= 1;
+    if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
+    updateBookmarkBtn();
+  }
+
+  /* ─── Toast ──────────────────────────────────────────────────── */
+  let toastTimer = null;
+  function showToast(msg) {
+    document.querySelectorAll('.lux-toast:not(.note-popup)').forEach(el => el.remove());
+    const t = document.createElement('div');
+    t.className = 'lux-toast';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.remove(), 2400);
+  }
+
+  /* ─── Helpers ────────────────────────────────────────────────── */
+  function fmtDate(ts) {
+    const d = new Date(ts);
+    return d.toLocaleDateString('ar-LY', { month: 'short', day: 'numeric' });
+  }
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function uid() { return Date.now() + '-' + Math.random().toString(36).slice(2,7); }
+
+  /* ─── Main init ─────────────────────────────────────────────── */
+  function init() {
+    canvas         = document.getElementById('pdfCanvas');
+    textLayerDiv   = document.getElementById('pdfTextLayer');
+    pdfWrapper     = document.getElementById('pdfWrapper');
+    progressBar    = document.getElementById('progressBarInner');
+    barTitle       = document.getElementById('barTitle');
+    barAuthor      = document.getElementById('barAuthor');
+    pageInput      = document.getElementById('pageInput');
+    totalPagesEl   = document.getElementById('totalPages');
+    prevBtn        = document.getElementById('prevPage');
+    nextBtn        = document.getElementById('nextPage');
+    zoomInBtn      = document.getElementById('zoomIn');
+    zoomOutBtn     = document.getElementById('zoomOut');
+    zoomLabel      = document.getElementById('zoomLabel');
+    themeBtn       = document.getElementById('themeBtn');
+    bookmarkBtn    = document.getElementById('bookmarkBtn');
+    hlToggleBtn    = document.getElementById('hlToggleBtn');
+    notesToggleBtn = document.getElementById('notesToggleBtn');
+    focusBtn       = document.getElementById('focusBtn');
+    sidebarPanel   = document.getElementById('sidebarPanel');
+    hlPalette      = document.getElementById('hlPalette');
+    noteModal      = document.getElementById('noteModal');
+    noteTextarea   = document.getElementById('noteTextarea');
+    shortcutsOverlay = document.getElementById('shortcutsOverlay');
+    readingTimeBadge = document.getElementById('readingTimeBadge');
+    focusHint      = document.getElementById('focusHint');
+    readerMessage  = document.getElementById('readerMessage');
+    msgText        = document.getElementById('msgText');
+    statusLine     = document.getElementById('statusLine');
+
+    ctx = canvas ? canvas.getContext('2d') : null;
+
+    sidebarTabs  = Array.from(document.querySelectorAll('.sidebar-tab'));
+    sidebarPanes = Array.from(document.querySelectorAll('.sidebar-pane'));
+
+    // Restore preferences
+    themeIdx = lsGet('taybaa-reader-theme', 0);
+    applyTheme(themeIdx);
+    scale = lsGet('taybaa-reader-zoom', 1.5);
+    if (zoomLabel) zoomLabel.textContent = Math.round(scale * 100) + '%';
+
+    // URL params
+    const params = new URLSearchParams(location.search);
+    const rawId  = params.get('id') || params.get('bookId') || '';
+    const pdfParam = params.get('pdf');
+    bookTitle  = params.get('title')  || '';
+    bookAuthor = params.get('author') || '';
+    bookId     = rawId;
+
+    // Update bar meta
+    if (barTitle)  barTitle.textContent  = bookTitle  || 'جارٍ التحميل...';
+    if (barAuthor) barAuthor.textContent = bookAuthor || '';
+    document.title = (bookTitle || 'قارئ') + ' — المكتبة الطيبة';
+
+    // Wire up toolbar buttons
+    document.getElementById('backBtn')?.addEventListener('click', () => history.back());
+
+    prevBtn?.addEventListener('click', () => goToPage(currentPage - 1));
+    nextBtn?.addEventListener('click', () => goToPage(currentPage + 1));
+
+    pageInput?.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const v = parseInt(pageInput.value, 10);
+        if (!isNaN(v)) goToPage(v);
+      }
+    });
+    pageInput?.addEventListener('blur', () => {
+      if (pageInput) pageInput.value = currentPage;
+    });
+
+    zoomInBtn?.addEventListener('click',  () => changeZoom(+0.25));
+    zoomOutBtn?.addEventListener('click', () => changeZoom(-0.25));
+
+    themeBtn?.addEventListener('click', () => applyTheme(themeIdx + 1));
+
+    bookmarkBtn?.addEventListener('click', toggleBookmark);
+
+    hlToggleBtn?.addEventListener('click', () => toggleSidebar('highlights'));
+    notesToggleBtn?.addEventListener('click', () => toggleSidebar('notes'));
+    bookmarkBtn?.addEventListener('dblclick', () => toggleSidebar('bookmarks'));
+    // Also bookmarks panel via separate btn
+    document.getElementById('bmPanelBtn')?.addEventListener('click', () => toggleSidebar('bookmarks'));
+
+    focusBtn?.addEventListener('click', toggleFocusMode);
+    document.getElementById('fsBtn')?.addEventListener('click', () => {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+      else document.exitFullscreen?.();
+    });
+
+    // Sidebar tabs
+    sidebarTabs.forEach(bt => bt.addEventListener('click', () => switchSideTab(bt.dataset.tab)));
+
+    // Highlight palette events
+    document.querySelectorAll('.hl-color-btn').forEach(btn => {
+      btn.addEventListener('click', () => applyHighlight(btn.dataset.colorId));
+    });
+    document.getElementById('hlNoteBtn')?.addEventListener('click', () => {
+      if (pendingSelection) openNoteModal(pendingSelection);
+    });
+    document.getElementById('hlDismissBtn')?.addEventListener('click', hideHlPalette);
+
+    // Note modal
+    document.getElementById('noteSaveBtn')?.addEventListener('click', saveNote);
+    document.getElementById('noteCancelBtn')?.addEventListener('click', closeNoteModal);
+    noteTextarea?.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && e.ctrlKey) saveNote();
+    });
+    noteModal?.addEventListener('click', e => {
+      if (e.target === noteModal) closeNoteModal();
+    });
+
+    // Shortcuts overlay
+    document.getElementById('shortcutsCloseBtn')?.addEventListener('click', () => {
+      shortcutsOverlay?.classList.remove('visible');
+    });
+    shortcutsOverlay?.addEventListener('click', e => {
+      if (e.target === shortcutsOverlay) shortcutsOverlay.classList.remove('visible');
+    });
+
+    // Text selection → highlight palette
+    document.addEventListener('mouseup', onMouseUp);
+    document.addEventListener('touchend', onMouseUp);
+
+    // Context menu on PDF wrapper → note
+    pdfWrapper?.addEventListener('contextmenu', e => {
+      const sel = captureSelection();
+      if (sel) {
+        e.preventDefault();
+        pendingSelection = sel;
+        pendingNoteCtx  = sel;
+        openNoteModal(sel);
+      }
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', handleKey);
+
+    // Reading time
+    updateTimeBadge();
+    if (bookId) startReadingTimer();
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stopReadingTimer();
+      else if (bookId) startReadingTimer();
+    });
+
+    // Load PDF
+    if (!pdfParam && !bookId) {
+      showError('لم يتم تحديد كتاب. تأكد من وجود معامل id في الرابط.');
+      return;
+    }
+
+    if (bookId && !bookTitle) {
+      // fetch book meta from API
+      fetch(`/api/books/${bookId}`)
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+          if (!data) return;
+          bookTitle  = data.title  || bookTitle;
+          bookAuthor = data.author || bookAuthor;
+          if (barTitle)  barTitle.textContent  = bookTitle;
+          if (barAuthor) barAuthor.textContent = bookAuthor;
+          document.title = bookTitle + ' — المكتبة الطيبة';
+          // If pdf not yet loaded, load from API
+          if (!pdfDoc && data.pdf) startPdfLoad(data.pdf);
+        })
+        .catch(() => {});
+    }
+
+    const pdfUrl = pdfParam || (bookId ? null : null);
+    if (pdfUrl) startPdfLoad(pdfUrl);
+    else if (bookId && !pdfParam) {
+      // Will load after API call resolves
+      if (statusLine) statusLine.textContent = 'جارٍ تحميل بيانات الكتاب...';
+    }
+
+    // Preload API-resolved URL
+    if (pdfParam) startPdfLoad(pdfParam);
+  }
+
+  function stopReadingTimer() {
+    if (readingTimer) { clearInterval(readingTimer); readingTimer = null; }
+  }
+
+  /* ─── Selection handler ─────────────────────────────────────── */
+  function onMouseUp(e) {
+    setTimeout(() => {
+      if (noteModal && noteModal.classList.contains('visible')) return;
+      const sel = captureSelection();
+      if (sel) {
+        pendingSelection = sel;
+        const x = e.clientX ?? (e.touches?.[0]?.clientX ?? 80);
+        const y = (e.clientY ?? (e.touches?.[0]?.clientY ?? 80)) + 14;
+        showHlPalette(x, y);
+      } else {
+        hideHlPalette();
+      }
+    }, 60);
+  }
+
+  /* ─── PDF loading ────────────────────────────────────────────── */
+  function startPdfLoad(url) {
+    if (!url) return;
+    // Normalise archive.org links
+    const archMatch = /archive\.org\/(?:embed|details|download)\/([^/?#]+)/.exec(url);
+    const archSlug  = archMatch ? archMatch[1] : null;
+    const directUrl = archSlug ? `https://archive.org/download/${archSlug}/${archSlug}.pdf` : url;
+
+    if (statusLine) statusLine.textContent = 'جارٍ تحميل PDF.js...';
+
+    loadPdfjsScript().then(ok => {
+      if (!ok) { useFallback(url, archSlug, 'فشل تحميل PDF.js'); return; }
+      pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS_WORKER;
+      if (statusLine) statusLine.textContent = 'جارٍ تحميل الكتاب...';
+      pdfjsLib.getDocument({ url: directUrl, withCredentials: false }).promise
+        .then(doc => onPdfLoaded(doc))
+        .catch(err => useFallback(url, archSlug, err.message || 'CORS'));
+    });
+  }
+
+  function loadPdfjsScript() {
+    return new Promise(resolve => {
+      if (typeof pdfjsLib !== 'undefined') { resolve(true); return; }
+      const s = document.createElement('script');
+      s.src     = PDFJS_SRC;
+      s.onload  = () => resolve(typeof pdfjsLib !== 'undefined');
+      s.onerror = () => resolve(false);
+      document.head.appendChild(s);
+    });
+  }
+
+  function onPdfLoaded(doc) {
+    pdfDoc     = doc;
+    totalPages = doc.numPages;
+
+    // Hide loading message, show canvas
+    if (readerMessage) readerMessage.style.display = 'none';
+    if (canvas)        canvas.style.display = 'block';
+    if (textLayerDiv)  textLayerDiv.style.display = 'block';
+
+    // Show nav
+    if (prevBtn)  prevBtn.hidden = false;
+    if (nextBtn)  nextBtn.hidden = false;
+    if (pageInput) pageInput.hidden = false;
+    document.querySelector('.page-sep')?.removeAttribute('hidden');
+    if (totalPagesEl) { totalPagesEl.textContent = totalPages; totalPagesEl.hidden = false; }
+
+    // Resume reading position
+    if (bookId && typeof READING !== 'undefined') {
+      const saved = Math.min(READING.getPage(bookId), totalPages);
+      if (saved > 1) {
+        currentPage = saved;
+        showToast(`استئنفناك من الصفحة ${saved}`);
+      }
+    }
+
+    renderPage(currentPage);
+    startReadingTimer();
+  }
+
+  function useFallback(url, archSlug, reason) {
+    console.log('Fallback because:', reason);
+    if (statusLine) statusLine.textContent = `تعذّر الفتح المباشر (${reason}) · يتم فتحه ببديل...`;
+
+    const stage = document.getElementById('readerMain');
+    if (!stage) return;
+    if (readerMessage) readerMessage.style.display = 'none';
+
+    const iframe = document.createElement('iframe');
+    iframe.className = 'iframe-stage';
+    iframe.allow = 'fullscreen';
+    iframe.allowFullscreen = true;
+
+    if (archSlug) {
+      iframe.src = `https://archive.org/embed/${archSlug}`;
+    } else {
+      iframe.src = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+    }
+    stage.appendChild(iframe);
+  }
+
+  function showError(msg) {
+    if (!readerMessage) return;
+    readerMessage.innerHTML = `
+      <h2>الكتاب غير متاح</h2>
+      <p>${msg}</p>
+      <p><a href="index.html">العودة إلى الصفحة الرئيسية</a></p>`;
+    readerMessage.style.display = 'block';
+  }
+
+  /* ─── Boot ───────────────────────────────────────────────────── */
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+})();

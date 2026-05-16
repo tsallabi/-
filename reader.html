@@ -1,216 +1,261 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#1a0f08">
-    <title>القارئ — المكتبة الطيبة</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700&family=Aref+Ruqaa:wght@700&display=swap" rel="stylesheet">
-    <style>
-        :root { --rdr-bg:#1a0f08; --rdr-bar:rgba(26,15,8,.92); --rdr-text:#f5e6c8; --rdr-gold:#d4af37; --rdr-border:rgba(212,175,55,.25); }
-        * { box-sizing: border-box; }
-        body { margin: 0; background: var(--rdr-bg); font-family: 'Cairo', system-ui, sans-serif; color: var(--rdr-text); }
-        .reader-bar { position: sticky; top: 0; z-index: 10; backdrop-filter: blur(14px) saturate(180%); background: var(--rdr-bar); border-bottom: 1px solid var(--rdr-border); display: flex; align-items: center; gap: .5rem; padding: .65rem .85rem; }
-        .reader-bar a, .reader-bar button { color: var(--rdr-text); background: rgba(212,175,55,.10); border: 1px solid var(--rdr-border); padding: .5rem .9rem; border-radius: 10px; text-decoration: none; font-family: inherit; font-size: .9rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: .35rem; }
-        .reader-bar a:hover, .reader-bar button:hover { background: rgba(212,175,55,.20); border-color: var(--rdr-gold); color: var(--rdr-gold); }
-        .reader-bar button:disabled { opacity: .4; cursor: not-allowed; }
-        .reader-title { font-weight: 700; flex: 1; text-align: center; padding: 0 .5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 1rem; font-family: 'Aref Ruqaa','Cairo',serif; color: var(--rdr-gold); }
-        .reader-page-info { font-size: .85rem; color: var(--rdr-text); opacity: .85; font-weight: 600; padding: 0 .35rem; }
-        .reader-stage { min-height: calc(100vh - 56px); display: flex; justify-content: center; padding: 1rem; background: var(--rdr-bg); }
-        canvas#pdfCanvas { max-width: 100%; height: auto; box-shadow: 0 10px 40px rgba(0,0,0,.5); background: #fff; border-radius: 4px; }
-        .iframe-stage { width: 100%; height: calc(100vh - 56px); border: 0; background: #000; display: block; }
-        .reader-message { color: var(--rdr-text); padding: 3rem 1.5rem; text-align: center; font-size: 1.05rem; max-width: 560px; margin: 0 auto; }
-        .reader-message h2 { font-family: 'Aref Ruqaa','Cairo',serif; color: var(--rdr-gold); margin: 0 0 1rem; }
-        .reader-message a { color: var(--rdr-gold); text-decoration: underline; }
-        .reader-loading { display: inline-block; width: 24px; height: 24px; border: 3px solid var(--rdr-border); border-top-color: var(--rdr-gold); border-radius: 50%; animation: spin .8s linear infinite; margin-inline-end: .55rem; vertical-align: middle; }
-        .reader-status-line { font-size: .85rem; color: var(--rdr-gold); opacity: .8; margin-top: 1rem; }
-        .resume-toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); background: rgba(58,36,18,.95); color: var(--rdr-gold); border: 1px solid var(--rdr-gold); padding: .75rem 1.25rem; border-radius: 10px; font-family: 'Aref Ruqaa','Cairo',serif; font-size: .9rem; z-index: 50; box-shadow: 0 10px 30px rgba(0,0,0,.5); animation: slideUp .4s ease-out; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes slideUp { from { transform: translate(-50%,20px); opacity: 0; } to { transform: translate(-50%,0); opacity: 1; } }
-        @media (max-width: 600px) {
-            .reader-title { font-size: .85rem; }
-            .reader-bar a, .reader-bar button { padding: .45rem .7rem; font-size: .8rem; }
-            .reader-page-info { display: none; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#FAF6EE">
+  <title>القارئ — المكتبة الطيبة</title>
+
+  <!-- Google Fonts: Arabic luxury stack -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;600;700&family=Amiri:ital,wght@0,400;0,700;1,400&family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Luxury reader styles -->
+  <link rel="stylesheet" href="css/reader-luxury.css?v=23">
 </head>
 <body>
-    <div class="reader-bar">
-        <a href="javascript:history.back()" aria-label="عودة">→ عودة</a>
-        <span class="reader-title" id="readerTitle">جارٍ التحميل...</span>
-        <button id="prevPage" type="button" aria-label="السابق" hidden>→</button>
-        <span class="reader-page-info" id="pageInfo" hidden>—</span>
-        <button id="nextPage" type="button" aria-label="التالي" hidden>←</button>
-        <button id="fullscreenBtn" type="button" aria-label="ملء الشاشة">⛶</button>
+
+  <!-- ─── Reading Progress Bar ────────────────────────────────── -->
+  <div id="readingProgress" role="progressbar" aria-label="تقدم القراءة">
+    <div class="bar" id="progressBarInner"></div>
+  </div>
+
+  <!-- ─── Luxury Toolbar ──────────────────────────────────────── -->
+  <header id="luxBar" role="banner">
+
+    <!-- Right: back + book info -->
+    <div class="bar-right">
+      <button id="backBtn" class="lux-btn" aria-label="عودة" title="العودة">
+        <span aria-hidden="true">→</span> عودة
+      </button>
+      <div class="bar-title-block">
+        <span id="barTitle">جارٍ التحميل...</span>
+        <span id="barAuthor"></span>
+      </div>
     </div>
 
-    <div class="reader-stage" id="readerStage">
-        <canvas id="pdfCanvas" hidden></canvas>
-        <div class="reader-message" id="readerMessage">
-            <span class="reader-loading"></span>
-            <span id="msgText">جارٍ تحضير الكتاب في قارئنا...</span>
-            <div class="reader-status-line" id="statusLine"></div>
+    <!-- Center: page navigation -->
+    <div class="bar-center">
+      <button id="prevPage" class="lux-btn icon-only" aria-label="الصفحة السابقة" title="السابق (←)" hidden disabled>
+        <span aria-hidden="true">›</span>
+      </button>
+      <input id="pageInput" type="number" min="1" aria-label="رقم الصفحة" hidden>
+      <span class="page-sep" hidden aria-hidden="true">/</span>
+      <span id="totalPages" class="" hidden></span>
+      <button id="nextPage" class="lux-btn icon-only" aria-label="الصفحة التالية" title="التالي (→)" hidden disabled>
+        <span aria-hidden="true">‹</span>
+      </button>
+    </div>
+
+    <!-- Left: tools -->
+    <div class="bar-left">
+      <!-- Zoom -->
+      <button id="zoomOut" class="lux-btn icon-only" aria-label="تصغير" title="تصغير (−)">−</button>
+      <span id="zoomLabel" aria-label="مستوى التكبير">150%</span>
+      <button id="zoomIn"  class="lux-btn icon-only" aria-label="تكبير"  title="تكبير (+)">+</button>
+
+      <div style="width:1px;height:20px;background:var(--bar-border);margin:0 .2rem;"></div>
+
+      <!-- Theme cycle -->
+      <button id="themeBtn" class="lux-btn" aria-label="تغيير الثيم" title="تغيير الثيم (T)">
+        ثيم <span class="theme-dot" aria-hidden="true"></span>
+      </button>
+
+      <!-- Bookmarks panel -->
+      <button id="bmPanelBtn" class="lux-btn icon-only" aria-label="الإشارات المرجعية" title="الإشارات المرجعية">
+        🔖
+      </button>
+
+      <!-- Bookmark current page -->
+      <button id="bookmarkBtn" class="lux-btn icon-only" aria-label="إشارة مرجعية" title="إشارة مرجعية (B)">
+        ◇
+      </button>
+
+      <!-- Highlights panel -->
+      <button id="hlToggleBtn" class="lux-btn icon-only" aria-label="التظليلات" title="التظليلات">
+        🖊
+      </button>
+
+      <!-- Notes panel -->
+      <button id="notesToggleBtn" class="lux-btn icon-only" aria-label="الملاحظات" title="الملاحظات">
+        ✏️
+      </button>
+
+      <!-- Focus mode -->
+      <button id="focusBtn" class="lux-btn icon-only" aria-label="وضع التركيز" title="وضع التركيز (F)">
+        ⊙
+      </button>
+
+      <!-- Fullscreen -->
+      <button id="fsBtn" class="lux-btn icon-only" aria-label="ملء الشاشة" title="ملء الشاشة">⛶</button>
+
+      <!-- Keyboard shortcuts help -->
+      <button class="lux-btn icon-only" aria-label="اختصارات لوحة المفاتيح" title="الاختصارات (؟)"
+              onclick="document.getElementById('shortcutsOverlay').classList.toggle('visible')">؟</button>
+    </div>
+  </header>
+
+  <!-- ─── Reader Shell ─────────────────────────────────────────── -->
+  <div id="readerShell">
+
+    <!-- PDF Stage -->
+    <main id="readerMain">
+
+      <!-- Loading/error message -->
+      <div class="reader-message" id="readerMessage">
+        <span class="reader-spinner" aria-hidden="true"></span>
+        <span id="msgText">جارٍ تحضير الكتاب في قارئنا الفاخر...</span>
+        <div class="status-line" id="statusLine"></div>
+      </div>
+
+      <!-- PDF canvas + text layer -->
+      <div id="pdfWrapper" class="pdf-wrapper" style="display:none;">
+        <canvas id="pdfCanvas" role="img" aria-label="صفحة الكتاب"></canvas>
+        <div id="pdfTextLayer" class="textLayer" dir="rtl"></div>
+      </div>
+
+    </main>
+
+    <!-- Sidebar Panel -->
+    <aside id="sidebarPanel" class="collapsed" aria-label="لوحة القراءة">
+      <nav class="sidebar-tabs" role="tablist">
+        <button class="sidebar-tab active" data-tab="bookmarks" role="tab" aria-selected="true">🔖 الإشارات</button>
+        <button class="sidebar-tab" data-tab="notes"     role="tab" aria-selected="false">✏️ الملاحظات</button>
+        <button class="sidebar-tab" data-tab="highlights" role="tab" aria-selected="false">🖊 التظليلات</button>
+      </nav>
+
+      <div class="sidebar-pane active" data-pane="bookmarks" role="tabpanel">
+        <div class="empty-state">
+          <span class="empty-icon">🔖</span>
+          لا توجد إشارات مرجعية بعد.<br>اضغط B لإضافة الصفحة الحالية.
         </div>
+      </div>
+      <div class="sidebar-pane" data-pane="notes" role="tabpanel">
+        <div class="empty-state">
+          <span class="empty-icon">✏️</span>
+          لا توجد ملاحظات بعد.<br>حدّد نصاً ثم اضغط ✏️ في شريط الأدوات.
+        </div>
+      </div>
+      <div class="sidebar-pane" data-pane="highlights" role="tabpanel">
+        <div class="empty-state">
+          <span class="empty-icon">🖊</span>
+          لا توجد تظليلات بعد.<br>حدّد أي نص في الكتاب لتظليله.
+        </div>
+      </div>
+    </aside>
+
+  </div><!-- /#readerShell -->
+
+  <!-- ─── Highlight Palette ─────────────────────────────────────── -->
+  <div id="hlPalette" role="toolbar" aria-label="ألوان التظليل">
+    <button class="hl-color-btn" data-color-id="yellow" style="background:#FBE16C"
+            title="أصفر مخطوطات — مهم" aria-label="تظليل أصفر"></button>
+    <button class="hl-color-btn" data-color-id="green"  style="background:#9CCBA0"
+            title="أخضر نعنع — للحفظ" aria-label="تظليل أخضر"></button>
+    <button class="hl-color-btn" data-color-id="blue"   style="background:#9CC2E3"
+            title="أزرق سماوي — تساؤل" aria-label="تظليل أزرق"></button>
+    <button class="hl-color-btn" data-color-id="red"    style="background:#E3786B"
+            title="أحمر فاقع — اعتراض" aria-label="تظليل أحمر"></button>
+    <button class="hl-note-btn" id="hlNoteBtn" title="إضافة ملاحظة" aria-label="إضافة ملاحظة">✏️</button>
+    <button class="hl-dismiss-btn" id="hlDismissBtn" title="إلغاء" aria-label="إلغاء">✕</button>
+  </div>
+
+  <!-- ─── Note Modal ────────────────────────────────────────────── -->
+  <div id="noteModal" role="dialog" aria-modal="true" aria-labelledby="noteModalTitle">
+    <div class="note-modal-box">
+      <div class="note-modal-title" id="noteModalTitle">✏️ إضافة ملاحظة</div>
+      <textarea id="noteTextarea" placeholder="اكتب ملاحظتك هنا... (يدعم **Markdown** الأساسي)" rows="4"></textarea>
+      <div class="note-modal-hint">Ctrl+Enter للحفظ · يدعم **عريض** و *مائل* و `كود`</div>
+      <div class="note-modal-actions">
+        <button id="noteCancelBtn" class="lux-btn">إلغاء</button>
+        <button id="noteSaveBtn"   class="lux-btn active">حفظ الملاحظة</button>
+      </div>
     </div>
+  </div>
 
-    <script src="js/user-system.js?v=13"></script>
-    <script>
-        (function() {
-            const params = new URLSearchParams(location.search);
-            const pdfUrl = params.get('pdf');
-            const title = params.get('title') || 'قراءة';
-            const bookId = params.get('bookId') || params.get('id');
+  <!-- ─── Keyboard Shortcuts Overlay ──────────────────────────── -->
+  <div id="shortcutsOverlay" role="dialog" aria-modal="true" aria-label="اختصارات لوحة المفاتيح">
+    <div class="shortcuts-box">
+      <div class="shortcuts-title">⌨️ اختصارات لوحة المفاتيح</div>
 
-            document.getElementById('readerTitle').textContent = title;
-            document.title = title + ' — المكتبة الطيبة';
+      <div class="shortcut-row">
+        <span class="shortcut-label">الصفحة السابقة</span>
+        <span class="shortcut-key">← / ↑</span>
+      </div>
+      <div class="shortcut-row">
+        <span class="shortcut-label">الصفحة التالية</span>
+        <span class="shortcut-key">→ / ↓</span>
+      </div>
+      <div class="shortcut-row">
+        <span class="shortcut-label">تكبير / تصغير</span>
+        <span class="shortcut-key">+ / −</span>
+      </div>
+      <div class="shortcut-row">
+        <span class="shortcut-label">وضع التركيز</span>
+        <span class="shortcut-key">F</span>
+      </div>
+      <div class="shortcut-row">
+        <span class="shortcut-label">تغيير الثيم</span>
+        <span class="shortcut-key">T</span>
+      </div>
+      <div class="shortcut-row">
+        <span class="shortcut-label">إشارة مرجعية</span>
+        <span class="shortcut-key">B</span>
+      </div>
+      <div class="shortcut-row">
+        <span class="shortcut-label">بحث</span>
+        <span class="shortcut-key">/</span>
+      </div>
+      <div class="shortcut-row">
+        <span class="shortcut-label">اختصارات / إغلاق</span>
+        <span class="shortcut-key">؟ / Esc</span>
+      </div>
 
-            const stage = document.getElementById('readerStage');
-            const canvas = document.getElementById('pdfCanvas');
-            const msg = document.getElementById('readerMessage');
-            const msgText = document.getElementById('msgText');
-            const statusLine = document.getElementById('statusLine');
-            const prevBtn = document.getElementById('prevPage');
-            const nextBtn = document.getElementById('nextPage');
-            const pageInfo = document.getElementById('pageInfo');
-            const fsBtn = document.getElementById('fullscreenBtn');
+      <button id="shortcutsCloseBtn" class="lux-btn active shortcuts-close">إغلاق</button>
+    </div>
+  </div>
 
-            fsBtn.addEventListener('click', () => {
-                if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
-                else document.exitFullscreen?.();
-            });
+  <!-- ─── Reading Time Badge ───────────────────────────────────── -->
+  <div id="readingTimeBadge" aria-live="polite"></div>
 
-            if (!pdfUrl) { showError('لم يتم تحديد كتاب.'); return; }
+  <!-- ─── Focus Mode Hint ──────────────────────────────────────── -->
+  <div id="focusHint" class="focus-hint" aria-live="polite">اضغط F للخروج من وضع التركيز</div>
 
-            // تحويل روابط archive.org إلى download URL
-            const archiveMatch = /archive\.org\/(?:embed|details|download)\/([^/?#]+)/.exec(pdfUrl);
-            const archiveSlug = archiveMatch ? archiveMatch[1] : null;
-            const directPdfUrl = archiveSlug
-                ? `https://archive.org/download/${archiveSlug}/${archiveSlug}.pdf`
-                : pdfUrl;
+  <!-- ─── Scripts ─────────────────────────────────────────────── -->
+  <script src="js/user-system.js?v=13"></script>
+  <script src="js/reader-luxury.js?v=23"></script>
 
-            // الأولوية: PDF.js (قارئنا) ثمّ fallback
-            statusLine.textContent = '📖 محاولة الفتح في قارئنا...';
-            loadPdfJsScript().then(ok => {
-                if (!ok) return useFallback('فشل تحميل PDF.js');
-                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-                tryRenderPDF(directPdfUrl);
-            });
+  <script>
+    /*
+     * Bridge: handle URL params that arrive via ?id= (API path)
+     * and ?pdf= (direct PDF URL). The luxury JS handles both but
+     * we also support the legacy ?pdf=&title=&bookId= format.
+     */
+    (function() {
+      const params = new URLSearchParams(location.search);
+      const pdfUrl  = params.get('pdf');
+      const title   = params.get('title');
+      const author  = params.get('author');
+      const bookId  = params.get('id') || params.get('bookId');
 
-            function loadPdfJsScript() {
-                return new Promise(resolve => {
-                    const s = document.createElement('script');
-                    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-                    s.onload = () => resolve(typeof pdfjsLib !== 'undefined');
-                    s.onerror = () => resolve(false);
-                    document.head.appendChild(s);
-                });
-            }
+      // If we have a direct pdf param but no id, load it immediately
+      // (reader-luxury.js handles the actual loading via init())
+      // Just make sure pdfWrapper becomes visible once canvas is ready
+      const wrapper = document.getElementById('pdfWrapper');
+      const canvas  = document.getElementById('pdfCanvas');
+      if (canvas) {
+        // Show wrapper when canvas has content
+        const obs = new MutationObserver(() => {
+          if (canvas.width > 0) {
+            if (wrapper) wrapper.style.display = 'inline-block';
+            obs.disconnect();
+          }
+        });
+        obs.observe(canvas, { attributes: true, attributeFilter: ['width'] });
+      }
+    })();
+  </script>
 
-            function tryRenderPDF(url) {
-                statusLine.textContent = '⏳ تحميل الملف...';
-                pdfjsLib.getDocument({ url, withCredentials: false }).promise
-                    .then(doc => renderPages(doc))
-                    .catch(err => {
-                        console.warn('PDF.js failed:', err);
-                        useFallback(err.message || 'CORS أو لم يوجد');
-                    });
-            }
-
-            function renderPages(pdfDoc) {
-                msg.style.display = 'none';
-                canvas.hidden = false;
-                const totalPages = pdfDoc.numPages;
-                prevBtn.hidden = false; nextBtn.hidden = false; pageInfo.hidden = false;
-                const ctx = canvas.getContext('2d');
-                let currentPage = 1, rendering = false;
-
-                if (bookId && typeof READING !== 'undefined') {
-                    const saved = Math.min(READING.getPage(bookId), totalPages);
-                    if (saved > 1) {
-                        currentPage = saved;
-                        showResumeToast(saved);
-                    }
-                }
-
-                function renderPage(num) {
-                    if (rendering) return;
-                    rendering = true;
-                    pdfDoc.getPage(num).then(page => {
-                        const scale = Math.min(2, Math.max(1, window.innerWidth / 700));
-                        const viewport = page.getViewport({ scale });
-                        canvas.width = viewport.width;
-                        canvas.height = viewport.height;
-                        return page.render({ canvasContext: ctx, viewport }).promise;
-                    }).then(() => {
-                        rendering = false;
-                        pageInfo.textContent = `${num} / ${totalPages}`;
-                        prevBtn.disabled = num >= totalPages;
-                        nextBtn.disabled = num <= 1;
-                        if (bookId && typeof READING !== 'undefined') READING.setPage(bookId, num);
-                    }).catch(err => { rendering = false; console.error(err); });
-                }
-                renderPage(currentPage);
-                prevBtn.addEventListener('click', () => {
-                    if (currentPage < totalPages) { currentPage++; renderPage(currentPage); }
-                });
-                nextBtn.addEventListener('click', () => {
-                    if (currentPage > 1) { currentPage--; renderPage(currentPage); }
-                });
-                document.addEventListener('keydown', e => {
-                    if (e.key === 'ArrowRight') prevBtn.click();
-                    else if (e.key === 'ArrowLeft') nextBtn.click();
-                });
-            }
-
-            function useFallback(reason) {
-                console.log('Using fallback because:', reason);
-                statusLine.textContent = `⚠️ ${reason} · تجربة بديل...`;
-                if (archiveSlug) {
-                    // archive.org رابط — استخدم iframe رسمي (لا خيار آخر للروابط التي ترفض CORS)
-                    showArchiveIframe(archiveSlug);
-                } else {
-                    // روابط أخرى — Google Docs Viewer
-                    showGoogleViewer(pdfUrl);
-                }
-            }
-
-            function showArchiveIframe(slug) {
-                msg.style.display = 'none';
-                const iframe = document.createElement('iframe');
-                iframe.className = 'iframe-stage';
-                iframe.src = `https://archive.org/embed/${slug}`;
-                iframe.allow = 'fullscreen';
-                iframe.allowFullscreen = true;
-                iframe.referrerPolicy = 'no-referrer';
-                stage.style.padding = '0';
-                stage.appendChild(iframe);
-            }
-
-            function showGoogleViewer(url) {
-                msg.style.display = 'none';
-                const iframe = document.createElement('iframe');
-                iframe.className = 'iframe-stage';
-                iframe.src = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
-                stage.style.padding = '0';
-                stage.appendChild(iframe);
-            }
-
-            function showResumeToast(page) {
-                const t = document.createElement('div');
-                t.className = 'resume-toast';
-                t.textContent = `📖 استئنفناك من الصفحة ${page}`;
-                document.body.appendChild(t);
-                setTimeout(() => t.remove(), 4000);
-            }
-            function showError(html) {
-                canvas.hidden = true;
-                msg.innerHTML = `
-                    <h2>📖 الكتاب غير متاح حالياً</h2>
-                    <p>${html}</p>
-                    <p>جرّب <a href="index.html">كتباً أخرى في الصفحة الرئيسية</a>.</p>`;
-                msg.style.display = 'block';
-            }
-        })();
-    </script>
 </body>
 </html>

@@ -1,0 +1,886 @@
+/*
+ * reader-luxury.css — المكتبة الطيبة Wave 2
+ * المخطوطة design language · RTL Arabic · v=23
+ */
+
+/* ─── CSS Variables / Themes ─────────────────────────────────── */
+:root {
+  /* Parchment theme (default) */
+  --bg:          #FAF6EE;
+  --bg2:         #F0E9D8;
+  --text:        #0F1B2D;
+  --text-muted:  #5a6a7a;
+  --gold:        #B89968;
+  --gold-light:  #d4b87a;
+  --red:         #B1373F;
+  --bar-bg:      rgba(250,246,238,.94);
+  --bar-border:  rgba(184,153,104,.35);
+  --canvas-shadow: 0 8px 48px rgba(15,27,45,.18);
+  --sidebar-bg:  #F5EFE2;
+  --sidebar-border: rgba(184,153,104,.28);
+  --btn-bg:      rgba(184,153,104,.12);
+  --btn-hover:   rgba(184,153,104,.28);
+  --transition:  380ms ease;
+  --progress-h:  3px;
+  --note-bg:     #fffbe8;
+  --note-border: #e0c97a;
+  --focus-hint:  rgba(15,27,45,.55);
+}
+
+[data-theme="sepia"] {
+  --bg:          #f4ead5;
+  --bg2:         #ede0c3;
+  --text:        #5b4636;
+  --text-muted:  #8a7060;
+  --bar-bg:      rgba(244,234,213,.95);
+  --sidebar-bg:  #ede0c4;
+  --canvas-shadow: 0 8px 48px rgba(91,70,54,.20);
+}
+
+[data-theme="dark"] {
+  --bg:          #1a1f2e;
+  --bg2:         #141824;
+  --text:        #d4cfc3;
+  --text-muted:  #8a8a98;
+  --bar-bg:      rgba(26,31,46,.95);
+  --bar-border:  rgba(184,153,104,.20);
+  --sidebar-bg:  #141824;
+  --btn-bg:      rgba(184,153,104,.08);
+  --btn-hover:   rgba(184,153,104,.20);
+  --canvas-shadow: 0 8px 48px rgba(0,0,0,.55);
+  --note-bg:     #1e2438;
+  --note-border: #3a4060;
+}
+
+[data-theme="oled"] {
+  --bg:          #0a0a0a;
+  --bg2:         #111111;
+  --text:        #c0c0c0;
+  --text-muted:  #777;
+  --bar-bg:      rgba(10,10,10,.97);
+  --bar-border:  rgba(184,153,104,.15);
+  --sidebar-bg:  #0f0f0f;
+  --btn-bg:      rgba(184,153,104,.06);
+  --btn-hover:   rgba(184,153,104,.16);
+  --canvas-shadow: 0 8px 48px rgba(0,0,0,.8);
+  --note-bg:     #151515;
+  --note-border: #333;
+}
+
+/* ─── Reset & Base ────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Cairo', system-ui, sans-serif;
+  direction: rtl;
+  transition: background var(--transition), color var(--transition);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ─── Progress Bar ────────────────────────────────────────────── */
+#readingProgress {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: var(--progress-h);
+  z-index: 200;
+  background: var(--bg2);
+  overflow: hidden;
+  transition: opacity var(--transition);
+}
+#readingProgress .bar {
+  height: 100%;
+  background: linear-gradient(to left, var(--gold-light), var(--gold));
+  transition: width 0.4s ease;
+  width: 0%;
+  border-radius: 0 2px 2px 0;
+}
+#readingProgress[title]:hover::after {
+  content: attr(data-tip);
+  position: absolute;
+  right: 50%;
+  transform: translateX(50%);
+  top: 6px;
+  background: var(--text);
+  color: var(--bg);
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: .78rem;
+  font-family: 'Cairo', sans-serif;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* ─── Luxury Toolbar ──────────────────────────────────────────── */
+#luxBar {
+  position: sticky;
+  top: var(--progress-h);
+  z-index: 100;
+  background: var(--bar-bg);
+  border-bottom: 1px solid var(--bar-border);
+  backdrop-filter: blur(18px) saturate(180%);
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .6rem .85rem;
+  transition: transform var(--transition), opacity var(--transition), background var(--transition);
+}
+
+/* RTL: right = book info, center = nav, left = tools */
+.bar-right {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+.bar-center {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  flex-shrink: 0;
+}
+.bar-left {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+/* Gold rule under bar */
+#luxBar::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: linear-gradient(to left, transparent, var(--gold), transparent);
+  opacity: .5;
+  pointer-events: none;
+}
+
+/* ─── Toolbar Buttons ─────────────────────────────────────────── */
+.lux-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .3rem;
+  background: var(--btn-bg);
+  border: 1px solid var(--bar-border);
+  color: var(--text);
+  border-radius: 10px;
+  padding: .42rem .75rem;
+  font-family: 'Reem Kufi', 'Cairo', sans-serif;
+  font-size: .85rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.lux-btn:hover, .lux-btn:focus-visible {
+  background: var(--btn-hover);
+  border-color: var(--gold);
+  color: var(--gold);
+  outline: none;
+}
+.lux-btn.active {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #fff;
+}
+.lux-btn:disabled {
+  opacity: .38;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.lux-btn.icon-only { padding: .42rem .55rem; }
+
+/* Back arrow */
+#backBtn { font-size: .9rem; }
+
+/* Book title + author in toolbar */
+.bar-title-block {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+#barTitle {
+  font-family: 'Aref Ruqaa','Cairo',serif;
+  font-size: .96rem;
+  font-weight: 700;
+  color: var(--gold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color var(--transition);
+}
+#barAuthor {
+  font-size: .75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Page nav */
+#pageInput {
+  width: 3.2rem;
+  text-align: center;
+  border: 1px solid var(--bar-border);
+  border-radius: 8px;
+  background: var(--btn-bg);
+  color: var(--text);
+  font-family: 'Cairo', sans-serif;
+  font-size: .9rem;
+  font-weight: 700;
+  padding: .3rem .3rem;
+  transition: border-color var(--transition), background var(--transition);
+}
+#pageInput:focus { border-color: var(--gold); outline: none; background: var(--bg); }
+.page-sep { color: var(--text-muted); font-size: .85rem; margin: 0 .2rem; }
+#totalPages { font-size: .85rem; color: var(--text-muted); font-weight: 700; }
+
+/* Theme indicator dot */
+.theme-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--gold);
+  margin-inline-start: .25rem;
+  transition: background .3s;
+}
+
+/* ─── Focus Mode ──────────────────────────────────────────────── */
+body.focus-mode #luxBar {
+  transform: translateY(-110%);
+  opacity: 0;
+  pointer-events: none;
+}
+body.focus-mode #readingProgress { opacity: 0; }
+body.focus-mode #sidebarPanel { display: none !important; }
+
+.focus-hint {
+  position: fixed;
+  bottom: 1.4rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(0);
+  background: var(--focus-hint);
+  color: #fff;
+  padding: .55rem 1.2rem;
+  border-radius: 20px;
+  font-family: 'Cairo', sans-serif;
+  font-size: .82rem;
+  z-index: 500;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .5s;
+}
+.focus-hint.visible { opacity: 1; }
+
+/* ─── Main Stage ──────────────────────────────────────────────── */
+#readerShell {
+  display: flex;
+  min-height: calc(100vh - 56px);
+}
+
+/* ─── Sidebar Panel ───────────────────────────────────────────── */
+#sidebarPanel {
+  width: 300px;
+  flex-shrink: 0;
+  background: var(--sidebar-bg);
+  border-inline-start: 1px solid var(--sidebar-border);
+  display: flex;
+  flex-direction: column;
+  transition: width var(--transition), opacity var(--transition), background var(--transition);
+  overflow: hidden;
+}
+#sidebarPanel.collapsed {
+  width: 0;
+  border: none;
+  opacity: 0;
+  pointer-events: none;
+}
+.sidebar-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--sidebar-border);
+}
+.sidebar-tab {
+  flex: 1;
+  padding: .6rem .3rem;
+  text-align: center;
+  font-family: 'Reem Kufi','Cairo',sans-serif;
+  font-size: .8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  border-bottom: 2px solid transparent;
+  transition: color var(--transition), border-color var(--transition);
+}
+.sidebar-tab.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+.sidebar-pane {
+  display: none;
+  flex: 1;
+  overflow-y: auto;
+  padding: .75rem;
+}
+.sidebar-pane.active { display: block; }
+
+/* Bookmark items */
+.bookmark-item {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .55rem .6rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background var(--transition);
+  margin-bottom: .35rem;
+  border: 1px solid transparent;
+}
+.bookmark-item:hover { background: var(--btn-hover); border-color: var(--bar-border); }
+.bookmark-thumb {
+  width: 38px;
+  height: 52px;
+  background: var(--bg2);
+  border-radius: 3px;
+  border: 1px solid var(--bar-border);
+  flex-shrink: 0;
+  overflow: hidden;
+  position: relative;
+}
+.bookmark-thumb canvas { width: 100%; height: 100%; object-fit: cover; }
+.bookmark-info { min-width: 0; }
+.bookmark-page {
+  font-family: 'Reem Kufi','Cairo',sans-serif;
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--gold);
+}
+.bookmark-date {
+  font-size: .72rem;
+  color: var(--text-muted);
+}
+.bookmark-del {
+  margin-inline-start: auto;
+  background: none;
+  border: none;
+  color: var(--red);
+  cursor: pointer;
+  font-size: .85rem;
+  opacity: .7;
+  flex-shrink: 0;
+  transition: opacity var(--transition);
+}
+.bookmark-del:hover { opacity: 1; }
+
+/* Note items */
+.note-item {
+  background: var(--note-bg);
+  border: 1px solid var(--note-border);
+  border-radius: 8px;
+  padding: .65rem .75rem;
+  margin-bottom: .5rem;
+  cursor: pointer;
+  transition: border-color var(--transition), transform var(--transition);
+}
+.note-item:hover { border-color: var(--gold); transform: translateX(-2px); }
+.note-header {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  margin-bottom: .35rem;
+}
+.note-diamond { color: var(--gold); font-size: .85rem; }
+.note-page { font-size: .78rem; color: var(--text-muted); }
+.note-del {
+  margin-inline-start: auto;
+  background: none;
+  border: none;
+  color: var(--red);
+  cursor: pointer;
+  font-size: .8rem;
+  opacity: .6;
+}
+.note-del:hover { opacity: 1; }
+.note-content {
+  font-family: 'Amiri', 'Cairo', serif;
+  font-size: .88rem;
+  line-height: 1.7;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Highlights pane */
+.hl-item {
+  display: flex;
+  align-items: flex-start;
+  gap: .5rem;
+  padding: .5rem .6rem;
+  border-radius: 8px;
+  margin-bottom: .35rem;
+  border: 1px solid var(--bar-border);
+  cursor: pointer;
+  transition: background var(--transition);
+}
+.hl-item:hover { background: var(--btn-hover); }
+.hl-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: .15rem;
+}
+.hl-text {
+  font-size: .82rem;
+  color: var(--text);
+  line-height: 1.5;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.hl-page { font-size: .72rem; color: var(--text-muted); }
+.hl-del {
+  background: none;
+  border: none;
+  color: var(--red);
+  cursor: pointer;
+  font-size: .75rem;
+  opacity: .6;
+  flex-shrink: 0;
+}
+.hl-del:hover { opacity: 1; }
+
+/* Reading time badge */
+#readingTimeBadge {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  background: var(--bar-bg);
+  border: 1px solid var(--bar-border);
+  color: var(--gold);
+  padding: .5rem .9rem;
+  border-radius: 20px;
+  font-family: 'Reem Kufi','Cairo',sans-serif;
+  font-size: .8rem;
+  font-weight: 600;
+  z-index: 90;
+  backdrop-filter: blur(12px);
+  opacity: 0;
+  transition: opacity .5s;
+  pointer-events: none;
+}
+#readingTimeBadge.visible { opacity: 1; }
+
+/* ─── Stage & Canvas ──────────────────────────────────────────── */
+#readerMain {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem 1rem;
+  min-height: calc(100vh - 56px);
+  position: relative;
+}
+
+.pdf-wrapper {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+}
+
+#pdfCanvas {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  box-shadow: var(--canvas-shadow);
+  border-radius: 4px;
+  transition: box-shadow var(--transition);
+}
+
+/* PDF.js text layer */
+.textLayer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+  opacity: 1;
+  line-height: 1;
+  pointer-events: auto;
+  user-select: text;
+}
+.textLayer span {
+  color: transparent;
+  position: absolute;
+  white-space: pre;
+  cursor: text;
+  transform-origin: 0% 0%;
+  font-family: 'Amiri', serif;
+  direction: rtl;
+  -webkit-font-smoothing: antialiased;
+}
+.textLayer ::selection {
+  background: rgba(251,225,108,.55);
+  color: transparent;
+}
+
+/* Highlight overlays drawn over text layer */
+.hl-overlay {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 3px;
+  mix-blend-mode: multiply;
+  z-index: 5;
+  transition: opacity .2s;
+}
+[data-theme="dark"] .hl-overlay,
+[data-theme="oled"] .hl-overlay { mix-blend-mode: screen; }
+
+/* Sticky note margin markers */
+.note-marker {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: var(--gold);
+  color: #fff;
+  font-size: .7rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0,0,0,.25);
+  transition: transform .2s;
+  user-select: none;
+}
+.note-marker:hover { transform: scale(1.2); }
+
+/* ─── Highlight Palette ───────────────────────────────────────── */
+#hlPalette {
+  position: fixed;
+  z-index: 300;
+  background: var(--bar-bg);
+  border: 1px solid var(--bar-border);
+  border-radius: 14px;
+  padding: .55rem .8rem;
+  display: flex;
+  gap: .6rem;
+  align-items: center;
+  box-shadow: 0 8px 32px rgba(0,0,0,.22);
+  backdrop-filter: blur(16px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .22s;
+  user-select: none;
+}
+#hlPalette.visible { opacity: 1; pointer-events: auto; }
+
+.hl-color-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform .18s, border-color .18s;
+  flex-shrink: 0;
+}
+.hl-color-btn:hover { transform: scale(1.25); border-color: var(--text); }
+
+.hl-note-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--gold);
+  font-size: 1.1rem;
+  line-height: 1;
+  transition: transform .18s;
+  padding: 0 .15rem;
+}
+.hl-note-btn:hover { transform: scale(1.2); }
+
+.hl-dismiss-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: .85rem;
+  padding: 0 .1rem;
+  transition: color .18s;
+}
+.hl-dismiss-btn:hover { color: var(--red); }
+
+/* ─── Note Input Modal ────────────────────────────────────────── */
+#noteModal {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15,27,45,.45);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s;
+}
+#noteModal.visible { opacity: 1; pointer-events: auto; }
+
+.note-modal-box {
+  background: var(--sidebar-bg);
+  border: 1px solid var(--gold);
+  border-radius: 16px;
+  padding: 1.5rem;
+  width: 92%;
+  max-width: 480px;
+  box-shadow: 0 16px 64px rgba(0,0,0,.3);
+  direction: rtl;
+}
+.note-modal-title {
+  font-family: 'Reem Kufi','Cairo',sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: .85rem;
+}
+#noteTextarea {
+  width: 100%;
+  min-height: 110px;
+  resize: vertical;
+  border: 1px solid var(--bar-border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Amiri','Cairo',serif;
+  font-size: .95rem;
+  line-height: 1.7;
+  padding: .65rem .85rem;
+  direction: rtl;
+  transition: border-color var(--transition);
+}
+#noteTextarea:focus { border-color: var(--gold); outline: none; }
+.note-modal-hint {
+  font-size: .75rem;
+  color: var(--text-muted);
+  margin-top: .4rem;
+  margin-bottom: .85rem;
+}
+.note-modal-actions {
+  display: flex;
+  gap: .6rem;
+  justify-content: flex-end;
+}
+
+/* ─── Keyboard Shortcuts Overlay ──────────────────────────────── */
+#shortcutsOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: rgba(15,27,45,.6);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s;
+}
+#shortcutsOverlay.visible { opacity: 1; pointer-events: auto; }
+
+.shortcuts-box {
+  background: var(--sidebar-bg);
+  border: 1px solid var(--gold);
+  border-radius: 18px;
+  padding: 1.8rem 2rem;
+  width: 92%;
+  max-width: 440px;
+  box-shadow: 0 20px 80px rgba(0,0,0,.35);
+  direction: rtl;
+}
+.shortcuts-title {
+  font-family: 'Reem Kufi','Cairo',sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 1.1rem;
+  text-align: center;
+}
+.shortcut-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .5rem 0;
+  border-bottom: 1px solid var(--bar-border);
+  font-size: .88rem;
+}
+.shortcut-row:last-child { border-bottom: none; }
+.shortcut-label { color: var(--text-muted); }
+.shortcut-key {
+  background: var(--btn-bg);
+  border: 1px solid var(--bar-border);
+  border-radius: 7px;
+  padding: .2rem .65rem;
+  font-family: 'Cairo', monospace;
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--gold);
+  white-space: nowrap;
+}
+.shortcuts-close {
+  display: block;
+  width: 100%;
+  margin-top: 1.2rem;
+  text-align: center;
+}
+
+/* ─── Toast Notification ──────────────────────────────────────── */
+.lux-toast {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(0);
+  background: var(--bar-bg);
+  color: var(--gold);
+  border: 1px solid var(--bar-border);
+  padding: .7rem 1.3rem;
+  border-radius: 12px;
+  font-family: 'Reem Kufi','Cairo',sans-serif;
+  font-size: .88rem;
+  z-index: 600;
+  box-shadow: 0 8px 32px rgba(0,0,0,.25);
+  backdrop-filter: blur(14px);
+  animation: luxToastIn .38s cubic-bezier(.34,1.56,.64,1) both;
+  pointer-events: none;
+}
+@keyframes luxToastIn {
+  from { transform: translateX(-50%) translateY(16px); opacity: 0; }
+  to   { transform: translateX(-50%) translateY(0); opacity: 1; }
+}
+
+/* ─── Loading / Error States ──────────────────────────────────── */
+#readerMessage {
+  width: 100%;
+  max-width: 560px;
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: var(--text);
+}
+#readerMessage h2 {
+  font-family: 'Aref Ruqaa','Cairo',serif;
+  color: var(--gold);
+  margin-bottom: 1rem;
+  font-size: 1.4rem;
+}
+#readerMessage a { color: var(--gold); text-decoration: underline; }
+
+.reader-spinner {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--bar-border);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  vertical-align: middle;
+  margin-inline-end: .6rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reader-spinner { animation: none; }
+  * { transition-duration: 1ms !important; animation-duration: 1ms !important; }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.status-line {
+  font-size: .8rem;
+  color: var(--gold);
+  opacity: .75;
+  margin-top: .85rem;
+  font-family: 'Cairo',sans-serif;
+}
+
+/* Iframe fallback */
+.iframe-stage {
+  width: 100%;
+  height: calc(100vh - 56px);
+  border: 0;
+  display: block;
+}
+
+/* ─── Zoom Control ────────────────────────────────────────────── */
+#zoomLabel {
+  font-size: .8rem;
+  color: var(--text-muted);
+  min-width: 2.8rem;
+  text-align: center;
+  font-family: 'Cairo',sans-serif;
+  font-weight: 700;
+}
+
+/* ─── Empty States ────────────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--text-muted);
+  font-family: 'Reem Kufi','Cairo',sans-serif;
+  font-size: .85rem;
+  line-height: 2;
+}
+.empty-icon { font-size: 2rem; display: block; margin-bottom: .5rem; }
+
+/* ─── Mobile (< 640px) ─────────────────────────────────────────── */
+@media (max-width: 640px) {
+  #sidebarPanel {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    width: 100% !important;
+    height: 60vh;
+    border-radius: 20px 20px 0 0;
+    z-index: 150;
+    transform: translateY(100%);
+    transition: transform var(--transition), opacity var(--transition);
+    opacity: 0;
+  }
+  #sidebarPanel.open {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  #sidebarPanel.collapsed { transform: translateY(100%); opacity: 0; width: 100% !important; }
+  #readerShell { flex-direction: column; }
+  #barTitle { font-size: .84rem; }
+  #barAuthor { display: none; }
+  .lux-btn { padding: .38rem .55rem; font-size: .78rem; }
+  #zoomLabel { display: none; }
+  #readingTimeBadge { bottom: 4.5rem; right: .75rem; }
+}
+
+/* ─── Scrollbar styling ────────────────────────────────────────── */
+#sidebarPanel ::-webkit-scrollbar { width: 5px; }
+#sidebarPanel ::-webkit-scrollbar-track { background: transparent; }
+#sidebarPanel ::-webkit-scrollbar-thumb { background: var(--bar-border); border-radius: 3px; }
