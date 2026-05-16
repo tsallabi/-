@@ -1,0 +1,114 @@
+name: 🏛️ تنزيل صورة قوس ماركوس
+
+on:
+  workflow_dispatch:
+
+jobs:
+  download-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: claude/online-library-design-ROC6E
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: تنزيل وتجهيز الصور من ويكيميديا
+        run: |
+          mkdir -p assets
+
+          # عدّة مصادر للصورة (Wikimedia Commons)
+          URLS=(
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Arco_de_Marco_Aurelio_Tripoli.jpg/1280px-Arco_de_Marco_Aurelio_Tripoli.jpg"
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Arch_of_Marcus_Aurelius_Tripoli_Libya.jpg/1280px-Arch_of_Marcus_Aurelius_Tripoli_Libya.jpg"
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Tripoli_Arch_of_Marcus_Aurelius.jpg/1280px-Tripoli_Arch_of_Marcus_Aurelius.jpg"
+            "https://upload.wikimedia.org/wikipedia/commons/c/ce/Arco_di_Marco_Aurelio_a_Tripoli.JPG"
+            "https://upload.wikimedia.org/wikipedia/commons/8/82/Tripoli-arch-of-marcus-aurelius.jpg"
+            "https://upload.wikimedia.org/wikipedia/commons/9/90/Marcus_Aurelius_Arch_Tripoli.jpg"
+          )
+
+          # حاول كل رابط حتى ينجح واحد
+          for URL in "${URLS[@]}"; do
+              echo "🔍 محاولة: $URL"
+              if curl -fsSL -H "User-Agent: TaybaaLibrary/1.0 (Educational Use)" \
+                  -o /tmp/arch.jpg --max-time 30 "$URL" 2>/dev/null; then
+                  SIZE=$(stat -c%s /tmp/arch.jpg)
+                  if [ "$SIZE" -gt 10000 ]; then
+                      echo "✅ نجح: $SIZE bytes"
+                      cp /tmp/arch.jpg assets/marcus-arch-original.jpg
+                      break
+                  fi
+              fi
+          done
+
+          if [ ! -f assets/marcus-arch-original.jpg ]; then
+              echo "⚠️ كل المصادر فشلت — محاولة بحث API"
+              # استخدم Wikimedia API للبحث
+              SEARCH=$(curl -s "https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=imageinfo&iiprop=url&titles=File:Arch_of_Marcus_Aurelius_Tripoli.jpg")
+              IMAGE_URL=$(echo "$SEARCH" | python3 -c "
+          import sys, json
+          d = json.load(sys.stdin)
+          pages = d.get('query', {}).get('pages', {})
+          for p in pages.values():
+              if 'imageinfo' in p:
+                  print(p['imageinfo'][0]['url'])
+                  break
+          " 2>/dev/null || echo "")
+              if [ -n "$IMAGE_URL" ]; then
+                  echo "📥 من API: $IMAGE_URL"
+                  curl -fsSL -H "User-Agent: TaybaaLibrary/1.0" -o assets/marcus-arch-original.jpg "$IMAGE_URL"
+              fi
+          fi
+
+          ls -la assets/
+
+      - name: تثبيت Python Pillow + معالجة الصورة
+        run: |
+          pip install Pillow
+
+          if [ -f assets/marcus-arch-original.jpg ]; then
+              python3 << 'PYEOF'
+          from PIL import Image, ImageEnhance, ImageFilter
+          
+          img = Image.open('assets/marcus-arch-original.jpg')
+          print(f"الأصلي: {img.size}, {img.mode}")
+          
+          # تحويل لـRGB لو فيه RGBA
+          if img.mode != 'RGB':
+              img = img.convert('RGB')
+          
+          # نسخة كبيرة (للسطح المكتب)
+          img_large = img.copy()
+          img_large.thumbnail((1600, 1100))
+          img_large.save('assets/marcus-arch-hero.jpg', 'JPEG', quality=85, optimize=True, progressive=True)
+          print(f"Hero: {img_large.size}")
+          
+          # نسخة متوسّطة (للموبايل)
+          img_mid = img.copy()
+          img_mid.thumbnail((800, 600))
+          img_mid.save('assets/marcus-arch-mobile.jpg', 'JPEG', quality=78, optimize=True, progressive=True)
+          print(f"Mobile: {img_mid.size}")
+          
+          # نسخة صغيرة (placeholder)
+          img_thumb = img.copy()
+          img_thumb.thumbnail((100, 75))
+          img_thumb.save('assets/marcus-arch-thumb.jpg', 'JPEG', quality=60, optimize=True)
+          print(f"Thumb: {img_thumb.size}")
+          PYEOF
+              ls -la assets/
+          fi
+
+      - name: دفع الصور لـGitHub
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/
+          if git diff --staged --quiet; then
+              echo "ℹ️ لا تغييرات"
+          else
+              git commit -m "🏛️ تنزيل صورة قوس ماركوس أوريليوس من Wikimedia"
+              git push origin claude/online-library-design-ROC6E
+              echo "✅ تمّ الدفع"
+          fi
