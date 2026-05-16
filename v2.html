@@ -6,8 +6,8 @@
     <meta name="theme-color" content="#FAF6EE">
     <title>المكتبة الطيبة — من طرابلس إلى العالم العربي</title>
 
-    <link rel="stylesheet" href="css/design-system.css?v=23">
-    <link rel="stylesheet" href="css/homepage-v2.css?v=23">
+    <link rel="stylesheet" href="css/design-system.css?v=24">
+    <link rel="stylesheet" href="css/homepage-v2.css?v=24">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -277,6 +277,31 @@
             to   { opacity: 1; transform: none; }
         }
 
+        /* Sanctuary nav link */
+        .snc-nav-link {
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+            font-family: 'Reem Kufi', sans-serif;
+            font-size: .88rem;
+            font-weight: 600;
+            color: #5a7a3a;
+            background: rgba(90,122,58,.08);
+            border: 1px solid rgba(90,122,58,.3);
+            padding: .5rem 1rem;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: all 280ms ease;
+            white-space: nowrap;
+        }
+        .snc-nav-link:hover {
+            background: rgba(90,122,58,.18);
+            border-color: #5a7a3a;
+            transform: translateY(-1px);
+        }
+        .snc-nav-link-label { }
+        @media (max-width: 480px) { .snc-nav-link-label { display: none; } }
+
         @media (max-width: 640px) {
             .hero-arch {
                 min-height: 92vh;
@@ -311,6 +336,11 @@
             </a>
             <div style="flex:1;"></div>
             <input class="input input-search" type="search" placeholder="ابحث عن كتاب، مؤلف، أو موضوع..." style="max-width:340px;" id="searchInput">
+            <!-- 🌿 Sanctuary link -->
+            <a href="sanctuary.html" class="snc-nav-link" title="واحة القراءة — يومياتي وأهدافي">
+                🌿
+                <span class="snc-nav-link-label">واحتي</span>
+            </a>
             <a href="favorites.html" class="btn btn-ghost" title="مفضّلتي">♥</a>
             <button class="btn btn-ghost" id="themeBtn" type="button">🌙</button>
         </div>
@@ -367,7 +397,7 @@
                     </div>
                 </div>
                 <div class="journeys-grid" id="journeysGrid">
-                    <div class="journey-card"><div class="journey-icon">⏳</div><div>جارٍ التحميل...</div></div>
+                    <div class="journey-card"><div class="journey-icon">⏳</div><div>جارّيس التحميل...</div></div>
                 </div>
             </div>
         </section>
@@ -382,7 +412,7 @@
                     </div>
                 </div>
                 <div class="featured-shelf" id="featuredBooks">
-                    <div class="book-spine"><div class="book-spine-cover"></div><div class="book-spine-info"><div class="book-spine-title">جارٍ التحميل...</div></div></div>
+                    <div class="book-spine"><div class="book-spine-cover"></div><div class="book-spine-info"><div class="book-spine-title">جارّيس التحميل...</div></div></div>
                 </div>
             </div>
         </section>
@@ -415,8 +445,8 @@
         </div>
     </footer>
 
-    <script src="js/user-system.js?v=23"></script>
-    <script src="js/homepage-v2.js?v=23"></script>
+    <script src="js/user-system.js?v=24"></script>
+    <script src="js/homepage-v2.js?v=24"></script>
     <script>
         document.getElementById('themeBtn')?.addEventListener('click', () => {
             const c = document.documentElement.getAttribute('data-theme') || 'light';

@@ -12,16 +12,18 @@
   <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;600;700&family=Amiri:ital,wght@0,400;0,700;1,400&family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 
   <!-- Luxury reader styles -->
-  <link rel="stylesheet" href="css/reader-luxury.css?v=23">
+  <link rel="stylesheet" href="css/reader-luxury.css?v=24">
+  <!-- Sanctuary wellness layer styles -->
+  <link rel="stylesheet" href="css/sanctuary.css?v=24">
 </head>
 <body>
 
-  <!-- ─── Reading Progress Bar ────────────────────────────────── -->
+  <!-- ─── Reading Progress Bar ──────────────────────────────── -->
   <div id="readingProgress" role="progressbar" aria-label="تقدم القراءة">
     <div class="bar" id="progressBarInner"></div>
   </div>
 
-  <!-- ─── Luxury Toolbar ──────────────────────────────────────── -->
+  <!-- ─── Luxury Toolbar ────────────────────────────────────── -->
   <header id="luxBar" role="banner">
 
     <!-- Right: back + book info -->
@@ -30,7 +32,7 @@
         <span aria-hidden="true">→</span> عودة
       </button>
       <div class="bar-title-block">
-        <span id="barTitle">جارٍ التحميل...</span>
+        <span id="barTitle">جارّيس التحميل...</span>
         <span id="barAuthor"></span>
       </div>
     </div>
@@ -74,7 +76,7 @@
 
       <!-- Highlights panel -->
       <button id="hlToggleBtn" class="lux-btn icon-only" aria-label="التظليلات" title="التظليلات">
-        🖊
+        🔊
       </button>
 
       <!-- Notes panel -->
@@ -96,7 +98,7 @@
     </div>
   </header>
 
-  <!-- ─── Reader Shell ─────────────────────────────────────────── -->
+  <!-- ─── Reader Shell ───────────────────────────────────────── -->
   <div id="readerShell">
 
     <!-- PDF Stage -->
@@ -105,7 +107,7 @@
       <!-- Loading/error message -->
       <div class="reader-message" id="readerMessage">
         <span class="reader-spinner" aria-hidden="true"></span>
-        <span id="msgText">جارٍ تحضير الكتاب في قارئنا الفاخر...</span>
+        <span id="msgText">جارّيس تحضير الكتاب في قارئنا الفاخر...</span>
         <div class="status-line" id="statusLine"></div>
       </div>
 
@@ -122,7 +124,7 @@
       <nav class="sidebar-tabs" role="tablist">
         <button class="sidebar-tab active" data-tab="bookmarks" role="tab" aria-selected="true">🔖 الإشارات</button>
         <button class="sidebar-tab" data-tab="notes"     role="tab" aria-selected="false">✏️ الملاحظات</button>
-        <button class="sidebar-tab" data-tab="highlights" role="tab" aria-selected="false">🖊 التظليلات</button>
+        <button class="sidebar-tab" data-tab="highlights" role="tab" aria-selected="false">🔊 التظليلات</button>
       </nav>
 
       <div class="sidebar-pane active" data-pane="bookmarks" role="tabpanel">
@@ -139,7 +141,7 @@
       </div>
       <div class="sidebar-pane" data-pane="highlights" role="tabpanel">
         <div class="empty-state">
-          <span class="empty-icon">🖊</span>
+          <span class="empty-icon">🔊</span>
           لا توجد تظليلات بعد.<br>حدّد أي نص في الكتاب لتظليله.
         </div>
       </div>
@@ -152,7 +154,7 @@
     <button class="hl-color-btn" data-color-id="yellow" style="background:#FBE16C"
             title="أصفر مخطوطات — مهم" aria-label="تظليل أصفر"></button>
     <button class="hl-color-btn" data-color-id="green"  style="background:#9CCBA0"
-            title="أخضر نعنع — للحفظ" aria-label="تظليل أخضر"></button>
+            title="أخضر نعناع — للحفظ" aria-label="تظليل أخضر"></button>
     <button class="hl-color-btn" data-color-id="blue"   style="background:#9CC2E3"
             title="أزرق سماوي — تساؤل" aria-label="تظليل أزرق"></button>
     <button class="hl-color-btn" data-color-id="red"    style="background:#E3786B"
@@ -161,7 +163,7 @@
     <button class="hl-dismiss-btn" id="hlDismissBtn" title="إلغاء" aria-label="إلغاء">✕</button>
   </div>
 
-  <!-- ─── Note Modal ────────────────────────────────────────────── -->
+  <!-- ─── Note Modal ───────────────────────────────────────────── -->
   <div id="noteModal" role="dialog" aria-modal="true" aria-labelledby="noteModalTitle">
     <div class="note-modal-box">
       <div class="note-modal-title" id="noteModalTitle">✏️ إضافة ملاحظة</div>
@@ -174,7 +176,7 @@
     </div>
   </div>
 
-  <!-- ─── Keyboard Shortcuts Overlay ──────────────────────────── -->
+  <!-- ─── Keyboard Shortcuts Overlay ───────────────────────────── -->
   <div id="shortcutsOverlay" role="dialog" aria-modal="true" aria-label="اختصارات لوحة المفاتيح">
     <div class="shortcuts-box">
       <div class="shortcuts-title">⌨️ اختصارات لوحة المفاتيح</div>
@@ -216,15 +218,17 @@
     </div>
   </div>
 
-  <!-- ─── Reading Time Badge ───────────────────────────────────── -->
+  <!-- ─── Reading Time Badge ────────────────────────────────────── -->
   <div id="readingTimeBadge" aria-live="polite"></div>
 
-  <!-- ─── Focus Mode Hint ──────────────────────────────────────── -->
+  <!-- ─── Focus Mode Hint ───────────────────────────────────────── -->
   <div id="focusHint" class="focus-hint" aria-live="polite">اضغط F للخروج من وضع التركيز</div>
 
-  <!-- ─── Scripts ─────────────────────────────────────────────── -->
-  <script src="js/user-system.js?v=13"></script>
-  <script src="js/reader-luxury.js?v=23"></script>
+  <!-- ─── Scripts ────────────────────────────────────────────────── -->
+  <script src="js/user-system.js?v=24"></script>
+  <script src="js/reader-luxury.js?v=24"></script>
+  <!-- Sanctuary wellness layer — loads after reader DOM is ready -->
+  <script src="js/sanctuary.js?v=24"></script>
 
   <script>
     /*
