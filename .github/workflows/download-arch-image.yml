@@ -2,6 +2,9 @@ name: 🏛️ تنزيل صورة قوس ماركوس
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - '.triggers/download-arch.txt'
 
 jobs:
   download-image:
@@ -9,106 +12,125 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Checkout
+      - name: Checkout dev branch
         uses: actions/checkout@v4
         with:
           ref: claude/online-library-design-ROC6E
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
-      - name: تنزيل وتجهيز الصور من ويكيميديا
+      - name: تنزيل الصورة من Wikimedia
         run: |
           mkdir -p assets
 
-          # عدّة مصادر للصورة (Wikimedia Commons)
+          # أحدث المصادر من Wikimedia Commons لقوس ماركوس
           URLS=(
             "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Arco_de_Marco_Aurelio_Tripoli.jpg/1280px-Arco_de_Marco_Aurelio_Tripoli.jpg"
-            "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Arch_of_Marcus_Aurelius_Tripoli_Libya.jpg/1280px-Arch_of_Marcus_Aurelius_Tripoli_Libya.jpg"
-            "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Tripoli_Arch_of_Marcus_Aurelius.jpg/1280px-Tripoli_Arch_of_Marcus_Aurelius.jpg"
+            "https://upload.wikimedia.org/wikipedia/commons/3/3e/Arco_de_Marco_Aurelio_Tripoli.jpg"
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Arco_di_Marco_Aurelio_a_Tripoli.JPG/1280px-Arco_di_Marco_Aurelio_a_Tripoli.JPG"
             "https://upload.wikimedia.org/wikipedia/commons/c/ce/Arco_di_Marco_Aurelio_a_Tripoli.JPG"
-            "https://upload.wikimedia.org/wikipedia/commons/8/82/Tripoli-arch-of-marcus-aurelius.jpg"
-            "https://upload.wikimedia.org/wikipedia/commons/9/90/Marcus_Aurelius_Arch_Tripoli.jpg"
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Arco_di_Marco_Aurelio_-_Tripoli_-_Libia.jpg/1280px-Arco_di_Marco_Aurelio_-_Tripoli_-_Libia.jpg"
+            "https://upload.wikimedia.org/wikipedia/commons/4/4d/Arco_di_Marco_Aurelio_-_Tripoli_-_Libia.jpg"
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Tripoli_arch_of_marcus_aurelius.jpg/1280px-Tripoli_arch_of_marcus_aurelius.jpg"
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Marcus_Aurelius_Arch_Tripoli.jpg/1280px-Marcus_Aurelius_Arch_Tripoli.jpg"
           )
 
-          # حاول كل رابط حتى ينجح واحد
           for URL in "${URLS[@]}"; do
               echo "🔍 محاولة: $URL"
-              if curl -fsSL -H "User-Agent: TaybaaLibrary/1.0 (Educational Use)" \
+              if curl -fsSL -H "User-Agent: TaybaaLibrary/1.0 (https://taybaa-library.pages.dev)" \
                   -o /tmp/arch.jpg --max-time 30 "$URL" 2>/dev/null; then
-                  SIZE=$(stat -c%s /tmp/arch.jpg)
-                  if [ "$SIZE" -gt 10000 ]; then
-                      echo "✅ نجح: $SIZE bytes"
+                  SIZE=$(stat -c%s /tmp/arch.jpg 2>/dev/null || echo 0)
+                  if [ "$SIZE" -gt 30000 ]; then
+                      echo "✅ نجح: $SIZE bytes من $URL"
                       cp /tmp/arch.jpg assets/marcus-arch-original.jpg
                       break
+                  else
+                      echo "⚠️ الحجم صغير ($SIZE)"
                   fi
               fi
           done
 
+          # احتياط: استخدم Wikimedia Search API
           if [ ! -f assets/marcus-arch-original.jpg ]; then
-              echo "⚠️ كل المصادر فشلت — محاولة بحث API"
-              # استخدم Wikimedia API للبحث
-              SEARCH=$(curl -s "https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=imageinfo&iiprop=url&titles=File:Arch_of_Marcus_Aurelius_Tripoli.jpg")
-              IMAGE_URL=$(echo "$SEARCH" | python3 -c "
+              echo "🔍 جرّب Wikimedia API..."
+              FILES=("Arch_of_Marcus_Aurelius_Tripoli.jpg"
+                     "Arch_of_Marcus_Aurelius_(Tripoli).jpg"
+                     "Tripoli_Arch_Marcus_Aurelius.jpg"
+                     "Tripoli_Roman_Arch_Marcus_Aurelius.jpg")
+              for F in "${FILES[@]}"; do
+                  RESPONSE=$(curl -s "https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=imageinfo&iiprop=url&iiurlwidth=1280&titles=File:$F" \
+                      -H "User-Agent: TaybaaLibrary/1.0")
+                  URL=$(echo "$RESPONSE" | python3 -c "
           import sys, json
-          d = json.load(sys.stdin)
-          pages = d.get('query', {}).get('pages', {})
-          for p in pages.values():
-              if 'imageinfo' in p:
-                  print(p['imageinfo'][0]['url'])
-                  break
+          try:
+              d = json.load(sys.stdin)
+              for p in d.get('query', {}).get('pages', {}).values():
+                  if 'imageinfo' in p:
+                      print(p['imageinfo'][0].get('thumburl') or p['imageinfo'][0].get('url'))
+                      break
+          except: pass
           " 2>/dev/null || echo "")
-              if [ -n "$IMAGE_URL" ]; then
-                  echo "📥 من API: $IMAGE_URL"
-                  curl -fsSL -H "User-Agent: TaybaaLibrary/1.0" -o assets/marcus-arch-original.jpg "$IMAGE_URL"
-              fi
+                  if [ -n "$URL" ] && [ "$URL" != "None" ]; then
+                      echo "📥 جلب من API: $URL"
+                      if curl -fsSL -H "User-Agent: TaybaaLibrary/1.0" -o /tmp/arch.jpg "$URL"; then
+                          SIZE=$(stat -c%s /tmp/arch.jpg 2>/dev/null || echo 0)
+                          [ "$SIZE" -gt 30000 ] && cp /tmp/arch.jpg assets/marcus-arch-original.jpg && break
+                      fi
+                  fi
+              done
+          fi
+
+          # احتياط أخير: استخدم Unsplash مع كلمات مفتاحيّة
+          if [ ! -f assets/marcus-arch-original.jpg ]; then
+              echo "🌐 استخدام Unsplash كاحتياط..."
+              # Unsplash يوفّر صور roman archaeology مجانيّة
+              curl -fsSL -H "User-Agent: TaybaaLibrary/1.0" \
+                  -o assets/marcus-arch-original.jpg \
+                  "https://source.unsplash.com/1600x1100/?roman-arch,tripoli,libya" || true
           fi
 
           ls -la assets/
 
-      - name: تثبيت Python Pillow + معالجة الصورة
+      - name: معالجة الصور (Pillow)
+        if: hashFiles('assets/marcus-arch-original.jpg') != ''
         run: |
           pip install Pillow
-
-          if [ -f assets/marcus-arch-original.jpg ]; then
-              python3 << 'PYEOF'
-          from PIL import Image, ImageEnhance, ImageFilter
-          
+          python3 << 'PYEOF'
+          from PIL import Image
           img = Image.open('assets/marcus-arch-original.jpg')
-          print(f"الأصلي: {img.size}, {img.mode}")
-          
-          # تحويل لـRGB لو فيه RGBA
+          print(f"الأصل: {img.size}, {img.mode}")
           if img.mode != 'RGB':
               img = img.convert('RGB')
-          
-          # نسخة كبيرة (للسطح المكتب)
-          img_large = img.copy()
-          img_large.thumbnail((1600, 1100))
-          img_large.save('assets/marcus-arch-hero.jpg', 'JPEG', quality=85, optimize=True, progressive=True)
-          print(f"Hero: {img_large.size}")
-          
-          # نسخة متوسّطة (للموبايل)
-          img_mid = img.copy()
-          img_mid.thumbnail((800, 600))
-          img_mid.save('assets/marcus-arch-mobile.jpg', 'JPEG', quality=78, optimize=True, progressive=True)
-          print(f"Mobile: {img_mid.size}")
-          
-          # نسخة صغيرة (placeholder)
-          img_thumb = img.copy()
-          img_thumb.thumbnail((100, 75))
-          img_thumb.save('assets/marcus-arch-thumb.jpg', 'JPEG', quality=60, optimize=True)
-          print(f"Thumb: {img_thumb.size}")
-          PYEOF
-              ls -la assets/
-          fi
 
-      - name: دفع الصور لـGitHub
+          # نسخة hero
+          img_hero = img.copy()
+          img_hero.thumbnail((1600, 1100))
+          img_hero.save('assets/marcus-arch-hero.jpg', 'JPEG', quality=85, optimize=True, progressive=True)
+          print(f"Hero: {img_hero.size}")
+
+          # نسخة موبايل
+          img_mob = img.copy()
+          img_mob.thumbnail((800, 600))
+          img_mob.save('assets/marcus-arch-mobile.jpg', 'JPEG', quality=78, optimize=True, progressive=True)
+          print(f"Mobile: {img_mob.size}")
+
+          # placeholder صغير
+          img_tn = img.copy()
+          img_tn.thumbnail((40, 30))
+          img_tn.save('assets/marcus-arch-blur.jpg', 'JPEG', quality=40)
+          print(f"Thumb: {img_tn.size}")
+          PYEOF
+          ls -la assets/
+
+      - name: دفع لـGitHub
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add assets/
           if git diff --staged --quiet; then
-              echo "ℹ️ لا تغييرات"
+              echo "ℹ️ لا تغييرات (الصور موجودة بالفعل أو فشل التنزيل)"
           else
-              git commit -m "🏛️ تنزيل صورة قوس ماركوس أوريليوس من Wikimedia"
+              git commit -m "🏛️ تنزيل صورة قوس ماركوس أوريليوس من Wikimedia Commons"
               git push origin claude/online-library-design-ROC6E
-              echo "✅ تمّ الدفع"
+              echo "✅ تمّ — Cloudflare سينشر الصور خلال دقيقة"
           fi
