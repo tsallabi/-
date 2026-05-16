@@ -1,0 +1,19 @@
+{
+  "name": "taybaa-library-server",
+  "version": "1.0.0",
+  "description": "Backend API for المكتبة الطيبة — books, search, users, annotations",
+  "type": "module",
+  "main": "index.mjs",
+  "scripts": {
+    "start": "node index.mjs",
+    "dev": "node --watch index.mjs"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "cors": "^2.8.5",
+    "compression": "^1.7.4"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
