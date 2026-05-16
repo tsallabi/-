@@ -7,19 +7,59 @@
     <title>المكتبة الطيبة — واحة المعرفة</title>
     <meta name="description" content="أكبر مكتبة عربيّة أونلاين — رفيقك في العلم والثقافة">
 
-    <link rel="stylesheet" href="css/design-system.css?v=14">
-    <link rel="stylesheet" href="css/homepage-v2.css?v=14">
+    <link rel="stylesheet" href="css/design-system.css?v=15">
+    <link rel="stylesheet" href="css/homepage-v2.css?v=15">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Cairo:wght@400;600;700&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('taybaa-theme') || 'light');</script>
+
+    <style>
+        :root {
+            --mihrab-bg: #FAF6EE;
+            --mihrab-ink: #0F1B2D;
+            --mihrab-red: #B1373F;
+            --mihrab-gold: #B89968;
+            --mihrab-turn: 380ms;
+            --mihrab-ease: cubic-bezier(.4,.0,.2,1);
+        }
+        .hero-mihrab { position: relative; min-height: 90vh; display: grid; place-items: center; padding: clamp(2rem,6vw,5rem) clamp(1rem,5vw,3rem); overflow: hidden; isolation: isolate; background: var(--mihrab-bg); }
+        .hero-mihrab::before, .hero-mihrab::after { content: ""; position: absolute; inset-block: 0; width: clamp(60px,9vw,140px); background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><g fill='none' stroke='%23B89968' stroke-width='.8' opacity='.55'><path d='M40 0 L80 40 L40 80 L0 40 Z'/><path d='M40 12 L68 40 L40 68 L12 40 Z'/><circle cx='40' cy='40' r='8'/><path d='M40 0 V80 M0 40 H80'/></g></svg>"); background-size: 80px 80px; opacity: .45; z-index: -1; animation: mihrab-breathe 6s var(--mihrab-ease) infinite; }
+        .hero-mihrab::before { inset-inline-start: 0; -webkit-mask-image: linear-gradient(to left, transparent, #000 60%); mask-image: linear-gradient(to left, transparent, #000 60%); }
+        .hero-mihrab::after { inset-inline-end: 0; -webkit-mask-image: linear-gradient(to right, transparent, #000 60%); mask-image: linear-gradient(to right, transparent, #000 60%); }
+        .mihrab-arch { position: relative; width: min(560px,92vw); text-align: center; padding: clamp(2rem,5vw,3.5rem) clamp(1.25rem,4vw,2.5rem) clamp(2.5rem,6vw,4rem); }
+        .mihrab-frame { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; stroke: var(--mihrab-gold); fill: none; stroke-width: 1.25; opacity: 0; stroke-dasharray: 1200; animation: mihrab-inscribe 1.6s var(--mihrab-ease) .2s forwards; }
+        .mihrab-eyebrow { font-family: 'Reem Kufi', sans-serif; font-size: .78rem; letter-spacing: .35em; color: var(--mihrab-gold); text-transform: uppercase; margin-bottom: 1.25rem; opacity: 0; animation: mihrab-rise var(--mihrab-turn) var(--mihrab-ease) .6s forwards; }
+        .mihrab-wordmark { font-family: 'Reem Kufi', sans-serif; font-weight: 700; font-size: clamp(2.6rem,7vw,4.75rem); line-height: 1.1; color: var(--mihrab-ink); margin: 0; opacity: 0; animation: mihrab-rise var(--mihrab-turn) var(--mihrab-ease) .8s forwards; }
+        .mihrab-wordmark .accent { color: var(--mihrab-red); }
+        .mihrab-rule { display: flex; align-items: center; justify-content: center; gap: 1rem; margin: 1.5rem auto; width: 60%; opacity: 0; animation: mihrab-rise var(--mihrab-turn) var(--mihrab-ease) 1s forwards; }
+        .mihrab-rule::before, .mihrab-rule::after { content: ""; flex: 1; height: 1px; background: linear-gradient(to right, transparent, var(--mihrab-gold), transparent); }
+        .mihrab-rule span { width: 8px; height: 8px; border: 1px solid var(--mihrab-gold); transform: rotate(45deg); }
+        .mihrab-tagline { font-family: 'Amiri', serif; font-size: clamp(1.1rem,2.2vw,1.4rem); font-style: italic; color: var(--mihrab-ink); max-width: 42ch; margin: 0 auto 2.25rem; opacity: 0; animation: mihrab-rise var(--mihrab-turn) var(--mihrab-ease) 1.2s forwards; }
+        .mihrab-cta-row { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; opacity: 0; animation: mihrab-rise var(--mihrab-turn) var(--mihrab-ease) 1.4s forwards; }
+        .mihrab-cta { display: inline-block; font-family: 'Reem Kufi', sans-serif; font-weight: 500; font-size: 1rem; padding: .95rem 2.25rem; background: var(--mihrab-red); color: var(--mihrab-bg); text-decoration: none; border: none; cursor: pointer; position: relative; transition: transform var(--mihrab-turn) var(--mihrab-ease), box-shadow var(--mihrab-turn) var(--mihrab-ease); }
+        .mihrab-cta::after { content: ""; position: absolute; inset: 0; border: 1px solid var(--mihrab-gold); transform: translate(6px,6px); transition: transform var(--mihrab-turn) var(--mihrab-ease); z-index: -1; }
+        .mihrab-cta:hover, .mihrab-cta:focus-visible { transform: translate(-2px,-2px); box-shadow: 0 8px 24px -8px rgba(177,55,63,.35); outline: none; }
+        .mihrab-cta:hover::after, .mihrab-cta:focus-visible::after { transform: translate(3px,3px); }
+        .mihrab-explore { display: inline-flex; flex-direction: column; align-items: center; gap: .5rem; font-family: 'Reem Kufi', sans-serif; font-size: .78rem; letter-spacing: .3em; color: var(--mihrab-ink); text-decoration: none; opacity: .7; transition: opacity var(--mihrab-turn) var(--mihrab-ease); cursor: pointer; background: none; border: none; }
+        .mihrab-explore:hover { opacity: 1; }
+        .mihrab-explore .chevron { width: 1px; height: 34px; background: var(--mihrab-gold); position: relative; animation: mihrab-turn-down 2.4s var(--mihrab-ease) infinite; }
+        .mihrab-explore .chevron::after { content: ""; position: absolute; bottom: 0; inset-inline-start: -3px; width: 7px; height: 7px; border-inline-end: 1px solid var(--mihrab-gold); border-block-end: 1px solid var(--mihrab-gold); transform: rotate(45deg); }
+        @keyframes mihrab-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+        @keyframes mihrab-inscribe { from { opacity: 0; stroke-dashoffset: 1200; } to { opacity: 1; stroke-dashoffset: 0; } }
+        @keyframes mihrab-breathe { 0%,100% { opacity: .35; transform: translateY(0); } 50% { opacity: .55; transform: translateY(-6px); } }
+        @keyframes mihrab-turn-down { 0%,100% { transform: translateY(0); opacity: .6; } 50% { transform: translateY(6px); opacity: 1; } }
+        @media (max-width: 640px) { .hero-mihrab::before, .hero-mihrab::after { width: 46px; opacity: .3; } .mihrab-rule { width: 80%; } }
+        @media (prefers-reduced-motion: reduce) { .hero-mihrab *, .hero-mihrab *::before, .hero-mihrab *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+        [data-theme="dark"] .hero-mihrab { background: var(--parchment-100); }
+        [data-theme="dark"] .mihrab-wordmark, [data-theme="dark"] .mihrab-tagline { color: var(--ink-900); }
+    </style>
 </head>
 <body>
 
-    <!-- ===== الهيدر ===== -->
-    <header class="site-header-luxury" style="position:sticky;top:0;z-index:50;backdrop-filter:blur(16px);background:color-mix(in srgb, var(--bg-elevated) 90%, transparent);border-bottom:1px solid var(--border);padding:1rem 0;">
+    <header style="position:sticky;top:0;z-index:50;backdrop-filter:blur(16px);background:color-mix(in srgb, var(--bg-elevated) 90%, transparent);border-bottom:1px solid var(--border);padding:1rem 0;">
         <div class="container" style="display:flex;align-items:center;gap:1rem;">
             <a href="index.html" style="display:flex;align-items:center;gap:.75rem;text-decoration:none;color:var(--text);">
                 <span style="width:42px;height:42px;border-radius:10px;background:var(--ink-900);color:var(--parchment-100);display:grid;place-items:center;font-family:'Reem Kufi',sans-serif;font-weight:700;font-size:1.2rem;">ط</span>
@@ -36,55 +76,50 @@
     </header>
 
     <main>
-        <!-- ===== البطل ===== -->
-        <section class="hero-luxury">
-            <div class="container">
-                <p class="hero-greeting" id="greeting">أهلاً بك</p>
-                <h1 class="hero-title">
-                    واحة المعرفة
-                    <br>
-                    <span class="hero-title-accent">في صحراء العصر</span>
+        <section class="hero-mihrab" aria-labelledby="wordmark">
+            <div class="mihrab-arch">
+                <svg class="mihrab-frame" viewBox="0 0 560 720" preserveAspectRatio="none" aria-hidden="true">
+                    <path d="M20 700 V300 C20 145 145 20 280 20 C415 20 540 145 540 300 V700"/>
+                    <path d="M40 700 V305 C40 158 158 40 280 40 C402 40 520 158 520 305 V700" opacity=".5"/>
+                </svg>
+                <p class="mihrab-eyebrow">منذ ١٤٤٧ هـ</p>
+                <h1 id="wordmark" class="mihrab-wordmark">
+                    المكتبة <span class="accent">الطيبة</span>
                 </h1>
-                <p class="hero-tagline">
-                    رفيقك في العلم · مستودع أفكارك · معلّمك الصامت
+                <div class="mihrab-rule" aria-hidden="true"><span></span></div>
+                <p class="mihrab-tagline">
+                    حيث تُقلَّب الصفحات بهدوء، وتُفتَح أبواب المعرفة على مصراعيها لقارئٍ يبحث عن الجوهر.
                 </p>
-                <div class="hero-actions">
-                    <a href="#shelves" class="btn btn-primary btn-lg">📚 ابدأ التصفّح</a>
-                    <button id="surpriseBtn" class="btn btn-lg" type="button">🎲 فاجئني بكتاب</button>
-                </div>
-
-                <!-- الإحصائيّات -->
-                <div class="stats-row">
-                    <div class="stat-item">
-                        <b id="statBooks">0</b>
-                        <span>كتاباً موثّقاً</span>
-                    </div>
-                    <div class="stat-item">
-                        <b id="statCategories">0</b>
-                        <span>فرعاً علميّاً</span>
-                    </div>
-                    <div class="stat-item">
-                        <b id="statReaders">0</b>
-                        <span>قارئاً نشطاً</span>
-                    </div>
+                <div class="mihrab-cta-row">
+                    <a href="#shelves" class="mihrab-cta">ادخل المكتبة</a>
+                    <button class="mihrab-explore" id="surpriseBtn" type="button" aria-label="فاجئني بكتاب">
+                        <span>🎲 فاجئني بكتاب</span>
+                        <span class="chevron" aria-hidden="true"></span>
+                    </button>
                 </div>
             </div>
         </section>
 
-        <!-- ===== حكمة اليوم ===== -->
-        <section style="padding:2rem 0;">
+        <section style="padding:3rem 0;background:var(--bg-subtle);">
             <div class="container">
-                <div id="dailyQuote"></div>
+                <div class="stats-row" style="margin:0;">
+                    <div class="stat-item"><b id="statBooks">0</b><span>كتاباً موثّقاً</span></div>
+                    <div class="stat-item"><b id="statCategories">0</b><span>فرعاً علميّاً</span></div>
+                    <div class="stat-item"><b id="statReaders">0</b><span>قارئاً نشطاً</span></div>
+                </div>
             </div>
         </section>
 
-        <!-- ===== الرحلات القرائيّة ===== -->
+        <section style="padding:3rem 0;">
+            <div class="container"><div id="dailyQuote"></div></div>
+        </section>
+
         <section class="section-luxury alt" id="journeys">
             <div class="container">
                 <div class="section-title">
-                    <span class="gold-mark">❆</span>
+                    <span class="gold-mark">✦</span>
                     <div>
-                        <h2>رحلات قرائيّة منّسّقة</h2>
+                        <h2>رحلات قرائيّة منسّقة</h2>
                         <p class="section-subtitle">مسارات مدروسة عبر عدّة كتب لتغوص في موضوع بعمق</p>
                     </div>
                 </div>
@@ -94,14 +129,13 @@
             </div>
         </section>
 
-        <!-- ===== أفضل الكتب ===== -->
         <section class="section-luxury" id="shelves">
             <div class="container">
                 <div class="section-title">
-                    <span class="gold-mark">❆</span>
+                    <span class="gold-mark">✦</span>
                     <div>
                         <h2>أفضل كتب المكتبة</h2>
-                        <p class="section-subtitle">اختيارات توصّ بها الـ<strong style="color:var(--indian-red)">12 ألف</strong> قارئ الأسبوع الماضي</p>
+                        <p class="section-subtitle">اختيارات توصّ بها قرّاء الأسبوع الماضي</p>
                     </div>
                 </div>
                 <div class="featured-shelf" id="featuredBooks">
@@ -110,11 +144,10 @@
             </div>
         </section>
 
-        <!-- ===== الأقسام ===== -->
         <section class="section-luxury alt" id="categories">
             <div class="container">
                 <div class="section-title">
-                    <span class="gold-mark">❆</span>
+                    <span class="gold-mark">✦</span>
                     <div>
                         <h2>تصفّح حسب الفرع</h2>
                         <p class="section-subtitle">14 فرعاً علميّاً وأدبيّاً</p>
@@ -125,14 +158,13 @@
         </section>
     </main>
 
-    <!-- ===== التذييل ===== -->
     <footer style="padding:3rem 0 2rem;border-top:1px solid var(--border);margin-top:4rem;background:var(--bg-elevated);text-align:center;">
         <div class="container">
             <div class="gold-divider-ornate" style="max-width:300px;margin:0 auto 1.5rem;">
-                <span class="gold-divider-ornate-symbol">❆</span>
+                <span class="gold-divider-ornate-symbol">✦</span>
             </div>
-            <p class="font-amiri" style="color:var(--text-muted);margin:0 0 1rem;font-size:1.1rem;">
-                "وما حيّ إلا في عدوّائه"
+            <p class="font-amiri" style="color:var(--text-muted);margin:0 0 1rem;font-size:1.1rem;font-style:italic;">
+                "خير جليس في الأنام كتاب"
             </p>
             <p style="font-size:.85rem;color:var(--text-soft);margin:0;">
                 © <span id="year">2026</span> المكتبة الطيبة · مشروع مجانيّ لخدمة العلم والثقافة العربيّة
@@ -140,25 +172,23 @@
         </div>
     </footer>
 
-    <script src="js/user-system.js?v=14"></script>
-    <script src="js/homepage-v2.js?v=14"></script>
+    <script src="js/user-system.js?v=15"></script>
+    <script src="js/homepage-v2.js?v=15"></script>
     <script>
-        // التثيم
         document.getElementById('themeBtn')?.addEventListener('click', () => {
-            const current = document.documentElement.getAttribute('data-theme') || 'light';
-            const next = current === 'light' ? 'dark' : 'light';
-            document.documentElement.setAttribute('data-theme', next);
-            localStorage.setItem('taybaa-theme', next);
+            const c = document.documentElement.getAttribute('data-theme') || 'light';
+            const n = c === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', n);
+            localStorage.setItem('taybaa-theme', n);
         });
-
-        // البحث
         document.getElementById('searchInput')?.addEventListener('keydown', e => {
-            if (e.key === 'Enter' && e.target.value.trim()) {
-                location.href = 'index-old.html?q=' + encodeURIComponent(e.target.value);
-            }
+            if (e.key === 'Enter' && e.target.value.trim()) location.href = 'index.html?q=' + encodeURIComponent(e.target.value);
         });
-
         document.getElementById('year').textContent = new Date().getFullYear();
+        document.querySelector('.mihrab-cta')?.addEventListener('click', e => {
+            const href = e.currentTarget.getAttribute('href');
+            if (href?.startsWith('#')) { e.preventDefault(); document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' }); }
+        });
     </script>
 </body>
 </html>
