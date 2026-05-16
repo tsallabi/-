@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#FAF6EE">
+  <title>واحتي — المكتبة الطيبة</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;600;700&family=Amiri:ital,wght@0,400;0,700;1,400&family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/reader-luxury.css?v=24">
+  <link rel="stylesheet" href="css/sanctuary.css?v=24">
+
+  <script>
+    (function(){
+      const t = localStorage.getItem('taybaa-theme') || '';
+      if (t) document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+
+  <style>
+    body {
+      background: var(--bg, #FAF6EE);
+      color: var(--text, #0F1B2D);
+      font-family: 'Cairo', system-ui, sans-serif;
+      direction: rtl;
+      min-height: 100vh;
+    }
+
+    /* ── Simple sticky nav ─────────────────────────────────────── */
+    .snc-nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--bar-bg, rgba(250,246,238,.94));
+      border-bottom: 1px solid var(--bar-border, rgba(184,153,104,.35));
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: .75rem 1rem;
+    }
+    .snc-nav-inner {
+      max-width: 860px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .snc-nav-logo {
+      font-family: 'Reem Kufi', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--text, #0F1B2D);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .snc-nav-logo-mark {
+      width: 34px; height: 34px;
+      background: var(--text, #0F1B2D);
+      color: var(--bg, #FAF6EE);
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      font-size: 1rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .snc-nav-spacer { flex: 1; }
+    .snc-nav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      font-size: .85rem;
+      color: var(--text-muted, #5a6a7a);
+      text-decoration: none;
+      font-family: 'Reem Kufi', sans-serif;
+      font-weight: 600;
+      padding: .4rem .8rem;
+      border-radius: 10px;
+      border: 1px solid var(--bar-border, rgba(184,153,104,.3));
+      background: rgba(184,153,104,.08);
+      transition: all 280ms ease;
+    }
+    .snc-nav-back:hover {
+      color: #B89968;
+      border-color: #B89968;
+      background: rgba(184,153,104,.18);
+    }
+
+    /* ── Theme toggle ──────────────────────────────────────────── */
+    #themeToggle {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      border: 1px solid var(--bar-border, rgba(184,153,104,.3));
+      background: rgba(184,153,104,.08);
+      color: var(--text, #0F1B2D);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      font-size: 1rem;
+      transition: all 280ms ease;
+    }
+    #themeToggle:hover { border-color: #B89968; color: #B89968; }
+
+    /* ── Goal ring in dashboard ─────────────────────────────────── */
+    .snc-dash-goal-label {
+      font-family: 'Cairo', sans-serif;
+      font-size: .9rem;
+      color: var(--text-muted, #5a6a7a);
+    }
+    .snc-dash-goal-target {
+      font-family: 'Reem Kufi', sans-serif;
+      font-weight: 700;
+      color: #B89968;
+      font-size: .95rem;
+    }
+
+    /* ── Stats goal bar ─────────────────────────────────────────── */
+    .snc-streak-big {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      font-family: 'Aref Ruqaa', serif;
+      font-size: 1.25rem;
+      color: #5a7a3a;
+      background: rgba(90,122,58,.1);
+      border: 1px solid rgba(90,122,58,.3);
+      border-radius: 999px;
+      padding: .5rem 1.25rem;
+    }
+
+    /* ── Heatmap day labels ─────────────────────────────────────── */
+    .snc-heatmap-wrap { overflow-x: auto; }
+    .snc-heatmap-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      margin-bottom: 4px;
+    }
+    .snc-hday {
+      text-align: center;
+      font-size: .65rem;
+      color: var(--text-muted, #5a6a7a);
+      font-family: 'Cairo', sans-serif;
+    }
+
+    /* ── Journal entry meta ─────────────────────────────────────── */
+    .snc-journal-mins {
+      font-size: .75rem;
+      color: var(--text-soft, #8a9aaa);
+      margin-inline-start: auto;
+    }
+
+    /* ── Category mini chart ─────────────────────────────────────── */
+    .snc-cat-bars { display: flex; flex-direction: column; gap: .5rem; }
+    .snc-cat-row  {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      font-size: .85rem;
+    }
+    .snc-cat-name {
+      width: 6rem;
+      text-align: right;
+      color: var(--text-muted, #5a6a7a);
+      flex-shrink: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .snc-cat-track {
+      flex: 1;
+      height: 10px;
+      background: rgba(184,153,104,.12);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .snc-cat-fill {
+      height: 100%;
+      border-radius: 5px;
+      background: linear-gradient(to left, #B89968, #caa96e);
+      transition: width .6s ease;
+    }
+    .snc-cat-val {
+      font-size: .75rem;
+      color: #B89968;
+      font-family: 'Reem Kufi', sans-serif;
+      font-weight: 700;
+      min-width: 2rem;
+      text-align: left;
+    }
+
+    /* ── Highlight heavy books ──────────────────────────────────── */
+    .snc-reread-list {
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+    }
+    .snc-reread-row {
+      display: flex;
+      align-items: center;
+      gap: .65rem;
+      padding: .7rem 1rem;
+      background: rgba(177,55,63,.05);
+      border: 1px solid rgba(177,55,63,.2);
+      border-radius: 12px;
+    }
+    .snc-reread-icon { font-size: 1.1rem; }
+    .snc-reread-title {
+      font-family: 'Amiri', serif;
+      font-style: italic;
+      font-size: .95rem;
+      color: #B1373F;
+      flex: 1;
+    }
+    .snc-reread-count {
+      font-size: .78rem;
+      color: var(--text-muted, #5a6a7a);
+      font-family: 'Reem Kufi', sans-serif;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── Navigation ───────────────────────────────────────────── -->
+  <nav class="snc-nav">
+    <div class="snc-nav-inner">
+      <a href="v2.html" class="snc-nav-logo">
+        <span class="snc-nav-logo-mark">ط</span>
+        <span>المكتبة الطيبة</span>
+      </a>
+      <span class="snc-nav-spacer"></span>
+      <a href="v2.html" class="snc-nav-back">← الرئيسية</a>
+      <button id="themeToggle" aria-label="تبديل الثيم">🌙</button>
+    </div>
+  </nav>
+
+  <!-- ─── Main Dashboard ───────────────────────────────────────── -->
+  <main class="snc-dash">
+
+    <!-- Hero -->
+    <div class="snc-dash-hero">
+      <h1 class="snc-dash-title">🌿 واحتي القرائيّة</h1>
+      <p class="snc-dash-sub">لحظاتك مع الكتب — أثمن ما تملك</p>
+    </div>
+
+    <!-- Goal + Streak row -->
+    <div class="snc-dash-goal-center" id="dashGoalSection">
+      <div id="dashGoalRing"><!-- filled by JS --></div>
+      <div class="snc-dash-goal-label" id="dashGoalStat">0 / 20 دقيقة اليوم</div>
+      <div class="snc-dash-goal-target" id="dashGoalTarget">الهدف: 20 دقيقة يومياً</div>
+      <div id="dashStreakWrap"></div>
+    </div>
+
+    <!-- Stats cards -->
+    <div class="snc-cards" id="statsCards">
+      <div class="snc-card">
+        <div class="snc-card-value" id="statToday">0</div>
+        <div class="snc-card-label">دقيقة اليوم</div>
+      </div>
+      <div class="snc-card">
+        <div class="snc-card-value" id="statWeek">0</div>
+        <div class="snc-card-label">دقيقة هذا الأسبوع</div>
+      </div>
+      <div class="snc-card">
+        <div class="snc-card-value" id="statMonth">0</div>
+        <div class="snc-card-label">دقيقة هذا الشهر</div>
+      </div>
+      <div class="snc-card">
+        <div class="snc-card-value" id="statTotal">0</div>
+        <div class="snc-card-label">دقيقة في كل الوقت</div>
+      </div>
+    </div>
+
+    <!-- Heatmap -->
+    <h2 class="snc-section-title">📅 آخر 30 يوماً</h2>
+    <div class="snc-heatmap-wrap">
+      <div class="snc-heatmap-days" id="heatmapDayLabels"></div>
+      <div class="snc-heatmap" id="heatmap"><!-- filled by JS --></div>
+    </div>
+    <p style="font-size:.74rem;color:var(--text-muted);text-align:center;margin:.5rem 0 0;font-family:'Cairo',sans-serif;">
+      ⬛ لا قراءة &nbsp;·&nbsp;
+      <span style="color:rgba(184,153,104,.4);">■</span> خفيف &nbsp;·&nbsp;
+      <span style="color:rgba(184,153,104,.9);">■</span> بلغت الهدف
+    </p>
+
+    <!-- Currently reading -->
+    <h2 class="snc-section-title">📖 ما تقرأه الآن</h2>
+    <div id="currentBooksSection" class="snc-books-list">
+      <p class="snc-journal-empty">لا كتب مفتوحة بعد.</p>
+    </div>
+
+    <!-- Most-highlighted (reread candidates) -->
+    <h2 class="snc-section-title">✨ ما يستحق إعادة القراءة</h2>
+    <div id="rereadSection" class="snc-reread-list">
+      <p class="snc-journal-empty">ظلّل نصوصاً في الكتب لتظهر هنا.</p>
+    </div>
+
+    <!-- Journal reflections -->
+    <h2 class="snc-section-title">🌙 يوميّات القراءة</h2>
+    <div id="journalSection" class="snc-journal-list">
+      <p class="snc-journal-empty">لم تكتب أي تأمّل بعد. أنهِ جلسة قراءة لتبدأ.</p>
+    </div>
+
+  </main>
+
+  <!-- ─── Scripts ──────────────────────────────────────────────── -->
+  <!--
+    sanctuary.js provides the SANCTUARY global API.
+    We load it here so we can use it without requiring the reader.
+    It will detect it's not on the reader page (no #pdfCanvas) and
+    skip injecting the toolbar, but still expose window.SANCTUARY.
+  -->
+  <script src="js/sanctuary.js?v=24"></script>
+
+  <script>
+  (function () {
+    'use strict';
+
+    /* ── Safe fallback if sanctuary.js didn't fully load ─────── */
+    const S = window.SANCTUARY || {
+      getGoal:         () => 20,
+      getTodayMinutes: () => 0,
+      getStreak:       () => 0,
+      buildGoalRing:   (p, s) => '',
+      getWeekMinutes:  () => 0,
+      getMonthMinutes: () => 0,
+      getTotalMinutes: () => 0,
+      getCurrentBooks: () => [],
+      getJournal:      () => [],
+      getDayMinutes:   () => 0,
+      getDayGoalMet:   () => false,
+      lsGet:           (k, d) => d,
+      dayKey:          () => ''
+    };
+
+    /* ── Theme toggle ─────────────────────────────────────────── */
+    const themeBtn = document.getElementById('themeToggle');
+    const themes = ['', 'sepia', 'dark', 'oled'];
+    let tIdx = themes.indexOf(document.documentElement.getAttribute('data-theme') || '');
+    if (tIdx < 0) tIdx = 0;
+    themeBtn.addEventListener('click', () => {
+      tIdx = (tIdx + 1) % themes.length;
+      const t = themes[tIdx];
+      document.documentElement.setAttribute('data-theme', t || '');
+      localStorage.setItem('taybaa-theme', t || '');
+      themeBtn.textContent = tIdx === 2 || tIdx === 3 ? '☀️' : '🌙';
+    });
+
+    /* ── Goal ring ────────────────────────────────────────────── */
+    const goalTarget = S.getGoal();
+    const todayMins  = S.getTodayMinutes();
+    const pct        = Math.min(1, todayMins / goalTarget);
+
+    const ringEl = document.getElementById('dashGoalRing');
+    if (ringEl) ringEl.innerHTML = S.buildGoalRing(pct, 140);
+    setText('dashGoalStat',   `${Math.round(todayMins)} / ${goalTarget} دقيقة اليوم`);
+    setText('dashGoalTarget', `الهدف: ${goalTarget} دقيقة يومياً`);
+
+    /* ── Streak ───────────────────────────────────────────────── */
+    const streak = S.getStreak();
+    const streakWrap = document.getElementById('dashStreakWrap');
+    if (streakWrap) {
+      if (streak > 0) {
+        streakWrap.innerHTML = `<div class="snc-streak-big">🌿 ${streak} ${streak === 1 ? 'يوم' : 'أيام'} متتالية</div>`;
+      } else {
+        streakWrap.innerHTML = '<p style="font-size:.85rem;color:var(--text-muted);font-family:\'Amiri\',serif;font-style:italic;">ابدأ اليوم لبناء سلسلتك القرائية.</p>';
+      }
+    }
+
+    /* ── Stats ────────────────────────────────────────────────── */
+    setText('statToday',  Math.round(todayMins));
+    setText('statWeek',   Math.round(S.getWeekMinutes()));
+    setText('statMonth',  Math.round(S.getMonthMinutes()));
+    setText('statTotal',  Math.round(S.getTotalMinutes()));
+
+    /* ── Heatmap ──────────────────────────────────────────────── */
+    const dayNames = ['أح','إث','ث','أر','خ','ج','س']; // Sun→Sat
+
+    const heatEl   = document.getElementById('heatmap');
+    const labelsEl = document.getElementById('heatmapDayLabels');
+    const DAYS = 30;
+
+    // Day labels header (last 7 of the 30, aligned to columns)
+    if (labelsEl) {
+      const today = new Date();
+      const startDow = new Date(today);
+      startDow.setDate(today.getDate() - (DAYS - 1));
+      dayNames.forEach(d => {
+        const el = document.createElement('div');
+        el.className = 'snc-hday';
+        el.textContent = d;
+        labelsEl.appendChild(el);
+      });
+    }
+
+    if (heatEl) {
+      const maxMins = (() => {
+        let m = 1;
+        for (let i = -(DAYS - 1); i <= 0; i++) m = Math.max(m, S.getDayMinutes(i));
+        return m;
+      })();
+
+      for (let i = -(DAYS - 1); i <= 0; i++) {
+        const mins = S.getDayMinutes(i);
+        const met  = S.getDayGoalMet(i);
+        const cell = document.createElement('div');
+        cell.className = 'snc-heat-cell';
+        if (met) cell.classList.add('snc-goal-met');
+
+        const ratio = mins / maxMins;
+        const level = mins < 1 ? 0 : ratio < 0.25 ? 1 : ratio < 0.5 ? 2 : ratio < 0.75 ? 3 : 4;
+        if (level) cell.dataset.level = level;
+
+        // Date for tooltip
+        const d = new Date();
+        d.setDate(d.getDate() + i);
+        const dateStr = d.toLocaleDateString('ar-LY', { month: 'short', day: 'numeric' });
+        cell.title = `${dateStr} — ${Math.round(mins)} دقيقة${met ? ' ✓' : ''}`;
+
+        heatEl.appendChild(cell);
+      }
+    }
+
+    /* ── Currently reading ────────────────────────────────────── */
+    const booksEl = document.getElementById('currentBooksSection');
+    const books = S.getCurrentBooks();
+    if (booksEl && books.length) {
+      booksEl.innerHTML = books.map(b => `
+        <a href="reader.html?id=${encodeURIComponent(b.id)}" class="snc-book-row">
+          <span class="snc-reread-icon">📖</span>
+          <span class="snc-book-id">${escHtml(b.id)}</span>
+          <span class="snc-book-page">ص ${b.page}</span>
+        </a>`).join('');
+    }
+
+    /* ── Most-highlighted (reread candidates) ─────────────────── */
+    const rereadEl = document.getElementById('rereadSection');
+    const hlData = {};
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('taybaa-hl-')) {
+          const id = k.replace('taybaa-hl-', '');
+          const items = S.lsGet(k, []);
+          if (items.length) hlData[id] = items.length;
+        }
+      }
+    } catch (_) {}
+    const rereadBooks = Object.entries(hlData)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+    if (rereadEl && rereadBooks.length) {
+      rereadEl.innerHTML = rereadBooks.map(([id, count]) => `
+        <div class="snc-reread-row">
+          <span class="snc-reread-icon">✨</span>
+          <span class="snc-reread-title">${escHtml(id)}</span>
+          <span class="snc-reread-count">${count} تظليل</span>
+          <a href="reader.html?id=${encodeURIComponent(id)}" class="snc-btn snc-btn-ghost"
+            style="padding:.35rem .75rem;font-size:.78rem;">اقرأ</a>
+        </div>`).join('');
+    }
+
+    /* ── Journal ──────────────────────────────────────────────── */
+    const journalEl = document.getElementById('journalSection');
+    const entries = S.getJournal();
+    if (journalEl && entries.length) {
+      journalEl.innerHTML = entries.slice(0, 20).map(e => {
+        const stars = e.stars ? '★'.repeat(e.stars) + '☆'.repeat(5 - e.stars) : '—';
+        const date  = e.date || '';
+        const mins  = e.minutes ? `${e.minutes} دقيقة` : '';
+        return `
+          <div class="snc-journal-entry">
+            <div class="snc-journal-header">
+              <span class="snc-journal-book">«${escHtml(e.bookTitle || e.bookId || '—')}»</span>
+              <span class="snc-journal-stars">${stars}</span>
+              <span class="snc-journal-mins">${mins}</span>
+              <span class="snc-journal-date">${escHtml(date)}</span>
+            </div>
+            ${e.note ? `<div class="snc-journal-note">${escHtml(e.note)}</div>` : ''}
+          </div>`;
+      }).join('');
+    }
+
+    /* ── Helpers ──────────────────────────────────────────────── */
+    function setText(id, val) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = val;
+    }
+    function escHtml(s) {
+      return String(s ?? '').replace(/[&<>"']/g, c =>
+        ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])
+      );
+    }
+
+    document.getElementById('year') && (document.getElementById('year').textContent = new Date().getFullYear());
+  })();
+  </script>
+
+</body>
+</html>
