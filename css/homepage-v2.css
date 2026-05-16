@@ -105,7 +105,7 @@
     font-size: .95rem;
 }
 
-/* === بطاقة حكمة اليوم (overrides quote-widget) === */
+/* === بطاقة حكمة اليوم === */
 #dailyQuote .daily-quote-card {
     max-width: 720px;
     margin: 3rem auto;
@@ -192,6 +192,8 @@
 }
 .journey-card {
     display: block;
+    width: 100%;
+    text-align: right;
     background: var(--bg-elevated);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
@@ -201,6 +203,8 @@
     transition: all var(--transition);
     position: relative;
     overflow: hidden;
+    cursor: pointer;
+    font-family: inherit;
 }
 .journey-card::before {
     content: '';
@@ -217,6 +221,10 @@
     border-color: var(--gold-line);
     box-shadow: var(--shadow-md);
     transform: translateY(-2px);
+}
+.journey-card:focus-visible {
+    outline: 2px solid var(--gold-line);
+    outline-offset: 3px;
 }
 .journey-icon {
     font-size: 2.5rem;
@@ -261,12 +269,18 @@
     text-decoration: none;
     color: inherit;
     transition: all var(--transition);
+    cursor: pointer;
+    font-family: inherit;
 }
 .category-tile:hover {
     border-color: var(--gold-line);
     background: var(--bg-subtle);
     transform: translateY(-2px);
     box-shadow: var(--shadow-sm);
+}
+.category-tile:focus-visible {
+    outline: 2px solid var(--gold-line);
+    outline-offset: 3px;
 }
 .category-tile-icon {
     font-size: 2rem;
@@ -291,4 +305,167 @@
 .section-luxury.alt {
     background: var(--bg-subtle);
     background-image: var(--pattern-mosque);
+}
+
+/* ============================================================
+   نافذة فاخرة (Modal) — تُفتح عند نقر بطاقة رحلة أو قسم
+   ============================================================ */
+.taybaa-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 27, 45, .72);
+    backdrop-filter: blur(12px) saturate(120%);
+    -webkit-backdrop-filter: blur(12px) saturate(120%);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 1rem;
+    opacity: 0;
+    transition: opacity 280ms cubic-bezier(.4, 0, .2, 1);
+}
+.taybaa-modal-overlay.is-open {
+    display: flex;
+    opacity: 1;
+}
+
+.taybaa-modal {
+    position: relative;
+    background: var(--bg-elevated, #FAF6EE);
+    border: 1px solid rgba(184, 153, 104, .55);
+    border-radius: 16px;
+    box-shadow:
+        0 0 0 1px rgba(184, 153, 104, .15) inset,
+        0 0 0 8px rgba(250, 246, 238, .35),
+        0 0 0 9px rgba(184, 153, 104, .35),
+        0 30px 80px -20px rgba(0, 0, 0, .6);
+    width: 100%;
+    max-width: 1080px;
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform: translateY(20px) scale(.97);
+    transition: transform 380ms cubic-bezier(.25, .8, .25, 1);
+}
+.taybaa-modal-overlay.is-open .taybaa-modal {
+    transform: none;
+}
+
+.taybaa-modal-close {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(184, 153, 104, .4);
+    background: rgba(250, 246, 238, .9);
+    color: #0F1B2D;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: all 280ms cubic-bezier(.4, 0, .2, 1);
+    z-index: 2;
+    font-family: inherit;
+}
+.taybaa-modal-close:hover {
+    background: #9c1f2d;
+    color: #FAF6EE;
+    border-color: #9c1f2d;
+    transform: rotate(90deg);
+}
+
+.taybaa-modal-header {
+    padding: 1.75rem 4rem 1.5rem 1.5rem;
+    border-bottom: 1px solid rgba(184, 153, 104, .25);
+    background: linear-gradient(180deg,
+        rgba(255, 250, 238, .95),
+        rgba(248, 240, 222, .92));
+}
+.taybaa-modal-title {
+    font-family: 'Reem Kufi', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    color: #0F1B2D;
+    margin: 0 0 .35rem;
+    line-height: 1.2;
+}
+.taybaa-modal-subtitle {
+    font-family: 'Amiri', serif;
+    font-style: italic;
+    color: #5b4636;
+    font-size: 1rem;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.taybaa-modal-body {
+    padding: 1.5rem;
+    overflow-y: auto;
+    flex: 1;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+.taybaa-modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+.taybaa-modal-body::-webkit-scrollbar-track {
+    background: rgba(184, 153, 104, .08);
+}
+.taybaa-modal-body::-webkit-scrollbar-thumb {
+    background: rgba(184, 153, 104, .45);
+    border-radius: 4px;
+}
+
+.taybaa-modal-books {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1.25rem;
+}
+@media (max-width: 640px) {
+    .taybaa-modal-books {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 1rem;
+    }
+}
+
+.taybaa-modal-loading {
+    text-align: center;
+    padding: 3rem 1rem;
+    font-family: 'Aref Ruqaa', serif;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+}
+
+.taybaa-modal-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-muted);
+}
+.taybaa-modal-empty-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: .6;
+}
+.taybaa-modal-empty p {
+    margin: 0 0 .5rem;
+    font-family: 'Reem Kufi', sans-serif;
+    font-size: 1.1rem;
+    color: var(--text);
+}
+.taybaa-modal-empty-hint {
+    font-family: 'Amiri', serif !important;
+    font-style: italic;
+    font-size: .95rem !important;
+    color: var(--text-muted) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .taybaa-modal-overlay,
+    .taybaa-modal,
+    .taybaa-modal-close {
+        transition: none !important;
+    }
 }
