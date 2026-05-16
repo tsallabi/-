@@ -6,8 +6,8 @@
     <meta name="theme-color" content="#FAF6EE">
     <title>المكتبة الطيبة — من طرابلس إلى العالم العربي</title>
 
-    <link rel="stylesheet" href="css/design-system.css?v=19">
-    <link rel="stylesheet" href="css/homepage-v2.css?v=19">
+    <link rel="stylesheet" href="css/design-system.css?v=20">
+    <link rel="stylesheet" href="css/homepage-v2.css?v=20">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,137 +16,130 @@
     <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('taybaa-theme') || 'light');</script>
 
     <style>
-        /* الـHero مع صورة قوس ماركوس الحقيقيّة */
+        /* ===== الـHero ===== */
         .hero-arch {
             position: relative;
-            min-height: 92vh;
+            min-height: 94vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 4rem 1rem 3rem;
+            padding: 3rem 1rem 2rem;
             overflow: hidden;
             isolation: isolate;
             background-color: #FAF6EE;
         }
 
-        /* الصورة الحقيقيّة (تُحمَّل من GitHub Action) */
+        /* صورة قوس ماركوس (LCP) */
         .hero-arch-bg {
-            position: absolute;
-            inset: 0;
+            position: absolute; inset: 0;
             background-image: url("/assets/marcus-arch-hero.jpg");
             background-size: cover;
-            background-position: center 40%;
-            background-repeat: no-repeat;
+            background-position: center 38%;
             z-index: 0;
             animation: bg-fade-in 1.5s ease-out;
         }
-
-        /* احتياط: تدرّج لوني لو الصورة لم تُحمّل بعد */
+        /* تدرّج احتياطي إذا لم تُحمَّل الصورة */
         .hero-arch::before {
-            content: '';
-            position: absolute;
-            inset: 0;
+            content: ''; position: absolute; inset: 0;
             background: linear-gradient(180deg,
-                #2a4a7f 0%,
-                #6a6a8a 30%,
-                #c97a5b 55%,
-                #e5b58a 75%,
-                #FAF6EE 100%);
+                #2a4a7f 0%, #6a6a8a 30%, #c97a5b 55%, #e5b58a 75%, #FAF6EE 100%);
             z-index: -1;
         }
+        @keyframes bg-fade-in { from { opacity: 0; } to { opacity: 1; } }
 
-        @keyframes bg-fade-in {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* طبقة مزج علويّة (تخفّف السماء وتدمج مع الصفحة) */
+        /* تظليل أعلى وأسفل لدمج الصورة مع باقي الصفحة */
         .hero-arch-overlay {
-            position: absolute;
-            inset: 0;
-            background:
-                /* تدرّج علوي → اللون مع تخفيف */
-                linear-gradient(180deg,
-                    rgba(250,246,238,.85) 0%,
-                    rgba(250,246,238,.55) 12%,
-                    rgba(250,246,238,.15) 28%,
-                    rgba(250,246,238,.05) 50%,
-                    rgba(250,246,238,.15) 70%,
-                    rgba(250,246,238,.6) 88%,
-                    rgba(250,246,238,1) 100%),
-                /* تدرّج جانبي خفيف */
-                linear-gradient(90deg,
-                    rgba(250,246,238,.25) 0%,
-                    transparent 20%,
-                    transparent 80%,
-                    rgba(250,246,238,.25) 100%);
+            position: absolute; inset: 0;
+            background: linear-gradient(180deg,
+                rgba(250,246,238,.30) 0%,
+                rgba(250,246,238,.05) 18%,
+                rgba(250,246,238,0)    50%,
+                rgba(250,246,238,.20) 78%,
+                rgba(250,246,238,.95) 100%);
             z-index: 1;
         }
 
-        /* فينييت دائري لإبراز المركز */
-        .hero-arch-vignette {
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(ellipse 60% 65% at center,
-                transparent 0%,
-                transparent 45%,
-                rgba(250,246,238,.3) 75%,
-                rgba(250,246,238,.7) 100%);
-            z-index: 2;
-        }
-
-        /* المحتوى */
-        .hero-arch-content {
+        /* ===== المخطوطة / Cartouche ===== */
+        .hero-cartouche {
             position: relative;
             z-index: 3;
-            text-align: center;
-            max-width: 720px;
+            max-width: 640px;
+            width: calc(100% - 2rem);
             margin: 0 auto;
-            padding-top: 1rem;
+            padding: clamp(1.75rem, 3.5vw, 2.75rem) clamp(1.5rem, 4vw, 3rem);
+            text-align: center;
+
+            /* رقعة ورق قديم */
+            background:
+                radial-gradient(ellipse at center top, rgba(255,250,238,.95), rgba(248,240,222,.92) 70%, rgba(238,224,198,.94) 100%);
+            backdrop-filter: blur(14px) saturate(115%);
+            -webkit-backdrop-filter: blur(14px) saturate(115%);
+
+            /* إطار ذهبي مزدوج */
+            border: 1px solid rgba(184,153,104,.55);
+            box-shadow:
+                0 0 0 1px rgba(184,153,104,.15) inset,
+                0 0 0 6px rgba(250,246,238,.55),
+                0 0 0 7px rgba(184,153,104,.35),
+                0 30px 60px -20px rgba(15,27,45,.55),
+                0 12px 24px -10px rgba(15,27,45,.35);
+
+            opacity: 0;
+            animation: cartouche-in 900ms cubic-bezier(.25,.8,.25,1) .25s forwards;
+        }
+        /* زخارف الزوايا */
+        .hero-cartouche::before,
+        .hero-cartouche::after {
+            content: '✦';
+            position: absolute;
+            color: #B89968;
+            font-size: 14px;
+            opacity: .85;
+        }
+        .hero-cartouche::before { top: 10px; right: 12px; }
+        .hero-cartouche::after  { bottom: 10px; left:  12px; }
+
+        @keyframes cartouche-in {
+            from { opacity: 0; transform: translateY(20px) scale(.97); }
+            to   { opacity: 1; transform: none; }
         }
 
         .hero-eyebrow {
             font-family: 'Reem Kufi', sans-serif;
-            font-size: .82rem;
-            letter-spacing: .35em;
+            font-size: .72rem;
+            letter-spacing: .42em;
             color: #6b4423;
-            text-transform: uppercase;
-            margin-bottom: 1rem;
-            text-shadow: 0 1px 3px rgba(250,246,238,1), 0 0 14px rgba(250,246,238,.85);
+            margin: 0 0 1rem;
             opacity: 0;
-            animation: rise-fade 600ms cubic-bezier(.25,.8,.25,1) .8s forwards;
+            animation: rise-fade 500ms ease-out .8s forwards;
         }
-
         .hero-wordmark {
             font-family: 'Reem Kufi', sans-serif;
             font-weight: 700;
-            font-size: clamp(2.6rem, 6.5vw, 4.75rem);
+            font-size: clamp(2.4rem, 6vw, 4rem);
             line-height: 1.05;
             color: #0F1B2D;
-            margin: 0 0 .5rem;
-            text-shadow:
-                0 2px 4px rgba(250,246,238,1),
-                0 0 30px rgba(250,246,238,.9),
-                0 0 60px rgba(250,246,238,.6);
+            margin: 0 0 .4rem;
             opacity: 0;
-            animation: rise-fade 600ms cubic-bezier(.25,.8,.25,1) 1s forwards;
+            animation: rise-fade 500ms ease-out 1s forwards;
         }
         .hero-wordmark .accent {
             color: #B1373F;
             font-family: 'Amiri', serif;
             font-style: italic;
+            margin-right: .15em;
         }
 
         .hero-rule {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 1rem;
-            margin: 1.25rem auto;
-            width: clamp(180px, 25vw, 280px);
+            gap: .9rem;
+            margin: 1rem auto 1.25rem;
+            width: clamp(160px, 25vw, 240px);
             opacity: 0;
-            animation: rise-fade 600ms cubic-bezier(.25,.8,.25,1) 1.2s forwards;
+            animation: rise-fade 500ms ease-out 1.2s forwards;
         }
         .hero-rule::before, .hero-rule::after {
             content: ''; flex: 1; height: 1px;
@@ -156,20 +149,24 @@
             width: 9px; height: 9px;
             border: 1.5px solid #B89968;
             transform: rotate(45deg);
-            background: #FAF6EE;
+            background: rgba(250,246,238,.9);
         }
 
         .hero-tagline {
             font-family: 'Amiri', serif;
             font-style: italic;
-            font-size: clamp(1.1rem, 2vw, 1.3rem);
+            font-size: clamp(1.05rem, 1.9vw, 1.25rem);
             color: #2A3B57;
-            max-width: 50ch;
-            margin: 0 auto 1.5rem;
-            line-height: 1.7;
-            text-shadow: 0 1px 3px rgba(250,246,238,.9);
+            max-width: 42ch;
+            margin: 0 auto 1.25rem;
+            line-height: 1.75;
             opacity: 0;
-            animation: rise-fade 600ms cubic-bezier(.25,.8,.25,1) 1.4s forwards;
+            animation: rise-fade 500ms ease-out 1.4s forwards;
+        }
+        .hero-tagline strong {
+            color: #B1373F;
+            font-style: normal;
+            font-weight: 700;
         }
 
         .hero-origin {
@@ -178,14 +175,13 @@
             gap: .75rem;
             font-family: 'Aref Ruqaa', serif;
             color: #6b4423;
-            font-size: .95rem;
-            margin-bottom: 2rem;
-            text-shadow: 0 1px 2px rgba(250,246,238,1);
+            font-size: .92rem;
+            margin: 0 auto 1.75rem;
             opacity: 0;
-            animation: rise-fade 600ms cubic-bezier(.25,.8,.25,1) 1.6s forwards;
+            animation: rise-fade 500ms ease-out 1.55s forwards;
         }
         .hero-origin::before, .hero-origin::after {
-            content: '◆'; color: #B89968; font-size: .7em;
+            content: '◆'; color: #B89968; font-size: .65em;
         }
 
         .hero-actions {
@@ -194,56 +190,43 @@
             justify-content: center;
             flex-wrap: wrap;
             opacity: 0;
-            animation: rise-fade 600ms cubic-bezier(.25,.8,.25,1) 1.8s forwards;
+            animation: rise-fade 500ms ease-out 1.7s forwards;
         }
 
         .arch-cta {
-            display: inline-flex;
-            align-items: center;
-            gap: .5rem;
+            display: inline-flex; align-items: center; gap: .5rem;
             font-family: 'Reem Kufi', sans-serif;
-            font-weight: 600;
-            font-size: 1rem;
-            padding: 1rem 2.25rem;
-            background: #B1373F;
-            color: #FAF6EE;
+            font-weight: 600; font-size: .98rem;
+            padding: .95rem 2rem;
+            background: #B1373F; color: #FAF6EE;
             text-decoration: none;
-            border: none;
-            cursor: pointer;
+            border: none; cursor: pointer;
             position: relative;
             transition: all 380ms cubic-bezier(.4,0,.2,1);
             border-radius: 2px;
             box-shadow: 0 8px 24px -8px rgba(0,0,0,.35);
         }
         .arch-cta::after {
-            content: '';
-            position: absolute;
-            inset: 0;
+            content: ''; position: absolute; inset: 0;
             border: 1px solid #B89968;
-            transform: translate(6px, 6px);
+            transform: translate(5px, 5px);
             transition: transform 380ms cubic-bezier(.4,0,.2,1);
-            z-index: -1;
-            border-radius: 2px;
+            z-index: -1; border-radius: 2px;
         }
         .arch-cta:hover {
             transform: translate(-2px, -2px);
             box-shadow: 0 14px 32px -8px rgba(177,55,63,.5);
         }
-        .arch-cta:hover::after { transform: translate(3px, 3px); }
+        .arch-cta:hover::after { transform: translate(2px, 2px); }
 
         .arch-ghost {
-            display: inline-flex;
-            align-items: center;
-            gap: .5rem;
+            display: inline-flex; align-items: center; gap: .5rem;
             font-family: 'Reem Kufi', sans-serif;
-            font-size: .95rem;
-            color: #2A3B57;
+            font-size: .92rem; color: #2A3B57;
             background: rgba(250,246,238,.85);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(184,153,104,.5);
-            padding: 1rem 1.75rem;
-            text-decoration: none;
-            cursor: pointer;
+            border: 1px solid rgba(184,153,104,.55);
+            padding: .95rem 1.6rem;
+            text-decoration: none; cursor: pointer;
             transition: all 380ms cubic-bezier(.4,0,.2,1);
             border-radius: 2px;
         }
@@ -254,13 +237,21 @@
         }
 
         @keyframes rise-fade {
-            from { opacity: 0; transform: translateY(14px); }
-            to { opacity: 1; transform: none; }
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: none; }
         }
 
         @media (max-width: 640px) {
-            .hero-arch { min-height: 85vh; padding: 2rem 1rem; }
-            .hero-arch-bg { background-size: 220% auto; background-position: center 35%; }
+            .hero-arch { min-height: 88vh; padding: 2rem 1rem; }
+            .hero-arch-bg { background-size: 240% auto; background-position: center 32%; }
+            .hero-cartouche { padding: 1.5rem 1.25rem; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .hero-arch-bg, .hero-cartouche,
+            .hero-eyebrow, .hero-wordmark, .hero-rule,
+            .hero-tagline, .hero-origin, .hero-actions {
+                animation: none !important; opacity: 1 !important; transform: none !important;
+            }
         }
     </style>
 </head>
@@ -286,16 +277,15 @@
         <section class="hero-arch" aria-labelledby="wordmark">
             <div class="hero-arch-bg"></div>
             <div class="hero-arch-overlay"></div>
-            <div class="hero-arch-vignette"></div>
 
-            <div class="hero-arch-content">
+            <div class="hero-cartouche">
                 <p class="hero-eyebrow">منذ ١٤٤٧ هـ · من طرابلس الغرب</p>
                 <h1 id="wordmark" class="hero-wordmark">
-                    المكتبة <span class="accent">الطيبة</span>
+                    المكتبة<span class="accent">الطيبة</span>
                 </h1>
                 <div class="hero-rule" aria-hidden="true"><span></span></div>
                 <p class="hero-tagline">
-                    من تحت <strong style="color:#B1373F;font-style:normal;">قوس طرابلس</strong>،
+                    من تحت <strong>قوس طرابلس</strong>،
                     حيث الحضارات تتعانق منذ ألفي عام،
                     نفتح أبواب المعرفة لكلّ قارئ عربيّ.
                 </p>
@@ -379,8 +369,8 @@
         </div>
     </footer>
 
-    <script src="js/user-system.js?v=19"></script>
-    <script src="js/homepage-v2.js?v=19"></script>
+    <script src="js/user-system.js?v=20"></script>
+    <script src="js/homepage-v2.js?v=20"></script>
     <script>
         document.getElementById('themeBtn')?.addEventListener('click', () => {
             const c = document.documentElement.getAttribute('data-theme') || 'light';
