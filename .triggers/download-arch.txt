@@ -1,3 +1,5 @@
-trigger: 2026-05-16T14:10:00Z
-purpose: download arch image from user-provided Flickr URL
-source: https://www.flickr.com/photos/libdas_gallery/906095697
+trigger: 2026-05-16T14:11:30Z
+purpose: download Arch of Marcus Aurelius from user-provided Google Photos share
+primary_source: https://photos.app.goo.gl/7AR82c8LNf1rPHy47
+fallback_flickr: https://www.flickr.com/photos/libdas_gallery/906095697
+fallback_wikimedia: API search
