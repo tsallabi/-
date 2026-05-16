@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#2a4a7f">
+    <meta name="theme-color" content="#FAF6EE">
     <title>المكتبة الطيبة — من طرابلس إلى العالم العربي</title>
 
-    <link rel="stylesheet" href="css/design-system.css?v=17">
-    <link rel="stylesheet" href="css/homepage-v2.css?v=17">
+    <link rel="stylesheet" href="css/design-system.css?v=19">
+    <link rel="stylesheet" href="css/homepage-v2.css?v=19">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,127 +16,124 @@
     <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('taybaa-theme') || 'light');</script>
 
     <style>
+        /* الـHero مع صورة قوس ماركوس الحقيقيّة */
         .hero-arch {
             position: relative;
-            min-height: 96vh;
+            min-height: 92vh;
             display: flex;
             flex-direction: column;
-            justify-content: flex-end;
-            padding: 0 0 3rem;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem 1rem 3rem;
             overflow: hidden;
             isolation: isolate;
-            background: linear-gradient(180deg,
-                #2a4a7f 0%,
-                #4a5a8a 25%,
-                #6a6a8a 45%,
-                #b88068 65%,
-                #e5b58a 80%,
-                #f0d8b0 95%,
-                #faf6ee 100%);
+            background-color: #FAF6EE;
         }
 
-        /* غيوم رقيقة في السماء */
+        /* الصورة الحقيقيّة (تُحمَّل من GitHub Action) */
+        .hero-arch-bg {
+            position: absolute;
+            inset: 0;
+            background-image: url("/assets/marcus-arch-hero.jpg");
+            background-size: cover;
+            background-position: center 40%;
+            background-repeat: no-repeat;
+            z-index: 0;
+            animation: bg-fade-in 1.5s ease-out;
+        }
+
+        /* احتياط: تدرّج لوني لو الصورة لم تُحمّل بعد */
         .hero-arch::before {
             content: '';
             position: absolute;
             inset: 0;
-            background-image:
-                radial-gradient(ellipse 200px 30px at 15% 18%, rgba(255,255,255,.25), transparent),
-                radial-gradient(ellipse 180px 25px at 70% 12%, rgba(255,255,255,.30), transparent),
-                radial-gradient(ellipse 220px 35px at 45% 22%, rgba(255,255,255,.20), transparent),
-                radial-gradient(ellipse 150px 22px at 85% 28%, rgba(255,255,255,.22), transparent),
-                radial-gradient(2px 2px at 25% 12%, rgba(255,255,255,.7), transparent),
-                radial-gradient(1.5px 1.5px at 55% 8%, rgba(255,255,255,.6), transparent),
-                radial-gradient(2px 2px at 80% 15%, rgba(255,255,255,.8), transparent);
-            pointer-events: none;
-            z-index: 0;
-            animation: clouds-drift 60s linear infinite;
+            background: linear-gradient(180deg,
+                #2a4a7f 0%,
+                #6a6a8a 30%,
+                #c97a5b 55%,
+                #e5b58a 75%,
+                #FAF6EE 100%);
+            z-index: -1;
         }
 
-        @keyframes clouds-drift {
-            from { background-position: 0 0; }
-            to { background-position: -400px 0; }
+        @keyframes bg-fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
-        .hero-arch-scene {
-            position: relative;
-            width: 100%;
-            max-width: 1400px;
-            margin: 0 auto;
-            z-index: 1;
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-            line-height: 0;
-        }
-
-        .arch-svg {
-            width: 100%;
-            height: auto;
-            filter: drop-shadow(0 12px 24px rgba(0,0,0,.3));
-            opacity: 0;
-            animation: fade-up-scene 1.5s cubic-bezier(.25,.8,.25,1) .3s forwards;
-        }
-
-        @keyframes fade-up-scene {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: none; }
-        }
-
-        .minaret-light {
-            animation: glow-pulse 3s ease-in-out infinite;
-        }
-
-        @keyframes glow-pulse {
-            0%, 100% { opacity: .55; }
-            50% { opacity: 1; }
-        }
-
-        .palm-fronds-anim {
-            transform-origin: 110px 280px;
-            animation: palm-sway 7s ease-in-out infinite;
-        }
-
-        @keyframes palm-sway {
-            0%, 100% { transform: rotate(-1.2deg); }
-            50% { transform: rotate(1.5deg); }
-        }
-
-        /* نصّ فوق المشهد */
-        .hero-arch-content {
+        /* طبقة مزج علويّة (تخفّف السماء وتدمج مع الصفحة) */
+        .hero-arch-overlay {
             position: absolute;
-            top: 8%;
-            left: 0; right: 0;
-            text-align: center;
+            inset: 0;
+            background:
+                /* تدرّج علوي → اللون مع تخفيف */
+                linear-gradient(180deg,
+                    rgba(250,246,238,.85) 0%,
+                    rgba(250,246,238,.55) 12%,
+                    rgba(250,246,238,.15) 28%,
+                    rgba(250,246,238,.05) 50%,
+                    rgba(250,246,238,.15) 70%,
+                    rgba(250,246,238,.6) 88%,
+                    rgba(250,246,238,1) 100%),
+                /* تدرّج جانبي خفيف */
+                linear-gradient(90deg,
+                    rgba(250,246,238,.25) 0%,
+                    transparent 20%,
+                    transparent 80%,
+                    rgba(250,246,238,.25) 100%);
+            z-index: 1;
+        }
+
+        /* فينييت دائري لإبراز المركز */
+        .hero-arch-vignette {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 60% 65% at center,
+                transparent 0%,
+                transparent 45%,
+                rgba(250,246,238,.3) 75%,
+                rgba(250,246,238,.7) 100%);
+            z-index: 2;
+        }
+
+        /* المحتوى */
+        .hero-arch-content {
+            position: relative;
             z-index: 3;
-            padding: 0 1rem;
+            text-align: center;
+            max-width: 720px;
+            margin: 0 auto;
+            padding-top: 1rem;
         }
 
         .hero-eyebrow {
             font-family: 'Reem Kufi', sans-serif;
-            font-size: .8rem;
+            font-size: .82rem;
             letter-spacing: .35em;
-            color: rgba(255,245,220,.95);
+            color: #6b4423;
             text-transform: uppercase;
             margin-bottom: 1rem;
-            text-shadow: 0 2px 8px rgba(0,0,0,.4);
+            text-shadow: 0 1px 3px rgba(250,246,238,1), 0 0 14px rgba(250,246,238,.85);
             opacity: 0;
-            animation: rise-fade 600ms cubic-bezier(.25,.8,.25,1) 1.2s forwards;
+            animation: rise-fade 600ms cubic-bezier(.25,.8,.25,1) .8s forwards;
         }
 
         .hero-wordmark {
             font-family: 'Reem Kufi', sans-serif;
             font-weight: 700;
-            font-size: clamp(2.5rem, 6vw, 4.5rem);
-            line-height: 1;
-            color: #FAF6EE;
-            margin: 0;
-            text-shadow: 0 4px 24px rgba(0,0,0,.5), 0 2px 6px rgba(0,0,0,.3);
+            font-size: clamp(2.6rem, 6.5vw, 4.75rem);
+            line-height: 1.05;
+            color: #0F1B2D;
+            margin: 0 0 .5rem;
+            text-shadow:
+                0 2px 4px rgba(250,246,238,1),
+                0 0 30px rgba(250,246,238,.9),
+                0 0 60px rgba(250,246,238,.6);
             opacity: 0;
-            animation: rise-fade 600ms cubic-bezier(.25,.8,.25,1) 1.4s forwards;
+            animation: rise-fade 600ms cubic-bezier(.25,.8,.25,1) 1s forwards;
         }
         .hero-wordmark .accent {
-            color: #f4d59a;
+            color: #B1373F;
             font-family: 'Amiri', serif;
             font-style: italic;
         }
@@ -146,43 +143,33 @@
             align-items: center;
             justify-content: center;
             gap: 1rem;
-            margin: 1rem auto;
-            width: clamp(180px, 30vw, 280px);
+            margin: 1.25rem auto;
+            width: clamp(180px, 25vw, 280px);
             opacity: 0;
-            animation: rise-fade 600ms cubic-bezier(.25,.8,.25,1) 1.6s forwards;
+            animation: rise-fade 600ms cubic-bezier(.25,.8,.25,1) 1.2s forwards;
         }
         .hero-rule::before, .hero-rule::after {
             content: ''; flex: 1; height: 1px;
-            background: linear-gradient(to right, transparent, #d4af37, transparent);
+            background: linear-gradient(to right, transparent, #B89968, transparent);
         }
         .hero-rule span {
             width: 9px; height: 9px;
-            border: 1px solid #d4af37;
+            border: 1.5px solid #B89968;
             transform: rotate(45deg);
-        }
-
-        @keyframes rise-fade {
-            from { opacity: 0; transform: translateY(14px); }
-            to { opacity: 1; transform: none; }
-        }
-
-        /* نصّ بعد المشهد */
-        .hero-arch-footer {
-            position: relative;
-            z-index: 4;
-            background: var(--bg);
-            padding: 3rem 1rem 2rem;
-            text-align: center;
+            background: #FAF6EE;
         }
 
         .hero-tagline {
             font-family: 'Amiri', serif;
             font-style: italic;
-            font-size: clamp(1.1rem, 2.2vw, 1.4rem);
-            color: var(--text);
-            max-width: 56ch;
+            font-size: clamp(1.1rem, 2vw, 1.3rem);
+            color: #2A3B57;
+            max-width: 50ch;
             margin: 0 auto 1.5rem;
             line-height: 1.7;
+            text-shadow: 0 1px 3px rgba(250,246,238,.9);
+            opacity: 0;
+            animation: rise-fade 600ms cubic-bezier(.25,.8,.25,1) 1.4s forwards;
         }
 
         .hero-origin {
@@ -190,12 +177,15 @@
             align-items: center;
             gap: .75rem;
             font-family: 'Aref Ruqaa', serif;
-            color: var(--text-muted);
+            color: #6b4423;
             font-size: .95rem;
             margin-bottom: 2rem;
+            text-shadow: 0 1px 2px rgba(250,246,238,1);
+            opacity: 0;
+            animation: rise-fade 600ms cubic-bezier(.25,.8,.25,1) 1.6s forwards;
         }
         .hero-origin::before, .hero-origin::after {
-            content: '◆'; color: var(--gold-line); font-size: .7em;
+            content: '◆'; color: #B89968; font-size: .7em;
         }
 
         .hero-actions {
@@ -203,6 +193,8 @@
             gap: 1rem;
             justify-content: center;
             flex-wrap: wrap;
+            opacity: 0;
+            animation: rise-fade 600ms cubic-bezier(.25,.8,.25,1) 1.8s forwards;
         }
 
         .arch-cta {
@@ -221,12 +213,13 @@
             position: relative;
             transition: all 380ms cubic-bezier(.4,0,.2,1);
             border-radius: 2px;
+            box-shadow: 0 8px 24px -8px rgba(0,0,0,.35);
         }
         .arch-cta::after {
             content: '';
             position: absolute;
             inset: 0;
-            border: 1px solid #b89968;
+            border: 1px solid #B89968;
             transform: translate(6px, 6px);
             transition: transform 380ms cubic-bezier(.4,0,.2,1);
             z-index: -1;
@@ -234,7 +227,7 @@
         }
         .arch-cta:hover {
             transform: translate(-2px, -2px);
-            box-shadow: 0 10px 28px -8px rgba(177,55,63,.4);
+            box-shadow: 0 14px 32px -8px rgba(177,55,63,.5);
         }
         .arch-cta:hover::after { transform: translate(3px, 3px); }
 
@@ -244,9 +237,10 @@
             gap: .5rem;
             font-family: 'Reem Kufi', sans-serif;
             font-size: .95rem;
-            color: var(--text);
-            background: transparent;
-            border: 1px solid var(--border-strong);
+            color: #2A3B57;
+            background: rgba(250,246,238,.85);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(184,153,104,.5);
             padding: 1rem 1.75rem;
             text-decoration: none;
             cursor: pointer;
@@ -254,19 +248,19 @@
             border-radius: 2px;
         }
         .arch-ghost:hover {
-            background: var(--bg-subtle);
-            border-color: var(--gold-line);
+            background: rgba(250,246,238,1);
+            border-color: #B89968;
+            transform: translateY(-1px);
+        }
+
+        @keyframes rise-fade {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: none; }
         }
 
         @media (max-width: 640px) {
-            .hero-arch-content { top: 5%; }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .hero-arch *, .hero-arch *::before {
-                animation-duration: .01ms !important;
-                animation-iteration-count: 1 !important;
-            }
+            .hero-arch { min-height: 85vh; padding: 2rem 1rem; }
+            .hero-arch-bg { background-size: 220% auto; background-position: center 35%; }
         }
     </style>
 </head>
@@ -290,348 +284,26 @@
 
     <main>
         <section class="hero-arch" aria-labelledby="wordmark">
-            <!-- النصّ فوق -->
+            <div class="hero-arch-bg"></div>
+            <div class="hero-arch-overlay"></div>
+            <div class="hero-arch-vignette"></div>
+
             <div class="hero-arch-content">
                 <p class="hero-eyebrow">منذ ١٤٤٧ هـ · من طرابلس الغرب</p>
                 <h1 id="wordmark" class="hero-wordmark">
                     المكتبة <span class="accent">الطيبة</span>
                 </h1>
                 <div class="hero-rule" aria-hidden="true"><span></span></div>
-            </div>
-
-            <!-- المشهد المعماري المُصحّح -->
-            <div class="hero-arch-scene" aria-hidden="true">
-                <svg class="arch-svg" viewBox="0 0 1400 600" preserveAspectRatio="xMidYEnd meet">
-                    <defs>
-                        <!-- حجارة القوس -->
-                        <linearGradient id="stone-main" x1="0" x2="0" y1="0" y2="1">
-                            <stop offset="0" stop-color="#e8d4a8"/>
-                            <stop offset=".4" stop-color="#c8a572"/>
-                            <stop offset="1" stop-color="#9a7440"/>
-                        </linearGradient>
-                        <linearGradient id="stone-shadow" x1="0" x2="0" y1="0" y2="1">
-                            <stop offset="0" stop-color="#b89865"/>
-                            <stop offset="1" stop-color="#6b4423"/>
-                        </linearGradient>
-                        <linearGradient id="stone-bright" x1="0" x2="0" y1="0" y2="1">
-                            <stop offset="0" stop-color="#f4e2b8"/>
-                            <stop offset="1" stop-color="#d4b888"/>
-                        </linearGradient>
-                        <!-- داخل القوس (مظلم) -->
-                        <linearGradient id="arch-inside" x1="0" x2="0" y1="0" y2="1">
-                            <stop offset="0" stop-color="#3a2412"/>
-                            <stop offset=".6" stop-color="#5a3a1a"/>
-                            <stop offset="1" stop-color="#8b5a2b"/>
-                        </linearGradient>
-                        <!-- مباني -->
-                        <linearGradient id="bldg-yellow" x1="0" x2="0" y1="0" y2="1">
-                            <stop offset="0" stop-color="#e8d088"/>
-                            <stop offset="1" stop-color="#c8a460"/>
-                        </linearGradient>
-                        <linearGradient id="bldg-white" x1="0" x2="0" y1="0" y2="1">
-                            <stop offset="0" stop-color="#faf0d8"/>
-                            <stop offset="1" stop-color="#d4c0a0"/>
-                        </linearGradient>
-                        <!-- نباتات -->
-                        <linearGradient id="leaves" x1="0" x2="0" y1="0" y2="1">
-                            <stop offset="0" stop-color="#5a7a3a"/>
-                            <stop offset="1" stop-color="#3d5a26"/>
-                        </linearGradient>
-                    </defs>
-
-                    <!-- ═══ المباني الخلفيّة (طرابلس القديمة) ═══ -->
-                    <g class="background-buildings" opacity=".85">
-                        <!-- مبنى أصفر يسار -->
-                        <rect x="180" y="380" width="180" height="180" fill="url(#bldg-yellow)"/>
-                        <rect x="180" y="375" width="180" height="8" fill="#a88547"/>
-                        <!-- نوافذ -->
-                        <g fill="#5a3a1a">
-                            <rect x="200" y="410" width="22" height="32"/>
-                            <rect x="240" y="410" width="22" height="32"/>
-                            <rect x="280" y="410" width="22" height="32"/>
-                            <rect x="320" y="410" width="22" height="32"/>
-                            <rect x="200" y="460" width="22" height="32"/>
-                            <rect x="240" y="460" width="22" height="32"/>
-                            <rect x="280" y="460" width="22" height="32"/>
-                            <rect x="320" y="460" width="22" height="32"/>
-                            <rect x="200" y="510" width="22" height="32"/>
-                            <rect x="240" y="510" width="22" height="32"/>
-                            <rect x="280" y="510" width="22" height="32"/>
-                            <rect x="320" y="510" width="22" height="32"/>
-                        </g>
-                        <!-- إطارات النوافذ بيضاء -->
-                        <g fill="none" stroke="#fff" stroke-width="2" opacity=".9">
-                            <rect x="200" y="410" width="22" height="32"/>
-                            <rect x="240" y="410" width="22" height="32"/>
-                            <rect x="280" y="410" width="22" height="32"/>
-                            <rect x="320" y="410" width="22" height="32"/>
-                            <rect x="200" y="460" width="22" height="32"/>
-                            <rect x="240" y="460" width="22" height="32"/>
-                            <rect x="280" y="460" width="22" height="32"/>
-                            <rect x="320" y="460" width="22" height="32"/>
-                        </g>
-
-                        <!-- مبنى أبيض يمين -->
-                        <rect x="1050" y="350" width="200" height="210" fill="url(#bldg-white)"/>
-                        <rect x="1050" y="345" width="200" height="9" fill="#a88547"/>
-                        <g fill="#5a3a1a">
-                            <rect x="1070" y="385" width="24" height="34"/>
-                            <rect x="1110" y="385" width="24" height="34"/>
-                            <rect x="1150" y="385" width="24" height="34"/>
-                            <rect x="1190" y="385" width="24" height="34"/>
-                            <rect x="1070" y="440" width="24" height="34"/>
-                            <rect x="1110" y="440" width="24" height="34"/>
-                            <rect x="1150" y="440" width="24" height="34"/>
-                            <rect x="1190" y="440" width="24" height="34"/>
-                            <rect x="1070" y="495" width="24" height="34"/>
-                            <rect x="1110" y="495" width="24" height="34"/>
-                            <rect x="1150" y="495" width="24" height="34"/>
-                            <rect x="1190" y="495" width="24" height="34"/>
-                        </g>
-                        <g fill="none" stroke="#fff" stroke-width="2" opacity=".9">
-                            <rect x="1070" y="385" width="24" height="34"/>
-                            <rect x="1110" y="385" width="24" height="34"/>
-                            <rect x="1150" y="385" width="24" height="34"/>
-                            <rect x="1190" y="385" width="24" height="34"/>
-                        </g>
-                    </g>
-
-                    <!-- ═══ المئذنة العثمانيّة (خلف القوس) ═══ -->
-                    <g class="minaret" transform="translate(750, 0)">
-                        <!-- البرج الأساسي -->
-                        <rect x="-12" y="220" width="24" height="200" fill="url(#stone-bright)"/>
-                        <!-- نقش الحجارة -->
-                        <g stroke="#a88547" stroke-width=".5" opacity=".4">
-                            <line x1="-12" y1="260" x2="12" y2="260"/>
-                            <line x1="-12" y1="300" x2="12" y2="300"/>
-                            <line x1="-12" y1="340" x2="12" y2="340"/>
-                            <line x1="-12" y1="380" x2="12" y2="380"/>
-                        </g>
-                        <!-- الشرفة الأولى -->
-                        <rect x="-20" y="215" width="40" height="8" fill="url(#stone-bright)"/>
-                        <rect x="-18" y="212" width="36" height="3" fill="#a88547"/>
-                        <!-- الجزء الأوسط (أرفع) -->
-                        <rect x="-9" y="160" width="18" height="55" fill="url(#stone-bright)"/>
-                        <!-- الشرفة الثانية -->
-                        <rect x="-16" y="155" width="32" height="6" fill="url(#stone-bright)"/>
-                        <rect x="-14" y="152" width="28" height="3" fill="#a88547"/>
-                        <!-- الجزء العلوي -->
-                        <rect x="-7" y="110" width="14" height="45" fill="url(#stone-bright)"/>
-                        <!-- السقف المخروطي -->
-                        <path d="M-10 110 L0 75 L10 110 Z" fill="url(#stone-main)"/>
-                        <!-- الإبرة -->
-                        <line x1="0" y1="75" x2="0" y2="50" stroke="#a88547" stroke-width="1.5"/>
-                        <circle cx="0" cy="50" r="3" fill="#d4af37"/>
-                        <!-- الهلال -->
-                        <path d="M0 45 Q5 45 4 41 Q0 47 0 45" fill="#d4af37"/>
-                        <!-- ضوء المئذنة -->
-                        <circle class="minaret-light" cx="0" cy="180" r="5" fill="#fff" opacity=".7"/>
-                        <circle class="minaret-light" cx="0" cy="180" r="12" fill="#fff" opacity=".25"/>
-                    </g>
-
-                    <!-- ═══════════════════════════════════════════════════════
-                         قوس ماركوس أوريليوس (Quadrifrons - cubic Roman arch)
-                         ═══════════════════════════════════════════════════════ -->
-                    <g class="marcus-arch" transform="translate(700, 0)">
-
-                        <!-- الكتلة العلويّة (Attic Story) -->
-                        <rect x="-150" y="180" width="300" height="80" fill="url(#stone-main)"/>
-                        <!-- نقش الحجارة العلويّة -->
-                        <g stroke="#8b6630" stroke-width=".8" opacity=".5" fill="none">
-                            <line x1="-150" y1="220" x2="150" y2="220"/>
-                            <line x1="-100" y1="180" x2="-100" y2="260"/>
-                            <line x1="-50" y1="180" x2="-50" y2="260"/>
-                            <line x1="0" y1="180" x2="0" y2="260"/>
-                            <line x1="50" y1="180" x2="50" y2="260"/>
-                            <line x1="100" y1="180" x2="100" y2="260"/>
-                        </g>
-
-                        <!-- الكورنيش الأوسط (Cornice) -->
-                        <rect x="-155" y="260" width="310" height="12" fill="url(#stone-bright)"/>
-                        <rect x="-160" y="272" width="320" height="6" fill="url(#stone-shadow)"/>
-
-                        <!-- زخارف على الكورنيش (Roman dentil molding) -->
-                        <g fill="#8b6630" opacity=".7">
-                            <rect x="-145" y="264" width="4" height="6"/>
-                            <rect x="-130" y="264" width="4" height="6"/>
-                            <rect x="-115" y="264" width="4" height="6"/>
-                            <rect x="-100" y="264" width="4" height="6"/>
-                            <rect x="-85" y="264" width="4" height="6"/>
-                            <rect x="-70" y="264" width="4" height="6"/>
-                            <rect x="-55" y="264" width="4" height="6"/>
-                            <rect x="-40" y="264" width="4" height="6"/>
-                            <rect x="-25" y="264" width="4" height="6"/>
-                            <rect x="-10" y="264" width="4" height="6"/>
-                            <rect x="5" y="264" width="4" height="6"/>
-                            <rect x="20" y="264" width="4" height="6"/>
-                            <rect x="35" y="264" width="4" height="6"/>
-                            <rect x="50" y="264" width="4" height="6"/>
-                            <rect x="65" y="264" width="4" height="6"/>
-                            <rect x="80" y="264" width="4" height="6"/>
-                            <rect x="95" y="264" width="4" height="6"/>
-                            <rect x="110" y="264" width="4" height="6"/>
-                            <rect x="125" y="264" width="4" height="6"/>
-                        </g>
-
-                        <!-- الكتلة الرئيسيّة (Main Block) -->
-                        <rect x="-150" y="278" width="300" height="260" fill="url(#stone-main)"/>
-
-                        <!-- نقش الحجارة الكبيرة (Ashlar masonry) -->
-                        <g stroke="#8b6630" stroke-width=".8" opacity=".4" fill="none">
-                            <!-- صفوف أفقيّة -->
-                            <line x1="-150" y1="318" x2="150" y2="318"/>
-                            <line x1="-150" y1="358" x2="150" y2="358"/>
-                            <line x1="-150" y1="398" x2="150" y2="398"/>
-                            <line x1="-150" y1="438" x2="150" y2="438"/>
-                            <line x1="-150" y1="478" x2="150" y2="478"/>
-                            <line x1="-150" y1="518" x2="150" y2="518"/>
-                            <!-- أعمدة (الأطراف فقط، لإظهار الـpilasters) -->
-                            <line x1="-110" y1="278" x2="-110" y2="538"/>
-                            <line x1="110" y1="278" x2="110" y2="538"/>
-                            <!-- حجارة أصغر داخل المنطقة المسطّحة -->
-                            <line x1="-80" y1="278" x2="-80" y2="290"/>
-                            <line x1="-30" y1="278" x2="-30" y2="290"/>
-                            <line x1="30" y1="278" x2="30" y2="290"/>
-                            <line x1="80" y1="278" x2="80" y2="290"/>
-                        </g>
-
-                        <!-- العمود المسطّح الأيسر (Pilaster) -->
-                        <rect x="-148" y="278" width="38" height="260" fill="url(#stone-main)"/>
-                        <line x1="-110" y1="278" x2="-110" y2="538" stroke="#8b6630" stroke-width="1" opacity=".5"/>
-                        <!-- تاج العمود الأيسر (Capital) -->
-                        <rect x="-152" y="290" width="46" height="14" fill="url(#stone-bright)"/>
-                        <!-- قاعدة العمود الأيسر (Base) -->
-                        <rect x="-152" y="510" width="46" height="14" fill="url(#stone-shadow)"/>
-                        <rect x="-156" y="524" width="54" height="14" fill="url(#stone-main)"/>
-
-                        <!-- العمود المسطّح الأيمن (Pilaster) -->
-                        <rect x="110" y="278" width="38" height="260" fill="url(#stone-main)"/>
-                        <line x1="110" y1="278" x2="110" y2="538" stroke="#8b6630" stroke-width="1" opacity=".5"/>
-                        <rect x="106" y="290" width="46" height="14" fill="url(#stone-bright)"/>
-                        <rect x="106" y="510" width="46" height="14" fill="url(#stone-shadow)"/>
-                        <rect x="102" y="524" width="54" height="14" fill="url(#stone-main)"/>
-
-                        <!-- ═══ القوس نفسه (Arch Opening) ═══ -->
-                        <!-- الفراغ المظلم داخل القوس -->
-                        <path d="M-100 538 L-100 410 Q-100 320 0 320 Q100 320 100 410 L100 538 Z"
-                              fill="url(#arch-inside)"/>
-
-                        <!-- إطار القوس (Voussoirs - keystone arch) -->
-                        <path d="M-105 410 Q-105 315 0 315 Q105 315 105 410 L100 410 Q100 320 0 320 Q-100 320 -100 410 Z"
-                              fill="url(#stone-bright)"/>
-
-                        <!-- المفتاح الأوسط (Keystone) -->
-                        <path d="M-12 315 L-6 305 L6 305 L12 315 L8 320 L-8 320 Z" fill="url(#stone-bright)"/>
-                        <rect x="-8" y="305" width="16" height="6" fill="url(#stone-shadow)" opacity=".5"/>
-
-                        <!-- خطوط الفسيفساء الحجريّة على القوس -->
-                        <g stroke="#8b6630" stroke-width="1" opacity=".6" fill="none">
-                            <line x1="-100" y1="410" x2="-105" y2="410"/>
-                            <line x1="-95" y1="370" x2="-100" y2="365"/>
-                            <line x1="-80" y1="340" x2="-85" y2="335"/>
-                            <line x1="-55" y1="320" x2="-60" y2="315"/>
-                            <line x1="-25" y1="316" x2="-28" y2="311"/>
-                            <line x1="25" y1="316" x2="28" y2="311"/>
-                            <line x1="55" y1="320" x2="60" y2="315"/>
-                            <line x1="80" y1="340" x2="85" y2="335"/>
-                            <line x1="95" y1="370" x2="100" y2="365"/>
-                            <line x1="100" y1="410" x2="105" y2="410"/>
-                        </g>
-
-                        <!-- إطار سفلي (Plinth) - الأرضيّة -->
-                        <rect x="-160" y="538" width="320" height="22" fill="url(#stone-shadow)"/>
-                        <rect x="-165" y="558" width="330" height="6" fill="url(#stone-main)"/>
-
-                        <!-- نقوش تزيينيّة على الكتلة الرئيسيّة (لمحة Victory reliefs) -->
-                        <g opacity=".25">
-                            <circle cx="-130" cy="380" r="3" fill="#8b6630"/>
-                            <circle cx="130" cy="380" r="3" fill="#8b6630"/>
-                            <circle cx="-130" cy="460" r="3" fill="#8b6630"/>
-                            <circle cx="130" cy="460" r="3" fill="#8b6630"/>
-                        </g>
-                    </g>
-
-                    <!-- ═══ النخلة (يسار) ═══ -->
-                    <g class="palm-tree" transform="translate(80, 0)">
-                        <!-- الجذع -->
-                        <path d="M30 560 Q34 480 30 380 Q27 360 32 340"
-                              stroke="#5a3a1a" stroke-width="9" fill="none" stroke-linecap="round"/>
-                        <!-- نقش الجذع -->
-                        <g stroke="#3a2412" stroke-width="1.5" opacity=".7" fill="none">
-                            <path d="M27 410 Q33 412 36 410"/>
-                            <path d="M27 435 Q33 437 36 435"/>
-                            <path d="M27 460 Q33 462 36 460"/>
-                            <path d="M27 485 Q33 487 36 485"/>
-                            <path d="M27 510 Q33 512 36 510"/>
-                            <path d="M27 535 Q33 537 36 535"/>
-                        </g>
-                        <!-- السعف -->
-                        <g class="palm-fronds-anim">
-                            <path d="M30 340 Q-10 325 -40 335 Q-5 310 30 325" fill="url(#leaves)"/>
-                            <path d="M30 340 Q70 325 100 335 Q65 310 30 325" fill="url(#leaves)"/>
-                            <path d="M30 340 Q-15 295 -45 270 Q5 290 30 322" fill="url(#leaves)"/>
-                            <path d="M30 340 Q75 295 105 270 Q55 290 30 322" fill="url(#leaves)"/>
-                            <path d="M30 340 Q20 285 25 250 Q30 285 30 322" fill="url(#leaves)"/>
-                            <path d="M30 340 Q40 285 35 250 Q30 285 30 322" fill="url(#leaves)"/>
-                            <!-- ثمار التمر -->
-                            <circle cx="22" cy="343" r="2.5" fill="#d4af37"/>
-                            <circle cx="28" cy="340" r="2.5" fill="#b8941f"/>
-                            <circle cx="34" cy="340" r="2.5" fill="#d4af37"/>
-                            <circle cx="40" cy="343" r="2.5" fill="#b8941f"/>
-                        </g>
-                    </g>
-
-                    <!-- ═══ النباتات في الواجهة (يسار) ═══ -->
-                    <g class="foreground-plants-left">
-                        <!-- شجيرات -->
-                        <ellipse cx="450" cy="585" rx="55" ry="22" fill="url(#leaves)"/>
-                        <ellipse cx="380" cy="590" rx="40" ry="18" fill="#5a7a3a" opacity=".8"/>
-                        <!-- زهور -->
-                        <circle cx="430" cy="572" r="3" fill="#B1373F"/>
-                        <circle cx="445" cy="568" r="3" fill="#f4d59a"/>
-                        <circle cx="465" cy="570" r="3" fill="#B1373F"/>
-                        <circle cx="475" cy="565" r="3" fill="#f4d59a"/>
-                        <circle cx="490" cy="568" r="3" fill="#B1373F"/>
-                    </g>
-
-                    <!-- ═══ النباتات في الواجهة (يمين) ═══ -->
-                    <g class="foreground-plants-right">
-                        <ellipse cx="970" cy="585" rx="55" ry="22" fill="url(#leaves)"/>
-                        <ellipse cx="1040" cy="590" rx="40" ry="18" fill="#5a7a3a" opacity=".8"/>
-                        <circle cx="950" cy="572" r="3" fill="#f4d59a"/>
-                        <circle cx="965" cy="568" r="3" fill="#B1373F"/>
-                        <circle cx="985" cy="570" r="3" fill="#f4d59a"/>
-                        <circle cx="995" cy="565" r="3" fill="#B1373F"/>
-                        <circle cx="1010" cy="568" r="3" fill="#f4d59a"/>
-                    </g>
-
-                    <!-- ═══ الرصيف الحجري في الواجهة ═══ -->
-                    <g class="stone-path" opacity=".55">
-                        <polygon points="540,570 860,570 880,600 520,600" fill="#9a7440"/>
-                        <!-- خطوط البلاط -->
-                        <g stroke="#5a3a1a" stroke-width=".8" opacity=".6">
-                            <line x1="560" y1="580" x2="840" y2="580"/>
-                            <line x1="550" y1="590" x2="850" y2="590"/>
-                            <line x1="620" y1="570" x2="615" y2="600"/>
-                            <line x1="700" y1="570" x2="700" y2="600"/>
-                            <line x1="780" y1="570" x2="785" y2="600"/>
-                        </g>
-                    </g>
-                </svg>
-            </div>
-        </section>
-
-        <!-- ═══════ النصّ ═══════ -->
-        <section class="hero-arch-footer">
-            <p class="hero-tagline">
-                من تحت <strong style="color:var(--indian-red,#B1373F);font-style:normal;">قوس طرابلس</strong>،
-                حيث الحضارات تتعانق منذ ألفي عام،
-                نفتح أبواب المعرفة لكلّ قارئ عربيّ.
-            </p>
-            <p class="hero-origin">🇱🇾 من ليبيا · إلى الوطن العربيّ</p>
-            <div class="hero-actions">
-                <a href="#shelves" class="arch-cta">📚 ادخل المكتبة</a>
-                <button class="arch-ghost" id="surpriseBtn" type="button">🎲 فاجئني بكتاب</button>
+                <p class="hero-tagline">
+                    من تحت <strong style="color:#B1373F;font-style:normal;">قوس طرابلس</strong>،
+                    حيث الحضارات تتعانق منذ ألفي عام،
+                    نفتح أبواب المعرفة لكلّ قارئ عربيّ.
+                </p>
+                <p class="hero-origin">🇱🇾 من ليبيا · إلى الوطن العربيّ</p>
+                <div class="hero-actions">
+                    <a href="#shelves" class="arch-cta">📚 ادخل المكتبة</a>
+                    <button class="arch-ghost" id="surpriseBtn" type="button">🎲 فاجئني بكتاب</button>
+                </div>
             </div>
         </section>
 
@@ -707,8 +379,8 @@
         </div>
     </footer>
 
-    <script src="js/user-system.js?v=17"></script>
-    <script src="js/homepage-v2.js?v=17"></script>
+    <script src="js/user-system.js?v=19"></script>
+    <script src="js/homepage-v2.js?v=19"></script>
     <script>
         document.getElementById('themeBtn')?.addEventListener('click', () => {
             const c = document.documentElement.getAttribute('data-theme') || 'light';
