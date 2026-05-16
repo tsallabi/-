@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#FAF6EE">
+    <title>المكتبة الطيبة — واحة المعرفة</title>
+    <meta name="description" content="أكبر مكتبة عربيّة أونلاين — رفيقك في العلم والثقافة">
+
+    <link rel="stylesheet" href="css/design-system.css?v=14">
+    <link rel="stylesheet" href="css/homepage-v2.css?v=14">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Cairo:wght@400;600;700&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('taybaa-theme') || 'light');</script>
+</head>
+<body>
+
+    <!-- ===== الهيدر ===== -->
+    <header class="site-header-luxury" style="position:sticky;top:0;z-index:50;backdrop-filter:blur(16px);background:color-mix(in srgb, var(--bg-elevated) 90%, transparent);border-bottom:1px solid var(--border);padding:1rem 0;">
+        <div class="container" style="display:flex;align-items:center;gap:1rem;">
+            <a href="index.html" style="display:flex;align-items:center;gap:.75rem;text-decoration:none;color:var(--text);">
+                <span style="width:42px;height:42px;border-radius:10px;background:var(--ink-900);color:var(--parchment-100);display:grid;place-items:center;font-family:'Reem Kufi',sans-serif;font-weight:700;font-size:1.2rem;">ط</span>
+                <div style="line-height:1.1;">
+                    <div style="font-family:'Reem Kufi',sans-serif;font-weight:700;font-size:1.15rem;">المكتبة الطيبة</div>
+                    <div style="font-size:.7rem;color:var(--text-muted);letter-spacing:.15em;">TAYBAA LIBRARY</div>
+                </div>
+            </a>
+            <div style="flex:1;"></div>
+            <input class="input input-search" type="search" placeholder="ابحث عن كتاب، مؤلف، أو موضوع..." style="max-width:340px;" id="searchInput">
+            <a href="favorites.html" class="btn btn-ghost" title="مفضّلتي">♥</a>
+            <button class="btn btn-ghost" id="themeBtn" title="تبديل الوضع" type="button">🌙</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- ===== البطل ===== -->
+        <section class="hero-luxury">
+            <div class="container">
+                <p class="hero-greeting" id="greeting">أهلاً بك</p>
+                <h1 class="hero-title">
+                    واحة المعرفة
+                    <br>
+                    <span class="hero-title-accent">في صحراء العصر</span>
+                </h1>
+                <p class="hero-tagline">
+                    رفيقك في العلم · مستودع أفكارك · معلّمك الصامت
+                </p>
+                <div class="hero-actions">
+                    <a href="#shelves" class="btn btn-primary btn-lg">📚 ابدأ التصفّح</a>
+                    <button id="surpriseBtn" class="btn btn-lg" type="button">🎲 فاجئني بكتاب</button>
+                </div>
+
+                <!-- الإحصائيّات -->
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <b id="statBooks">0</b>
+                        <span>كتاباً موثّقاً</span>
+                    </div>
+                    <div class="stat-item">
+                        <b id="statCategories">0</b>
+                        <span>فرعاً علميّاً</span>
+                    </div>
+                    <div class="stat-item">
+                        <b id="statReaders">0</b>
+                        <span>قارئاً نشطاً</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== حكمة اليوم ===== -->
+        <section style="padding:2rem 0;">
+            <div class="container">
+                <div id="dailyQuote"></div>
+            </div>
+        </section>
+
+        <!-- ===== الرحلات القرائيّة ===== -->
+        <section class="section-luxury alt" id="journeys">
+            <div class="container">
+                <div class="section-title">
+                    <span class="gold-mark">❆</span>
+                    <div>
+                        <h2>رحلات قرائيّة منّسّقة</h2>
+                        <p class="section-subtitle">مسارات مدروسة عبر عدّة كتب لتغوص في موضوع بعمق</p>
+                    </div>
+                </div>
+                <div class="journeys-grid" id="journeysGrid">
+                    <div class="journey-card"><div class="journey-icon">⏳</div><div>جارٍ التحميل...</div></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== أفضل الكتب ===== -->
+        <section class="section-luxury" id="shelves">
+            <div class="container">
+                <div class="section-title">
+                    <span class="gold-mark">❆</span>
+                    <div>
+                        <h2>أفضل كتب المكتبة</h2>
+                        <p class="section-subtitle">اختيارات توصّ بها الـ<strong style="color:var(--indian-red)">12 ألف</strong> قارئ الأسبوع الماضي</p>
+                    </div>
+                </div>
+                <div class="featured-shelf" id="featuredBooks">
+                    <div class="book-spine"><div class="book-spine-cover"></div><div class="book-spine-info"><div class="book-spine-title">جارٍ التحميل...</div></div></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== الأقسام ===== -->
+        <section class="section-luxury alt" id="categories">
+            <div class="container">
+                <div class="section-title">
+                    <span class="gold-mark">❆</span>
+                    <div>
+                        <h2>تصفّح حسب الفرع</h2>
+                        <p class="section-subtitle">14 فرعاً علميّاً وأدبيّاً</p>
+                    </div>
+                </div>
+                <div class="categories-luxury-grid" id="categoriesGrid"></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===== التذييل ===== -->
+    <footer style="padding:3rem 0 2rem;border-top:1px solid var(--border);margin-top:4rem;background:var(--bg-elevated);text-align:center;">
+        <div class="container">
+            <div class="gold-divider-ornate" style="max-width:300px;margin:0 auto 1.5rem;">
+                <span class="gold-divider-ornate-symbol">❆</span>
+            </div>
+            <p class="font-amiri" style="color:var(--text-muted);margin:0 0 1rem;font-size:1.1rem;">
+                "وما حيّ إلا في عدوّائه"
+            </p>
+            <p style="font-size:.85rem;color:var(--text-soft);margin:0;">
+                © <span id="year">2026</span> المكتبة الطيبة · مشروع مجانيّ لخدمة العلم والثقافة العربيّة
+            </p>
+        </div>
+    </footer>
+
+    <script src="js/user-system.js?v=14"></script>
+    <script src="js/homepage-v2.js?v=14"></script>
+    <script>
+        // التثيم
+        document.getElementById('themeBtn')?.addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme') || 'light';
+            const next = current === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('taybaa-theme', next);
+        });
+
+        // البحث
+        document.getElementById('searchInput')?.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && e.target.value.trim()) {
+                location.href = 'index-old.html?q=' + encodeURIComponent(e.target.value);
+            }
+        });
+
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>
