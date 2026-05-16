@@ -27,35 +27,33 @@
   ];
 
   const HL_COLORS = [
-    { id: 'yellow', hex: '#FBE16C', label: 'أصفر مخطوطات — مهم',      alpha: 'rgba(251,225,108,.5)'  },
-    { id: 'green',  hex: '#9CCBA0', label: 'أخضر نعنع — للحفظ',       alpha: 'rgba(156,203,160,.5)'  },
-    { id: 'blue',   hex: '#9CC2E3', label: 'أزرق سماوي — تساؤل',     alpha: 'rgba(156,194,227,.5)'  },
-    { id: 'red',    hex: '#E3786B', label: 'أحمر فاقع — اعتراض',     alpha: 'rgba(227,120,107,.5)'  }
+    { id: 'yellow', hex: '#FBE16C', label: 'أصفر مخطوطات — مهم',  alpha: 'rgba(251,225,108,.5)' },
+    { id: 'green',  hex: '#9CCBA0', label: 'أخضر نعنع — للحفظ',   alpha: 'rgba(156,203,160,.5)' },
+    { id: 'blue',   hex: '#9CC2E3', label: 'أزرق سماوي — تساؤل',  alpha: 'rgba(156,194,227,.5)' },
+    { id: 'red',    hex: '#E3786B', label: 'أحمر فاقع — اعتراض',  alpha: 'rgba(227,120,107,.5)' }
   ];
 
   const PDFJS_SRC    = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
   const PDFJS_WORKER = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
   /* ─── State ────────────────────────────────────────────────── */
-  let pdfDoc     = null;
-  let currentPage = 1;
-  let totalPages  = 0;
-  let scale       = 1.5;
-  let rendering   = false;
-  let bookId      = '';
-  let bookTitle   = '';
-  let bookAuthor  = '';
-  let themeIdx    = 0;
-  let focusMode   = false;
-  let pendingSelection = null;  // { text, rects } for highlight
-  let pendingNoteCtx  = null;  // same but for note
-  let readingSeconds  = 0;
-  let readingTimer    = null;
-  let currentPdfPage  = null;  // pdf page object for thumbnails
-  let sidebarOpen     = false;
-  let activeSideTab   = 'bookmarks';
+  let pdfDoc        = null;
+  let currentPage   = 1;
+  let totalPages    = 0;
+  let scale         = 1.5;
+  let rendering     = false;
+  let bookId        = '';
+  let bookTitle     = '';
+  let bookAuthor    = '';
+  let themeIdx      = 0;
+  let focusMode     = false;
+  let pendingSelection = null;
+  let pendingNoteCtx   = null;
+  let readingTimer  = null;
+  let sidebarOpen   = false;
+  let activeSideTab = 'bookmarks';
 
-  /* ─── DOM refs (populated in init) ────────────────────────── */
+  /* ─── DOM refs ─────────────────────────────────────────────── */
   let canvas, ctx, textLayerDiv, pdfWrapper;
   let progressBar, barTitle, barAuthor, pageInput, totalPagesEl;
   let prevBtn, nextBtn, zoomInBtn, zoomOutBtn, zoomLabel;
@@ -63,7 +61,7 @@
   let sidebarPanel, sidebarTabs, sidebarPanes;
   let hlPalette, noteModal, noteTextarea, shortcutsOverlay;
   let readingTimeBadge, focusHint;
-  let readerMessage, msgText, statusLine;
+  let readerMessage, statusLine;
 
   /* ─── localStorage helpers ─────────────────────────────────── */
   function lsGet(key, def) {
@@ -74,7 +72,7 @@
     try { localStorage.setItem(key, JSON.stringify(val)); } catch(_) {}
   }
 
-  /* ─── Bookmarks ────────────────────────────────────────────── */
+  /* ─── Bookmarks ─────────────────────────────────────────────── */
   function bmKey()    { return `taybaa-bm-${bookId}`; }
   function bmGetAll() { return lsGet(bmKey(), []); }
   function bmHas(p)   { return bmGetAll().some(b => b.page === p); }
@@ -89,7 +87,7 @@
   }
   function bmToggle(p) {
     if (bmHas(p)) { bmRemove(p); return false; }
-    else { const t = getThumbDataURL(); bmAdd(p, t); return true; }
+    else { bmAdd(p, getThumbDataURL()); return true; }
   }
 
   function getThumbDataURL() {
@@ -104,68 +102,51 @@
     } catch { return ''; }
   }
 
-  /* ─── Highlights ───────────────────────────────────────────── */
+  /* ─── Highlights ─────────────────────────────────────────────── */
   function hlKey()    { return `taybaa-hl-${bookId}`; }
   function hlGetAll() { return lsGet(hlKey(), []); }
-  function hlAdd(entry) {
-    const all = hlGetAll();
-    all.push(entry);
-    lsSet(hlKey(), all);
-  }
-  function hlRemove(id) {
-    lsSet(hlKey(), hlGetAll().filter(h => h.id !== id));
-  }
+  function hlAdd(entry) { const a = hlGetAll(); a.push(entry); lsSet(hlKey(), a); }
+  function hlRemove(id) { lsSet(hlKey(), hlGetAll().filter(h => h.id !== id)); }
 
-  /* ─── Notes ────────────────────────────────────────────────── */
+  /* ─── Notes ──────────────────────────────────────────────────── */
   function noteKey()    { return `taybaa-notes-${bookId}`; }
   function noteGetAll() { return lsGet(noteKey(), []); }
-  function noteAdd(entry) {
-    const all = noteGetAll();
-    all.push(entry);
-    lsSet(noteKey(), all);
-  }
-  function noteRemove(id) {
-    lsSet(noteKey(), noteGetAll().filter(n => n.id !== id));
-  }
+  function noteAdd(entry) { const a = noteGetAll(); a.push(entry); lsSet(noteKey(), a); }
+  function noteRemove(id) { lsSet(noteKey(), noteGetAll().filter(n => n.id !== id)); }
 
-  /* ─── Reading time ─────────────────────────────────────────── */
+  /* ─── Reading time ───────────────────────────────────────────── */
   function rtKey() { return `taybaa-reading-time-${bookId}`; }
   function rtGet() { return lsGet(rtKey(), 0); }
-  function rtAdd(secs) { lsSet(rtKey(), rtGet() + secs); }
-  function rtFmt(secs) {
-    const mins = Math.floor(secs / 60);
-    if (mins < 1) return 'أقل من دقيقة';
-    return `${mins} دقيقة`;
+  function rtAdd(s) { lsSet(rtKey(), rtGet() + s); }
+  function rtFmt(s) {
+    const m = Math.floor(s / 60);
+    return m < 1 ? 'أقل من دقيقة' : `${m} دقيقة`;
   }
 
   function startReadingTimer() {
     if (readingTimer) return;
-    const tick = 10; // every 10s
-    let acc = 0;
     readingTimer = setInterval(() => {
       if (document.hidden) return;
-      acc += tick;
-      readingSeconds = rtGet() + tick;
-      rtAdd(tick);
+      rtAdd(10);
       updateTimeBadge();
-    }, tick * 1000);
+    }, 10000);
+  }
+  function stopReadingTimer() {
+    if (readingTimer) { clearInterval(readingTimer); readingTimer = null; }
   }
 
   function updateTimeBadge() {
     const secs = rtGet();
-    if (secs < 60) return;
-    if (readingTimeBadge) {
-      readingTimeBadge.textContent = `قضيت ${rtFmt(secs)} في هذا الكتاب`;
-      readingTimeBadge.classList.add('visible');
-    }
+    if (secs < 60 || !readingTimeBadge) return;
+    readingTimeBadge.textContent = `قضيت ${rtFmt(secs)} في هذا الكتاب`;
+    readingTimeBadge.classList.add('visible');
   }
 
-  /* ─── Theme ─────────────────────────────────────────────────── */
+  /* ─── Theme ──────────────────────────────────────────────────── */
   function applyTheme(idx) {
     themeIdx = ((idx % THEMES.length) + THEMES.length) % THEMES.length;
     const t = THEMES[themeIdx];
-    document.documentElement.dataset.theme =
-      t.id === 'parchment' ? '' : t.id;
+    document.documentElement.dataset.theme = t.id === 'parchment' ? '' : t.id;
     lsSet('taybaa-reader-theme', themeIdx);
     if (themeBtn) {
       const dot = themeBtn.querySelector('.theme-dot');
@@ -174,7 +155,7 @@
     }
   }
 
-  /* ─── Progress bar ─────────────────────────────────────────── */
+  /* ─── Progress bar ───────────────────────────────────────────── */
   function updateProgress() {
     if (!progressBar || !totalPages) return;
     const pct = totalPages > 1 ? ((currentPage - 1) / (totalPages - 1)) * 100 : 100;
@@ -184,51 +165,36 @@
     progressBar.parentElement.title = tip;
   }
 
-  /* ─── Page navigation ──────────────────────────────────────── */
+  /* ─── Page navigation ────────────────────────────────────────── */
   function goToPage(num) {
     if (!pdfDoc || rendering) return;
-    num = Math.max(1, Math.min(totalPages, num));
-    currentPage = num;
-    renderPage(num);
+    currentPage = Math.max(1, Math.min(totalPages, num));
+    renderPage(currentPage);
   }
 
-  /* ─── Render ────────────────────────────────────────────────── */
+  /* ─── Render ─────────────────────────────────────────────────── */
   function renderPage(num) {
     if (!pdfDoc || rendering) return;
     rendering = true;
 
     pdfDoc.getPage(num).then(page => {
-      currentPdfPage = page;
       const vp = page.getViewport({ scale });
       canvas.width  = vp.width;
       canvas.height = vp.height;
-
-      // size wrapper
       if (pdfWrapper) {
         pdfWrapper.style.width  = vp.width  + 'px';
         pdfWrapper.style.height = vp.height + 'px';
       }
-
-      const renderCtx = { canvasContext: ctx, viewport: vp };
-      return page.render(renderCtx).promise.then(() => ({ page, vp }));
+      return page.render({ canvasContext: ctx, viewport: vp }).promise
+        .then(() => ({ page, vp }));
     }).then(({ page, vp }) => {
       rendering = false;
       updatePageUI();
       updateProgress();
-
-      // Save progress
       if (bookId && typeof READING !== 'undefined') READING.setPage(bookId, num);
-
-      // Text layer
       buildTextLayer(page, vp);
-
-      // Re-draw highlights for this page
       drawHighlightsForPage(num);
-
-      // Note markers for this page
       drawNoteMarkersForPage(num);
-
-      // Refresh bookmark icon state
       updateBookmarkBtn();
     }).catch(err => {
       rendering = false;
@@ -241,7 +207,6 @@
     textLayerDiv.innerHTML = '';
     textLayerDiv.style.width  = viewport.width  + 'px';
     textLayerDiv.style.height = viewport.height + 'px';
-
     page.getTextContent().then(tc => {
       if (typeof pdfjsLib === 'undefined') return;
       pdfjsLib.renderTextLayer({
@@ -253,63 +218,52 @@
     });
   }
 
-  /* ─── Highlights rendering ─────────────────────────────────── */
+  /* ─── Highlights rendering ───────────────────────────────────── */
   function drawHighlightsForPage(pageNum) {
-    // Remove existing overlays
-    if (pdfWrapper) {
-      pdfWrapper.querySelectorAll('.hl-overlay').forEach(el => el.remove());
-    }
-    const items = hlGetAll().filter(h => h.page === pageNum);
-    items.forEach(h => renderHlOverlay(h));
+    if (pdfWrapper) pdfWrapper.querySelectorAll('.hl-overlay').forEach(el => el.remove());
+    hlGetAll().filter(h => h.page === pageNum).forEach(renderHlOverlay);
   }
 
   function renderHlOverlay(h) {
     if (!pdfWrapper || !canvas) return;
     const color = HL_COLORS.find(c => c.id === h.colorId);
     if (!color) return;
-
-    const scaleX = canvas.width  / h.vpWidth;
-    const scaleY = canvas.height / h.vpHeight;
-
+    const sx = canvas.width  / h.vpWidth;
+    const sy = canvas.height / h.vpHeight;
     (h.rects || []).forEach(r => {
-      const div = document.createElement('div');
-      div.className = 'hl-overlay';
-      div.dataset.hlId = h.id;
-      div.style.left   = (r.x * scaleX) + 'px';
-      div.style.top    = (r.y * scaleY) + 'px';
-      div.style.width  = (r.w * scaleX) + 'px';
-      div.style.height = (r.h * scaleY) + 'px';
-      div.style.background = color.alpha;
-      pdfWrapper.appendChild(div);
+      const d = document.createElement('div');
+      d.className = 'hl-overlay';
+      d.dataset.hlId = h.id;
+      d.style.left   = (r.x * sx) + 'px';
+      d.style.top    = (r.y * sy) + 'px';
+      d.style.width  = (r.w * sx) + 'px';
+      d.style.height = (r.h * sy) + 'px';
+      d.style.background = color.alpha;
+      pdfWrapper.appendChild(d);
     });
   }
 
-  /* ─── Note markers ─────────────────────────────────────────── */
+  /* ─── Note markers ───────────────────────────────────────────── */
   function drawNoteMarkersForPage(pageNum) {
     if (pdfWrapper) pdfWrapper.querySelectorAll('.note-marker').forEach(el => el.remove());
-    const notes = noteGetAll().filter(n => n.page === pageNum);
-    notes.forEach(n => renderNoteMarker(n));
+    noteGetAll().filter(n => n.page === pageNum).forEach(renderNoteMarker);
   }
 
   function renderNoteMarker(n) {
     if (!pdfWrapper || !canvas) return;
-    const scaleX = canvas.width  / (n.vpWidth  || canvas.width);
-    const scaleY = canvas.height / (n.vpHeight || canvas.height);
-    const marker = document.createElement('div');
-    marker.className = 'note-marker';
-    marker.textContent = '◆';
-    marker.title = n.text.slice(0, 60);
-    marker.style.right = Math.max(0, (n.x || 10) * scaleX) + 'px';
-    marker.style.top   = (n.y || 20) * scaleY + 'px';
-    marker.addEventListener('click', e => {
-      e.stopPropagation();
-      showNotePopup(n, marker);
-    });
-    pdfWrapper.appendChild(marker);
+    const sx = canvas.width  / (n.vpWidth  || canvas.width);
+    const sy = canvas.height / (n.vpHeight || canvas.height);
+    const m  = document.createElement('div');
+    m.className   = 'note-marker';
+    m.textContent = '◆';
+    m.title = n.text.slice(0, 60);
+    m.style.right = Math.max(0, (n.x || 10) * sx) + 'px';
+    m.style.top   = (n.y || 20) * sy + 'px';
+    m.addEventListener('click', e => { e.stopPropagation(); showNotePopup(n, m); });
+    pdfWrapper.appendChild(m);
   }
 
   function showNotePopup(note, anchor) {
-    // Remove existing popups
     document.querySelectorAll('.note-popup').forEach(el => el.remove());
     const popup = document.createElement('div');
     popup.className = 'note-popup lux-toast';
@@ -318,22 +272,28 @@
     const del = document.createElement('button');
     del.textContent = 'حذف الملاحظة';
     del.style.cssText = 'display:block;margin-top:.6rem;background:none;border:1px solid #B1373F;color:#B1373F;border-radius:8px;padding:.3rem .7rem;cursor:pointer;font-family:Cairo,sans-serif;font-size:.78rem;';
-    del.onclick = () => { noteRemove(note.id); popup.remove(); drawNoteMarkersForPage(currentPage); refreshSidebarNotes(); };
+    del.onclick = () => {
+      noteRemove(note.id); popup.remove();
+      drawNoteMarkersForPage(currentPage); refreshSidebarNotes();
+    };
     popup.appendChild(del);
     document.body.appendChild(popup);
-    // position near anchor
     const r = anchor.getBoundingClientRect();
-    popup.style.position = 'fixed';
-    popup.style.top  = (r.bottom + 6) + 'px';
-    popup.style.right = (window.innerWidth - r.right) + 'px';
-    popup.style.left  = 'auto';
-    popup.style.transform = 'none';
-    popup.style.bottom = 'auto';
-    popup.style.animation = 'luxToastIn .3s ease both';
-    setTimeout(() => { document.addEventListener('click', () => popup.remove(), { once: true }); }, 100);
+    Object.assign(popup.style, {
+      position: 'fixed',
+      top:       (r.bottom + 6) + 'px',
+      right:     (window.innerWidth - r.right) + 'px',
+      left:      'auto',
+      transform: 'none',
+      bottom:    'auto',
+      animation: 'luxToastIn .3s ease both'
+    });
+    setTimeout(() => {
+      document.addEventListener('click', () => popup.remove(), { once: true });
+    }, 100);
   }
 
-  /* ─── Highlight palette ────────────────────────────────────── */
+  /* ─── Highlight palette ──────────────────────────────────────── */
   function showHlPalette(x, y) {
     if (!hlPalette) return;
     hlPalette.style.top  = y + 'px';
@@ -350,40 +310,30 @@
     const sel = window.getSelection();
     if (!sel || sel.isCollapsed || !sel.toString().trim()) return null;
     const text = sel.toString().trim();
-    const rects = [];
     if (!pdfWrapper) return null;
-    const wrapRect = pdfWrapper.getBoundingClientRect();
-
+    const wr = pdfWrapper.getBoundingClientRect();
+    const rects = [];
     for (let i = 0; i < sel.rangeCount; i++) {
-      const range = sel.getRangeAt(i);
-      const boxes = Array.from(range.getClientRects());
-      boxes.forEach(b => {
+      Array.from(sel.getRangeAt(i).getClientRects()).forEach(b => {
         if (b.width < 2 || b.height < 2) return;
-        rects.push({
-          x: b.left - wrapRect.left,
-          y: b.top  - wrapRect.top,
-          w: b.width,
-          h: b.height
-        });
+        rects.push({ x: b.left - wr.left, y: b.top - wr.top, w: b.width, h: b.height });
       });
     }
-    if (!rects.length) return null;
-    return { text, rects };
+    return rects.length ? { text, rects } : null;
   }
 
-  /* ─── Apply highlight ──────────────────────────────────────── */
+  /* ─── Apply highlight ────────────────────────────────────────── */
   function applyHighlight(colorId) {
     if (!pendingSelection) return;
-    const { text, rects } = pendingSelection;
     const entry = {
-      id: Date.now() + '-' + Math.random().toString(36).slice(2,7),
-      page: currentPage,
+      id:       Date.now() + '-' + Math.random().toString(36).slice(2,7),
+      page:     currentPage,
       colorId,
-      text,
-      rects,
+      text:     pendingSelection.text,
+      rects:    pendingSelection.rects,
       vpWidth:  canvas ? canvas.width  : 800,
       vpHeight: canvas ? canvas.height : 1100,
-      ts: Date.now()
+      ts:       Date.now()
     };
     hlAdd(entry);
     renderHlOverlay(entry);
@@ -393,9 +343,9 @@
     showToast('تم التظليل');
   }
 
-  /* ─── Open note modal ──────────────────────────────────────── */
-  function openNoteModal(ctx) {
-    pendingNoteCtx = ctx;
+  /* ─── Note modal ─────────────────────────────────────────────── */
+  function openNoteModal(selCtx) {
+    pendingNoteCtx = selCtx;
     if (!noteModal || !noteTextarea) return;
     noteTextarea.value = '';
     noteModal.classList.add('visible');
@@ -407,21 +357,19 @@
     if (!noteTextarea || !pendingNoteCtx) return;
     const text = noteTextarea.value.trim();
     if (!text) { closeNoteModal(); return; }
-    const sel = pendingNoteCtx;
-    // position: first rect or center
-    const pos = sel.rects && sel.rects[0]
-      ? { x: sel.rects[0].x, y: sel.rects[0].y }
+    const pos = pendingNoteCtx.rects?.[0]
+      ? { x: pendingNoteCtx.rects[0].x, y: pendingNoteCtx.rects[0].y }
       : { x: 20, y: 100 };
     const entry = {
-      id: Date.now() + '-' + Math.random().toString(36).slice(2,7),
-      page: currentPage,
+      id:           Date.now() + '-' + Math.random().toString(36).slice(2,7),
+      page:         currentPage,
       text,
-      x: pos.x,
-      y: pos.y,
-      vpWidth:  canvas ? canvas.width  : 800,
-      vpHeight: canvas ? canvas.height : 1100,
-      selectedText: sel.text || '',
-      ts: Date.now()
+      x:            pos.x,
+      y:            pos.y,
+      vpWidth:      canvas ? canvas.width  : 800,
+      vpHeight:     canvas ? canvas.height : 1100,
+      selectedText: pendingNoteCtx.text || '',
+      ts:           Date.now()
     };
     noteAdd(entry);
     renderNoteMarker(entry);
@@ -436,7 +384,7 @@
     window.getSelection()?.removeAllRanges();
   }
 
-  /* ─── Simple Markdown renderer ─────────────────────────────── */
+  /* ─── Simple Markdown ─────────────────────────────────────────── */
   function simpleMarkdown(text) {
     return text
       .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
@@ -446,7 +394,7 @@
       .replace(/\n/g,'<br>');
   }
 
-  /* ─── Bookmarks ─────────────────────────────────────────────── */
+  /* ─── Bookmarks UI ───────────────────────────────────────────── */
   function updateBookmarkBtn() {
     if (!bookmarkBtn) return;
     const has = bmHas(currentPage);
@@ -461,29 +409,27 @@
     showToast(added ? 'تمت إضافة الإشارة المرجعية' : 'تمت إزالة الإشارة المرجعية');
   }
 
-  /* ─── Sidebar ────────────────────────────────────────────────── */
+  /* ─── Sidebar ─────────────────────────────────────────────────── */
   function toggleSidebar(tab) {
     if (!sidebarPanel) return;
-    const isMobile = window.innerWidth < 640;
+    const mobile = window.innerWidth < 640;
     if (sidebarOpen && activeSideTab === tab) {
-      // close
       sidebarOpen = false;
-      if (isMobile) sidebarPanel.classList.remove('open');
-      else sidebarPanel.classList.add('collapsed');
+      mobile ? sidebarPanel.classList.remove('open')
+             : sidebarPanel.classList.add('collapsed');
     } else {
       sidebarOpen = true;
       activeSideTab = tab;
-      if (isMobile) { sidebarPanel.classList.add('open'); sidebarPanel.classList.remove('collapsed'); }
-      else sidebarPanel.classList.remove('collapsed');
+      if (mobile) { sidebarPanel.classList.add('open'); sidebarPanel.classList.remove('collapsed'); }
+      else          sidebarPanel.classList.remove('collapsed');
       switchSideTab(tab);
     }
   }
 
   function switchSideTab(tab) {
     activeSideTab = tab;
-    if (!sidebarTabs || !sidebarPanes) return;
-    sidebarTabs.forEach(bt => bt.classList.toggle('active', bt.dataset.tab === tab));
-    sidebarPanes.forEach(pn => pn.classList.toggle('active', pn.dataset.pane === tab));
+    sidebarTabs?.forEach(bt => bt.classList.toggle('active', bt.dataset.tab === tab));
+    sidebarPanes?.forEach(pn => pn.classList.toggle('active', pn.dataset.pane === tab));
     if (tab === 'bookmarks')  refreshSidebarBookmarks();
     if (tab === 'notes')      refreshSidebarNotes();
     if (tab === 'highlights') refreshSidebarHighlights();
@@ -507,10 +453,7 @@
         <button class="bookmark-del" data-page="${b.page}" title="حذف" aria-label="حذف الإشارة">✕</button>
       </div>`).join('');
     pane.querySelectorAll('.bookmark-item').forEach(el => {
-      el.addEventListener('click', e => {
-        if (e.target.classList.contains('bookmark-del')) return;
-        goToPage(+el.dataset.page);
-      });
+      el.addEventListener('click', e => { if (!e.target.classList.contains('bookmark-del')) goToPage(+el.dataset.page); });
     });
     pane.querySelectorAll('.bookmark-del').forEach(btn => {
       btn.addEventListener('click', e => {
@@ -540,7 +483,7 @@
         <div class="note-content">${simpleMarkdown(n.text.slice(0,200))}</div>
       </div>`).join('');
     pane.querySelectorAll('.note-item').forEach(el => {
-      el.addEventListener('click', e => { if (e.target.classList.contains('note-del')) return; goToPage(+el.dataset.page); });
+      el.addEventListener('click', e => { if (!e.target.classList.contains('note-del')) goToPage(+el.dataset.page); });
     });
     pane.querySelectorAll('.note-del').forEach(btn => {
       btn.addEventListener('click', e => {
@@ -571,7 +514,7 @@
         </div>`;
     }).join('');
     pane.querySelectorAll('.hl-item').forEach(el => {
-      el.addEventListener('click', e => { if (e.target.classList.contains('hl-del')) return; goToPage(+el.dataset.page); });
+      el.addEventListener('click', e => { if (!e.target.classList.contains('hl-del')) goToPage(+el.dataset.page); });
     });
     pane.querySelectorAll('.hl-del').forEach(btn => {
       btn.addEventListener('click', e => {
@@ -583,54 +526,43 @@
     });
   }
 
-  /* ─── Focus mode ────────────────────────────────────────────── */
+  /* ─── Focus mode ──────────────────────────────────────────────── */
   function toggleFocusMode() {
     focusMode = !focusMode;
     document.body.classList.toggle('focus-mode', focusMode);
     if (focusMode && focusHint) {
       focusHint.classList.add('visible');
-      setTimeout(() => focusHint && focusHint.classList.remove('visible'), 3000);
+      setTimeout(() => focusHint?.classList.remove('visible'), 3000);
     }
   }
 
-  /* ─── Keyboard shortcuts ────────────────────────────────────── */
+  /* ─── Keyboard shortcuts ──────────────────────────────────────── */
   function handleKey(e) {
-    // Don't interfere with inputs
     if (['INPUT','TEXTAREA'].includes(e.target.tagName)) return;
 
-    // Close overlays first
     if (e.key === 'Escape') {
-      if (shortcutsOverlay && shortcutsOverlay.classList.contains('visible')) { shortcutsOverlay.classList.remove('visible'); return; }
-      if (noteModal && noteModal.classList.contains('visible')) { closeNoteModal(); return; }
-      if (focusMode) { toggleFocusMode(); return; }
+      if (shortcutsOverlay?.classList.contains('visible')) { shortcutsOverlay.classList.remove('visible'); return; }
+      if (noteModal?.classList.contains('visible'))        { closeNoteModal(); return; }
+      if (focusMode)                                        { toggleFocusMode(); return; }
       hideHlPalette();
       return;
     }
-
-    if (e.key === '?' || e.key === '/') {
-      if (shortcutsOverlay) shortcutsOverlay.classList.toggle('visible');
-      return;
-    }
+    if (e.key === '?' || e.key === '/') { shortcutsOverlay?.classList.toggle('visible'); return; }
 
     switch (e.key) {
       case 'ArrowRight': case 'ArrowUp':
-        e.preventDefault(); goToPage(currentPage - 1); break; // RTL: right = prev
-      case 'ArrowLeft': case 'ArrowDown':
+        e.preventDefault(); goToPage(currentPage - 1); break;
+      case 'ArrowLeft':  case 'ArrowDown':
         e.preventDefault(); goToPage(currentPage + 1); break;
-      case '+': case '=':
-        e.preventDefault(); changeZoom(+0.25); break;
-      case '-':
-        e.preventDefault(); changeZoom(-0.25); break;
-      case 'f': case 'F':
-        toggleFocusMode(); break;
-      case 't': case 'T':
-        applyTheme(themeIdx + 1); break;
-      case 'b': case 'B':
-        toggleBookmark(); break;
+      case '+': case '=': e.preventDefault(); changeZoom(+0.25); break;
+      case '-':           e.preventDefault(); changeZoom(-0.25); break;
+      case 'f': case 'F': toggleFocusMode();  break;
+      case 't': case 'T': applyTheme(themeIdx + 1); break;
+      case 'b': case 'B': toggleBookmark(); break;
     }
   }
 
-  /* ─── Zoom ───────────────────────────────────────────────────── */
+  /* ─── Zoom ────────────────────────────────────────────────────── */
   function changeZoom(delta) {
     scale = Math.max(0.75, Math.min(4, scale + delta));
     if (zoomLabel) zoomLabel.textContent = Math.round(scale * 100) + '%';
@@ -640,65 +572,62 @@
 
   /* ─── Page UI update ─────────────────────────────────────────── */
   function updatePageUI() {
-    if (pageInput) pageInput.value = currentPage;
+    if (pageInput)    pageInput.value          = currentPage;
     if (totalPagesEl) totalPagesEl.textContent = totalPages;
-    if (prevBtn) prevBtn.disabled = currentPage <= 1;
-    if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
+    if (prevBtn)      prevBtn.disabled  = currentPage <= 1;
+    if (nextBtn)      nextBtn.disabled  = currentPage >= totalPages;
     updateBookmarkBtn();
   }
 
-  /* ─── Toast ──────────────────────────────────────────────────── */
+  /* ─── Toast ───────────────────────────────────────────────────── */
   let toastTimer = null;
   function showToast(msg) {
     document.querySelectorAll('.lux-toast:not(.note-popup)').forEach(el => el.remove());
     const t = document.createElement('div');
-    t.className = 'lux-toast';
+    t.className   = 'lux-toast';
     t.textContent = msg;
     document.body.appendChild(t);
     if (toastTimer) clearTimeout(toastTimer);
     toastTimer = setTimeout(() => t.remove(), 2400);
   }
 
-  /* ─── Helpers ────────────────────────────────────────────────── */
+  /* ─── Helpers ─────────────────────────────────────────────────── */
   function fmtDate(ts) {
-    const d = new Date(ts);
-    return d.toLocaleDateString('ar-LY', { month: 'short', day: 'numeric' });
+    return new Date(ts).toLocaleDateString('ar-LY', { month: 'short', day: 'numeric' });
   }
   function escHtml(s) {
     return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
-  function uid() { return Date.now() + '-' + Math.random().toString(36).slice(2,7); }
 
-  /* ─── Main init ─────────────────────────────────────────────── */
+  /* ─── Main init ───────────────────────────────────────────────── */
   function init() {
-    canvas         = document.getElementById('pdfCanvas');
-    textLayerDiv   = document.getElementById('pdfTextLayer');
-    pdfWrapper     = document.getElementById('pdfWrapper');
-    progressBar    = document.getElementById('progressBarInner');
-    barTitle       = document.getElementById('barTitle');
-    barAuthor      = document.getElementById('barAuthor');
-    pageInput      = document.getElementById('pageInput');
-    totalPagesEl   = document.getElementById('totalPages');
-    prevBtn        = document.getElementById('prevPage');
-    nextBtn        = document.getElementById('nextPage');
-    zoomInBtn      = document.getElementById('zoomIn');
-    zoomOutBtn     = document.getElementById('zoomOut');
-    zoomLabel      = document.getElementById('zoomLabel');
-    themeBtn       = document.getElementById('themeBtn');
-    bookmarkBtn    = document.getElementById('bookmarkBtn');
-    hlToggleBtn    = document.getElementById('hlToggleBtn');
-    notesToggleBtn = document.getElementById('notesToggleBtn');
-    focusBtn       = document.getElementById('focusBtn');
-    sidebarPanel   = document.getElementById('sidebarPanel');
-    hlPalette      = document.getElementById('hlPalette');
-    noteModal      = document.getElementById('noteModal');
-    noteTextarea   = document.getElementById('noteTextarea');
+    canvas           = document.getElementById('pdfCanvas');
+    textLayerDiv     = document.getElementById('pdfTextLayer');
+    pdfWrapper       = document.getElementById('pdfWrapper');
+    progressBar      = document.getElementById('progressBarInner');
+    barTitle         = document.getElementById('barTitle');
+    barAuthor        = document.getElementById('barAuthor');
+    pageInput        = document.getElementById('pageInput');
+    totalPagesEl     = document.getElementById('totalPages');
+    prevBtn          = document.getElementById('prevPage');
+    nextBtn          = document.getElementById('nextPage');
+    zoomInBtn        = document.getElementById('zoomIn');
+    zoomOutBtn       = document.getElementById('zoomOut');
+    zoomLabel        = document.getElementById('zoomLabel');
+    themeBtn         = document.getElementById('themeBtn');
+    bookmarkBtn      = document.getElementById('bookmarkBtn');
+    hlToggleBtn      = document.getElementById('hlToggleBtn');
+    notesToggleBtn   = document.getElementById('notesToggleBtn');
+    focusBtn         = document.getElementById('focusBtn');
+    sidebarPanel     = document.getElementById('sidebarPanel');
+    hlPalette        = document.getElementById('hlPalette');
+    noteModal        = document.getElementById('noteModal');
+    noteTextarea     = document.getElementById('noteTextarea');
     shortcutsOverlay = document.getElementById('shortcutsOverlay');
     readingTimeBadge = document.getElementById('readingTimeBadge');
-    focusHint      = document.getElementById('focusHint');
-    readerMessage  = document.getElementById('readerMessage');
-    msgText        = document.getElementById('msgText');
-    statusLine     = document.getElementById('statusLine');
+    focusHint        = document.getElementById('focusHint');
+    readerMessage    = document.getElementById('readerMessage');
+    statusLine       = document.getElementById('statusLine');
 
     ctx = canvas ? canvas.getContext('2d') : null;
 
@@ -712,156 +641,117 @@
     if (zoomLabel) zoomLabel.textContent = Math.round(scale * 100) + '%';
 
     // URL params
-    const params = new URLSearchParams(location.search);
-    const rawId  = params.get('id') || params.get('bookId') || '';
+    const params   = new URLSearchParams(location.search);
+    const rawId    = params.get('id') || params.get('bookId') || '';
     const pdfParam = params.get('pdf');
     bookTitle  = params.get('title')  || '';
     bookAuthor = params.get('author') || '';
     bookId     = rawId;
 
-    // Update bar meta
     if (barTitle)  barTitle.textContent  = bookTitle  || 'جارٍ التحميل...';
     if (barAuthor) barAuthor.textContent = bookAuthor || '';
     document.title = (bookTitle || 'قارئ') + ' — المكتبة الطيبة';
 
-    // Wire up toolbar buttons
+    // ── Toolbar wiring ──────────────────────────────────────────
     document.getElementById('backBtn')?.addEventListener('click', () => history.back());
-
     prevBtn?.addEventListener('click', () => goToPage(currentPage - 1));
     nextBtn?.addEventListener('click', () => goToPage(currentPage + 1));
 
     pageInput?.addEventListener('keydown', e => {
-      if (e.key === 'Enter') {
-        const v = parseInt(pageInput.value, 10);
-        if (!isNaN(v)) goToPage(v);
-      }
+      if (e.key === 'Enter') { const v = parseInt(pageInput.value, 10); if (!isNaN(v)) goToPage(v); }
     });
-    pageInput?.addEventListener('blur', () => {
-      if (pageInput) pageInput.value = currentPage;
-    });
+    pageInput?.addEventListener('blur', () => { if (pageInput) pageInput.value = currentPage; });
 
     zoomInBtn?.addEventListener('click',  () => changeZoom(+0.25));
     zoomOutBtn?.addEventListener('click', () => changeZoom(-0.25));
-
-    themeBtn?.addEventListener('click', () => applyTheme(themeIdx + 1));
-
+    themeBtn?.addEventListener('click',   () => applyTheme(themeIdx + 1));
     bookmarkBtn?.addEventListener('click', toggleBookmark);
-
-    hlToggleBtn?.addEventListener('click', () => toggleSidebar('highlights'));
-    notesToggleBtn?.addEventListener('click', () => toggleSidebar('notes'));
     bookmarkBtn?.addEventListener('dblclick', () => toggleSidebar('bookmarks'));
-    // Also bookmarks panel via separate btn
-    document.getElementById('bmPanelBtn')?.addEventListener('click', () => toggleSidebar('bookmarks'));
 
+    document.getElementById('bmPanelBtn')?.addEventListener('click',   () => toggleSidebar('bookmarks'));
+    hlToggleBtn?.addEventListener('click',    () => toggleSidebar('highlights'));
+    notesToggleBtn?.addEventListener('click', () => toggleSidebar('notes'));
     focusBtn?.addEventListener('click', toggleFocusMode);
+
     document.getElementById('fsBtn')?.addEventListener('click', () => {
       if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
       else document.exitFullscreen?.();
     });
 
-    // Sidebar tabs
     sidebarTabs.forEach(bt => bt.addEventListener('click', () => switchSideTab(bt.dataset.tab)));
 
-    // Highlight palette events
-    document.querySelectorAll('.hl-color-btn').forEach(btn => {
-      btn.addEventListener('click', () => applyHighlight(btn.dataset.colorId));
-    });
+    document.querySelectorAll('.hl-color-btn').forEach(btn =>
+      btn.addEventListener('click', () => applyHighlight(btn.dataset.colorId))
+    );
     document.getElementById('hlNoteBtn')?.addEventListener('click', () => {
       if (pendingSelection) openNoteModal(pendingSelection);
     });
     document.getElementById('hlDismissBtn')?.addEventListener('click', hideHlPalette);
 
-    // Note modal
     document.getElementById('noteSaveBtn')?.addEventListener('click', saveNote);
     document.getElementById('noteCancelBtn')?.addEventListener('click', closeNoteModal);
-    noteTextarea?.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && e.ctrlKey) saveNote();
-    });
-    noteModal?.addEventListener('click', e => {
-      if (e.target === noteModal) closeNoteModal();
-    });
+    noteTextarea?.addEventListener('keydown', e => { if (e.key === 'Enter' && e.ctrlKey) saveNote(); });
+    noteModal?.addEventListener('click', e => { if (e.target === noteModal) closeNoteModal(); });
 
-    // Shortcuts overlay
-    document.getElementById('shortcutsCloseBtn')?.addEventListener('click', () => {
-      shortcutsOverlay?.classList.remove('visible');
-    });
+    document.getElementById('shortcutsCloseBtn')?.addEventListener('click', () =>
+      shortcutsOverlay?.classList.remove('visible')
+    );
     shortcutsOverlay?.addEventListener('click', e => {
       if (e.target === shortcutsOverlay) shortcutsOverlay.classList.remove('visible');
     });
 
-    // Text selection → highlight palette
     document.addEventListener('mouseup', onMouseUp);
     document.addEventListener('touchend', onMouseUp);
 
-    // Context menu on PDF wrapper → note
     pdfWrapper?.addEventListener('contextmenu', e => {
       const sel = captureSelection();
-      if (sel) {
-        e.preventDefault();
-        pendingSelection = sel;
-        pendingNoteCtx  = sel;
-        openNoteModal(sel);
-      }
+      if (sel) { e.preventDefault(); pendingSelection = sel; openNoteModal(sel); }
     });
 
-    // Keyboard shortcuts
     document.addEventListener('keydown', handleKey);
 
     // Reading time
     updateTimeBadge();
-    if (bookId) startReadingTimer();
     document.addEventListener('visibilitychange', () => {
-      if (document.hidden) stopReadingTimer();
-      else if (bookId) startReadingTimer();
+      document.hidden ? stopReadingTimer() : (bookId && startReadingTimer());
     });
 
-    // Load PDF
+    // ── Load PDF ────────────────────────────────────────────────
     if (!pdfParam && !bookId) {
       showError('لم يتم تحديد كتاب. تأكد من وجود معامل id في الرابط.');
       return;
     }
 
-    if (bookId && !bookTitle) {
-      // fetch book meta from API
+    if (pdfParam) {
+      // Direct PDF URL — load immediately
+      startPdfLoad(pdfParam);
+    } else {
+      // Book ID — fetch metadata first, then load PDF from API response
+      if (statusLine) statusLine.textContent = 'جارٍ تحميل بيانات الكتاب...';
       fetch(`/api/books/${bookId}`)
-        .then(r => r.ok ? r.json() : null)
+        .then(r => r.ok ? r.json() : Promise.reject('not-ok'))
         .then(data => {
-          if (!data) return;
           bookTitle  = data.title  || bookTitle;
           bookAuthor = data.author || bookAuthor;
           if (barTitle)  barTitle.textContent  = bookTitle;
           if (barAuthor) barAuthor.textContent = bookAuthor;
           document.title = bookTitle + ' — المكتبة الطيبة';
-          // If pdf not yet loaded, load from API
-          if (!pdfDoc && data.pdf) startPdfLoad(data.pdf);
+          if (data.pdf) startPdfLoad(data.pdf);
+          else showError('لا يوجد ملف PDF مرتبط بهذا الكتاب.');
         })
-        .catch(() => {});
+        .catch(() => showError('تعذّر تحميل بيانات الكتاب من الخادم.'));
     }
-
-    const pdfUrl = pdfParam || (bookId ? null : null);
-    if (pdfUrl) startPdfLoad(pdfUrl);
-    else if (bookId && !pdfParam) {
-      // Will load after API call resolves
-      if (statusLine) statusLine.textContent = 'جارٍ تحميل بيانات الكتاب...';
-    }
-
-    // Preload API-resolved URL
-    if (pdfParam) startPdfLoad(pdfParam);
   }
 
-  function stopReadingTimer() {
-    if (readingTimer) { clearInterval(readingTimer); readingTimer = null; }
-  }
-
-  /* ─── Selection handler ─────────────────────────────────────── */
+  /* ─── Selection handler ───────────────────────────────────────── */
   function onMouseUp(e) {
     setTimeout(() => {
-      if (noteModal && noteModal.classList.contains('visible')) return;
+      if (noteModal?.classList.contains('visible')) return;
       const sel = captureSelection();
       if (sel) {
         pendingSelection = sel;
-        const x = e.clientX ?? (e.touches?.[0]?.clientX ?? 80);
-        const y = (e.clientY ?? (e.touches?.[0]?.clientY ?? 80)) + 14;
+        const x = e.clientX ?? e.touches?.[0]?.clientX ?? 80;
+        const y = (e.clientY ?? e.touches?.[0]?.clientY ?? 80) + 14;
         showHlPalette(x, y);
       } else {
         hideHlPalette();
@@ -869,10 +759,9 @@
     }, 60);
   }
 
-  /* ─── PDF loading ────────────────────────────────────────────── */
+  /* ─── PDF loading ─────────────────────────────────────────────── */
   function startPdfLoad(url) {
     if (!url) return;
-    // Normalise archive.org links
     const archMatch = /archive\.org\/(?:embed|details|download)\/([^/?#]+)/.exec(url);
     const archSlug  = archMatch ? archMatch[1] : null;
     const directUrl = archSlug ? `https://archive.org/download/${archSlug}/${archSlug}.pdf` : url;
@@ -904,49 +793,39 @@
     pdfDoc     = doc;
     totalPages = doc.numPages;
 
-    // Hide loading message, show canvas
+    // Show the canvas wrapper, hide loading message
     if (readerMessage) readerMessage.style.display = 'none';
-    if (canvas)        canvas.style.display = 'block';
-    if (textLayerDiv)  textLayerDiv.style.display = 'block';
+    if (pdfWrapper)    pdfWrapper.style.display     = 'inline-block';
 
-    // Show nav
-    if (prevBtn)  prevBtn.hidden = false;
-    if (nextBtn)  nextBtn.hidden = false;
+    // Show nav controls
+    [prevBtn, nextBtn].forEach(b => { if (b) b.hidden = false; });
     if (pageInput) pageInput.hidden = false;
     document.querySelector('.page-sep')?.removeAttribute('hidden');
     if (totalPagesEl) { totalPagesEl.textContent = totalPages; totalPagesEl.hidden = false; }
 
-    // Resume reading position
+    // Resume position
     if (bookId && typeof READING !== 'undefined') {
       const saved = Math.min(READING.getPage(bookId), totalPages);
-      if (saved > 1) {
-        currentPage = saved;
-        showToast(`استئنفناك من الصفحة ${saved}`);
-      }
+      if (saved > 1) { currentPage = saved; showToast(`استئنفناك من الصفحة ${saved}`); }
     }
 
     renderPage(currentPage);
-    startReadingTimer();
+    if (bookId) startReadingTimer();
   }
 
   function useFallback(url, archSlug, reason) {
     console.log('Fallback because:', reason);
     if (statusLine) statusLine.textContent = `تعذّر الفتح المباشر (${reason}) · يتم فتحه ببديل...`;
-
     const stage = document.getElementById('readerMain');
     if (!stage) return;
     if (readerMessage) readerMessage.style.display = 'none';
-
     const iframe = document.createElement('iframe');
     iframe.className = 'iframe-stage';
     iframe.allow = 'fullscreen';
     iframe.allowFullscreen = true;
-
-    if (archSlug) {
-      iframe.src = `https://archive.org/embed/${archSlug}`;
-    } else {
-      iframe.src = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
-    }
+    iframe.src = archSlug
+      ? `https://archive.org/embed/${archSlug}`
+      : `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
     stage.appendChild(iframe);
   }
 
@@ -959,7 +838,7 @@
     readerMessage.style.display = 'block';
   }
 
-  /* ─── Boot ───────────────────────────────────────────────────── */
+  /* ─── Boot ────────────────────────────────────────────────────── */
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
