@@ -1,6 +1,6 @@
 /**
  * الصفحة الرئيسيّة الفاخرة — تستخدم Cloudflare Pages Functions API
- * v23: بطاقات الرحلات والأقسام تفتح نافذة فاخرة بكتبها
+ * v26: ترتيب الفئات يُقدّم فئات ريادة الأعمال وتطوير الذات أوّلاً
  */
 
 (async function() {
@@ -97,6 +97,8 @@
                 const icons = {
                     'الدين والإسلاميات': '🕌',
                     'تطوير الذات والنجاح': '🌱',
+                    'تطوير الذات': '🌱',
+                    'التنمية البشرية': '🌟',
                     'علم النفس': '🧠',
                     'الفلسفة والفكر': '🏛️',
                     'التاريخ والتراث': '📜',
@@ -105,12 +107,43 @@
                     'ريادة الأعمال': '🚀',
                     'إدارة الأعمال': '📊',
                     'التسويق': '📣',
+                    'القيادة': '👑',
                     'المال والاستثمار': '💰',
+                    'الاستثمار والمال': '💰',
                     'العلوم والمعرفة': '🔬',
                     'الشعر': '✍️',
                     'كتب الأطفال': '🧸'
                 };
-                el.innerHTML = categories.slice(0, 14).map(c => `
+
+                // ===== Wave 5: إعادة ترتيب — فئات ريادة الأعمال أوّلاً =====
+                // قائمة التفضيل (الترتيب مهمّ). نطابق بمرونة لاحتواء اختلافات التسمية.
+                const PRIORITY = [
+                    ['ريادة الأعمال'],
+                    ['تطوير الذات', 'تطوير الذات والنجاح'],
+                    ['التنمية البشرية'],
+                    ['إدارة الأعمال'],
+                    ['التسويق'],
+                    ['الاستثمار والمال', 'المال والاستثمار']
+                ];
+                const matchIndex = (name) => {
+                    for (let i = 0; i < PRIORITY.length; i++) {
+                        if (PRIORITY[i].some(alias => alias === name)) return i;
+                    }
+                    return -1;
+                };
+                const priorityBuckets = PRIORITY.map(() => null);
+                const rest = [];
+                categories.forEach(c => {
+                    const idx = matchIndex(c.name);
+                    if (idx >= 0 && priorityBuckets[idx] === null) {
+                        priorityBuckets[idx] = c;
+                    } else {
+                        rest.push(c);
+                    }
+                });
+                const ordered = priorityBuckets.filter(Boolean).concat(rest);
+
+                el.innerHTML = ordered.slice(0, 14).map(c => `
                     <button type="button" class="category-tile" data-category="${escape(c.name)}">
                         <div class="category-tile-icon">${icons[c.name] || '📚'}</div>
                         <div class="category-tile-name">${escape(c.name)}</div>
