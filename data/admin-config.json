@@ -1,7 +1,7 @@
 {
   "_comment": "Admin & access-control configuration. Edit the email arrays below. After changes are committed Cloudflare Pages will redeploy automatically.",
   "adminEmails": [
-    "REPLACE_WITH_OWNER_EMAIL@example.com"
+    "tsallabi55@gmail.com"
   ],
   "hiddenBooks": [],
   "_hiddenBooks_note": "Add book IDs (as strings) here to globally hide them from all non-admin users.",
@@ -10,7 +10,7 @@
     "الإسلاميات"
   ],
   "categoryAllowedEmails": [
-    "REPLACE_WITH_OWNER_EMAIL@example.com"
+    "tsallabi55@gmail.com"
   ],
   "_categoryAllowedEmails_note": "Emails listed here (in addition to adminEmails) can view restrictedCategories. Admins always see everything."
 }
