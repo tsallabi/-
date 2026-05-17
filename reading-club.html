@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#FAF6EE">
+  <title>نادي المكتبة الطيبة — المكتبة الطيبة</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;600;700&family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <script>(function(){ const t=localStorage.getItem('taybaa-theme')||'light'; document.documentElement.setAttribute('data-theme',t); })();</script>
+
+  <style>
+    /* ═══ Design tokens ══════════════════════════════════════════════ */
+    :root {
+      --parchment: #FAF6EE;
+      --ink: #0F1B2D;
+      --red: #B1373F;
+      --gold: #B89968;
+      --gold-soft: rgba(184,153,104,.12);
+      --border: rgba(184,153,104,.25);
+      --border-strong: rgba(184,153,104,.45);
+      --bg: #FAF6EE;
+      --bg-subtle: rgba(184,153,104,.07);
+      --bg-elevated: #FFFFFF;
+      --text: #0F1B2D;
+      --text-muted: #5a6a7a;
+      --text-soft: #8a9aaa;
+    }
+    [data-theme="dark"] {
+      --bg: #0F1B2D;
+      --bg-subtle: rgba(184,153,104,.07);
+      --bg-elevated: #1a2a3d;
+      --text: #FAF6EE;
+      --text-muted: #9aacb8;
+      --text-soft: #6a7e8a;
+      --border: rgba(184,153,104,.2);
+      --border-strong: rgba(184,153,104,.4);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Cairo', system-ui, sans-serif;
+      direction: rtl;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* ═══ Nav ════════════════════════════════════════════════════════ */
+    .club-nav {
+      position: sticky; top: 0; z-index: 50;
+      background: color-mix(in srgb, var(--bg) 92%, transparent);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: .75rem 1.25rem;
+    }
+    .club-nav-inner {
+      max-width: 860px; margin: 0 auto;
+      display: flex; align-items: center; gap: .75rem;
+    }
+    .club-logo {
+      font-family: 'Reem Kufi', sans-serif; font-weight: 700; font-size: 1rem;
+      color: var(--text); text-decoration: none;
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .club-logo-mark {
+      width: 34px; height: 34px; border-radius: 8px;
+      background: var(--ink); color: var(--parchment);
+      display: grid; place-items: center;
+      font-weight: 700; font-size: 1rem; flex-shrink: 0;
+    }
+    [data-theme="dark"] .club-logo-mark { background: var(--gold); color: var(--ink); }
+    .nav-spacer { flex: 1; }
+    .nav-back {
+      font-size: .85rem; color: var(--text-muted); text-decoration: none;
+      font-family: 'Reem Kufi', sans-serif; font-weight: 600;
+      padding: .4rem .85rem; border-radius: 10px;
+      border: 1px solid var(--border); background: var(--bg-subtle);
+      transition: all .2s;
+    }
+    .nav-back:hover { color: var(--gold); border-color: var(--gold); }
+    .nav-theme-btn {
+      width: 36px; height: 36px; border-radius: 10px;
+      border: 1px solid var(--border); background: var(--bg-subtle);
+      color: var(--text); cursor: pointer; display: grid;
+      place-items: center; font-size: 1rem; transition: all .2s;
+    }
+    .nav-theme-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ═══ Hero ════════════════════════════════════════════════════════ */
+    .club-hero {
+      background: linear-gradient(135deg, #2a1810 0%, #3a2412 35%, #1a0f08 100%);
+      padding: 4rem 1.5rem 3rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .club-hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: radial-gradient(circle, rgba(184,153,104,.12) 1px, transparent 1px);
+      background-size: 18px 18px;
+      pointer-events: none;
+    }
+    .club-hero-badge {
+      display: inline-block;
+      font-family: 'Reem Kufi', sans-serif;
+      font-size: .78rem; font-weight: 700;
+      letter-spacing: .2em; color: var(--gold);
+      border: 1px solid rgba(184,153,104,.4);
+      border-radius: 999px; padding: .4rem 1.1rem;
+      background: rgba(184,153,104,.08);
+      margin-bottom: 1.5rem;
+    }
+    .club-hero-title {
+      font-family: 'Aref Ruqaa', 'Amiri', serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700; color: #FAF6EE;
+      line-height: 1.25; margin-bottom: .75rem;
+    }
+    .club-hero-title .accent { color: var(--gold); }
+    .club-hero-sub {
+      font-family: 'Amiri', serif; font-style: italic;
+      font-size: 1.1rem; color: rgba(250,246,238,.7);
+      max-width: 48ch; margin: 0 auto 2rem;
+    }
+    .club-month-pill {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: rgba(177,55,63,.2); border: 1px solid rgba(177,55,63,.5);
+      border-radius: 999px; padding: .5rem 1.2rem;
+      font-family: 'Cairo', sans-serif; font-size: .85rem;
+      color: #FAF6EE;
+    }
+
+    /* ═══ Container ══════════════════════════════════════════════════ */
+    .container { max-width: 860px; margin: 0 auto; padding: 0 1.25rem; }
+
+    /* ═══ Book of the Month card ═════════════════════════════════════ */
+    .book-card {
+      display: flex; gap: 2rem; align-items: flex-start;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-strong);
+      border-radius: 20px; padding: 2rem;
+      margin: 2.5rem 0;
+      box-shadow: 0 8px 32px rgba(0,0,0,.06);
+    }
+    @media (max-width: 600px) { .book-card { flex-direction: column; gap: 1.25rem; } }
+    .book-card-cover {
+      flex-shrink: 0;
+      width: 120px; height: 170px;
+      border-radius: 8px;
+      background: linear-gradient(160deg, #3a2412 0%, #1a0f08 100%);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 1rem;
+      position: relative; overflow: hidden;
+      box-shadow: 4px 6px 18px rgba(0,0,0,.3);
+      font-family: 'Amiri', serif;
+    }
+    .book-card-cover::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(184,153,104,.08) 1px, transparent 1px);
+      background-size: 10px 10px;
+    }
+    .book-card-cover-title {
+      font-size: .95rem; font-weight: 700;
+      color: #FAF6EE; line-height: 1.3;
+      font-family: 'Aref Ruqaa', serif;
+    }
+    .book-card-cover-author {
+      font-size: .75rem; color: var(--gold);
+      margin-top: .4rem; font-style: italic;
+    }
+    .book-card-cover-year {
+      font-size: .68rem; color: rgba(250,246,238,.5);
+      margin-top: .3rem;
+    }
+    .book-card-body { flex: 1; }
+    .book-card-eyebrow {
+      font-family: 'Reem Kufi', sans-serif;
+      font-size: .72rem; font-weight: 700;
+      letter-spacing: .15em; color: var(--gold);
+      margin-bottom: .5rem;
+    }
+    .book-card-title {
+      font-family: 'Aref Ruqaa', 'Amiri', serif;
+      font-size: 1.6rem; font-weight: 700;
+      color: var(--text); line-height: 1.25;
+      margin-bottom: .35rem;
+    }
+    .book-card-author {
+      font-family: 'Amiri', serif; font-style: italic;
+      font-size: 1rem; color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+    .book-card-description {
+      font-family: 'Amiri', serif;
+      font-size: 1rem; line-height: 1.9;
+      color: var(--text);
+      margin-bottom: 1.25rem;
+    }
+    .book-card-actions { display: flex; gap: .75rem; flex-wrap: wrap; }
+    .btn-read {
+      display: inline-flex; align-items: center; gap: .4rem;
+      padding: .65rem 1.4rem;
+      background: linear-gradient(135deg, #B1373F, #8a1825);
+      color: #FAF6EE; border: none; border-radius: 10px;
+      font-family: 'Aref Ruqaa', 'Cairo', serif;
+      font-weight: 700; font-size: .95rem;
+      cursor: pointer; text-decoration: none;
+      transition: all .2s;
+    }
+    .btn-read:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(177,55,63,.35); }
+    .btn-share-card {
+      display: inline-flex; align-items: center; gap: .4rem;
+      padding: .65rem 1.2rem;
+      background: var(--gold-soft); border: 1px solid var(--gold);
+      color: var(--gold); border-radius: 10px;
+      font-family: 'Cairo', serif;
+      font-weight: 700; font-size: .9rem;
+      cursor: pointer; transition: all .2s;
+    }
+    .btn-share-card:hover { background: rgba(184,153,104,.2); transform: translateY(-1px); }
+
+    /* ═══ Discussion prompts ═════════════════════════════════════════ */
+    .section-title {
+      font-family: 'Aref Ruqaa', 'Amiri', serif;
+      font-size: 1.4rem; font-weight: 700;
+      color: var(--text); margin: 2.5rem 0 1.1rem;
+      display: flex; align-items: center; gap: .6rem;
+    }
+    .prompts-list {
+      list-style: none; display: flex; flex-direction: column; gap: .75rem;
+      margin-bottom: 2rem;
+    }
+    .prompts-list li {
+      display: flex; align-items: flex-start; gap: .75rem;
+      background: var(--bg-subtle); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1rem 1.25rem;
+      font-family: 'Amiri', serif; font-size: 1rem;
+      line-height: 1.75; color: var(--text);
+      transition: border-color .2s;
+    }
+    .prompts-list li:hover { border-color: var(--gold); }
+    .prompt-num {
+      flex-shrink: 0; width: 26px; height: 26px;
+      border-radius: 50%; background: var(--gold);
+      color: #1a0f08; font-family: 'Reem Kufi', sans-serif;
+      font-weight: 700; font-size: .8rem;
+      display: grid; place-items: center;
+    }
+
+    /* ═══ Forum ══════════════════════════════════════════════════════ */
+    .forum-section { margin: 2.5rem 0 4rem; }
+    .forum-compose {
+      background: var(--bg-subtle);
+      border: 1px dashed var(--border-strong);
+      border-radius: 16px; padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .forum-compose-title {
+      font-family: 'Aref Ruqaa', 'Amiri', serif;
+      font-size: 1rem; font-weight: 700;
+      color: var(--text); margin-bottom: 1rem;
+    }
+    .forum-login-note {
+      font-size: .85rem; color: var(--text-muted);
+      font-family: 'Cairo', sans-serif; margin-bottom: .75rem;
+    }
+    .forum-login-note a { color: var(--gold); cursor: pointer; }
+    .forum-textarea {
+      width: 100%; background: var(--bg-elevated);
+      border: 1px solid var(--border); border-radius: 12px;
+      color: var(--text); font-family: 'Amiri', serif;
+      font-size: 1rem; line-height: 1.75; padding: .85rem 1rem;
+      resize: vertical; direction: rtl; transition: border-color .2s, box-shadow .2s;
+    }
+    .forum-textarea:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(184,153,104,.15); }
+    .forum-post-btn {
+      margin-top: .75rem;
+      display: inline-flex; align-items: center; gap: .4rem;
+      padding: .65rem 1.4rem;
+      background: linear-gradient(135deg, var(--gold), #d4af37);
+      color: #1a0f08; border: none; border-radius: 10px;
+      font-family: 'Aref Ruqaa', 'Cairo', serif;
+      font-weight: 700; font-size: .95rem;
+      cursor: pointer; transition: all .2s;
+    }
+    .forum-post-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(184,153,104,.35); }
+    .forum-post-btn:disabled { opacity: .45; cursor: not-allowed; }
+
+    .forum-posts { display: flex; flex-direction: column; gap: 1.25rem; }
+    .forum-post {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 1.25rem;
+      transition: border-color .2s;
+    }
+    .forum-post:hover { border-color: rgba(184,153,104,.4); }
+    .forum-post-header {
+      display: flex; align-items: center; gap: .65rem;
+      margin-bottom: .75rem;
+    }
+    .forum-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: grid; place-items: center;
+      font-family: 'Reem Kufi', sans-serif;
+      font-weight: 700; font-size: 1rem;
+      color: #fff; flex-shrink: 0;
+    }
+    .forum-post-name {
+      font-weight: 700; font-size: .9rem; color: var(--text);
+    }
+    .forum-post-date {
+      font-size: .75rem; color: var(--text-soft);
+      margin-inline-start: auto;
+    }
+    .forum-post-text {
+      font-family: 'Amiri', serif;
+      font-size: 1rem; line-height: 1.8;
+      color: var(--text); margin-bottom: .85rem;
+    }
+    .forum-post-actions {
+      display: flex; gap: .5rem;
+    }
+    .forum-reply-btn, .forum-like-btn {
+      display: inline-flex; align-items: center; gap: .35rem;
+      padding: .35rem .85rem;
+      border: 1px solid var(--border); border-radius: 999px;
+      background: var(--bg-subtle); color: var(--text-muted);
+      font-family: 'Cairo', sans-serif; font-size: .8rem;
+      cursor: pointer; transition: all .15s;
+    }
+    .forum-reply-btn:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-soft); }
+    .forum-like-btn:hover { border-color: var(--red); color: var(--red); }
+    .forum-like-btn.liked { border-color: var(--red); color: var(--red); background: rgba(177,55,63,.08); }
+    .forum-replies {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: .85rem;
+      padding-inline-start: 1.5rem;
+    }
+    .forum-reply {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 12px; padding: .85rem 1rem;
+    }
+    .forum-reply-compose {
+      margin-top: .85rem;
+      display: none;
+      flex-direction: column; gap: .5rem;
+    }
+    .forum-reply-compose.open { display: flex; }
+    .forum-reply-textarea {
+      width: 100%; background: var(--bg-elevated);
+      border: 1px solid var(--border); border-radius: 10px;
+      color: var(--text); font-family: 'Amiri', serif;
+      font-size: .95rem; line-height: 1.75; padding: .65rem .85rem;
+      resize: vertical; direction: rtl;
+    }
+    .forum-reply-textarea:focus { outline: none; border-color: var(--gold); }
+    .forum-reply-submit {
+      align-self: flex-start;
+      padding: .45rem 1rem;
+      background: var(--gold-soft); border: 1px solid var(--gold);
+      color: var(--gold); border-radius: 8px;
+      font-family: 'Cairo', sans-serif; font-size: .85rem;
+      font-weight: 700; cursor: pointer; transition: all .15s;
+    }
+    .forum-reply-submit:hover { background: rgba(184,153,104,.2); }
+    .forum-empty {
+      text-align: center; padding: 2.5rem 1rem;
+      color: var(--text-muted);
+      font-family: 'Amiri', serif; font-style: italic;
+      font-size: 1rem;
+    }
+
+    /* ═══ Share card canvas overlay ═════════════════════════════════ */
+    #shareOverlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(15,27,45,.7); display: none;
+      align-items: center; justify-content: center;
+    }
+    #shareOverlay.open { display: flex; }
+    .share-box {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-strong);
+      border-radius: 20px; padding: 2rem;
+      max-width: 480px; width: 90%;
+      text-align: center;
+    }
+    .share-box h3 {
+      font-family: 'Aref Ruqaa', serif;
+      font-size: 1.2rem; color: var(--text); margin-bottom: 1rem;
+    }
+    #shareCanvas {
+      max-width: 100%; border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.15);
+      margin-bottom: 1rem;
+    }
+    .share-actions { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; }
+    .share-download-btn {
+      padding: .65rem 1.4rem;
+      background: linear-gradient(135deg, var(--gold), #d4af37);
+      color: #1a0f08; border: none; border-radius: 10px;
+      font-family: 'Aref Ruqaa', 'Cairo', serif;
+      font-weight: 700; font-size: .95rem;
+      cursor: pointer; text-decoration: none;
+    }
+    .share-close-btn {
+      padding: .65rem 1.2rem;
+      background: var(--bg-subtle); border: 1px solid var(--border);
+      color: var(--text-muted); border-radius: 10px;
+      font-family: 'Cairo', sans-serif; font-size: .9rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── Nav ──────────────────────────────────────────────────── -->
+  <nav class="club-nav">
+    <div class="club-nav-inner">
+      <a href="v2.html" class="club-logo">
+        <span class="club-logo-mark">ط</span>
+        <span>المكتبة الطيبة</span>
+      </a>
+      <div class="nav-spacer"></div>
+      <a href="v2.html" class="nav-back">→ الرئيسية</a>
+      <button class="nav-theme-btn" id="themeBtn" aria-label="تبديل الثيم">🌙</button>
+    </div>
+  </nav>
+
+  <!-- ─── Hero ──────────────────────────────────────────────────── -->
+  <div class="club-hero">
+    <div class="club-hero-badge">📖 نادي القراءة</div>
+    <h1 class="club-hero-title">
+      نادي <span class="accent">المكتبة الطيبة</span>
+    </h1>
+    <p class="club-hero-sub">
+      كتاب واحد كلّ شهر — نقرأه معاً ونتناقشه بعمق
+    </p>
+    <div class="club-month-pill">
+      <span>📅</span>
+      <span>كتاب شهر مايو 2026</span>
+    </div>
+  </div>
+
+  <!-- ─── Main ───────────────────────────────────────────────────── -->
+  <main class="container">
+
+    <!-- Book of the Month -->
+    <div class="book-card">
+      <div class="book-card-cover" aria-hidden="true">
+        <div class="book-card-cover-title">الأيّام</div>
+        <div class="book-card-cover-author">طه حسين</div>
+        <div class="book-card-cover-year">1929</div>
+      </div>
+      <div class="book-card-body">
+        <div class="book-card-eyebrow">🏅 كتاب الشهر</div>
+        <h2 class="book-card-title">الأيّام</h2>
+        <div class="book-card-author">لـ طه حسين · 1929</div>
+        <p class="book-card-description">
+          سيرة ذاتيّة موحية تحكي طفولة طه حسين في مصر الريفيّة — طفل فقد بصره في سنواته الأولى، 
+          ثم شقتته إرادته نحو العلم والحضارة. 
+          كتبها بأسلوب شعريّ رفيع وضمير الغائب، 
+          فجاءت وثيقةً فنيّةً خالدةً من أروع ما أنتجه الأدب العربيّ الحديث.
+        </p>
+        <div class="book-card-actions">
+          <a href="reader.html?id=ayyam-taha-hussein" class="btn-read">📖 اقرأ الكتاب</a>
+          <button class="btn-share-card" id="openShareBtn">🎨 بطاقة مشاركة</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Discussion Prompts -->
+    <h2 class="section-title">🔍 محاور النقاش</h2>
+    <ul class="prompts-list">
+      <li>
+        <span class="prompt-num">1</span>
+        كيف عبّر طه حسين عن علاقة الطفولة بالإبداع، وهل ترى أن المعاناة تصنع الأديب أم تكسره;
+      </li>
+      <li>
+        <span class="prompt-num">2</span>
+        اختار طه أسلوب ضمير الغائب في كتابة سيرته. ما الأثر الذي خلّفه هذا الخيار عليك كقارئ;
+      </li>
+      <li>
+        <span class="prompt-num">3</span>
+        الكتاب يدور حول مصر الريفيّة والأزهر وباريس. ماذا يكشف هذا التناقض عن صراع الأجيال في العالم العربي;
+      </li>
+      <li>
+        <span class="prompt-num">4</span>
+        هل تعتقد أن رواية طه حسين تحتفظ براهنيتها اليوم;
+      </li>
+      <li>
+        <span class="prompt-num">5</span>
+        ما المشهد أو العبارة التي بقيت عالقة في ذاكرتك أكثر من غيرها;
+      </li>
+    </ul>
+
+    <!-- Forum -->
+    <h2 class="section-title">💬 منتدى النقاش</h2>
+    <div class="forum-section">
+
+      <!-- Compose -->
+      <div class="forum-compose" id="forumCompose">
+        <div class="forum-compose-title">شاركنا رأيك في الكتاب…</div>
+        <p class="forum-login-note" id="forumLoginNote"></p>
+        <textarea class="forum-textarea" id="forumText" rows="3"
+          placeholder="فكرة، سؤال، ملاحظة… شارك ما تشاء!"
+          aria-label="نص مشاركتك"></textarea>
+        <button class="forum-post-btn" id="forumSubmit" type="button" disabled>
+          ✨ نشر المشاركة
+        </button>
+      </div>
+
+      <!-- Posts list -->
+      <div class="forum-posts" id="forumPosts">
+        <div class="forum-empty" id="forumEmpty">
+          <p>📬 كن أوّل من يفتح النقاش!</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ─── Share Card Overlay ────────────────────────────────────── -->
+  <div id="shareOverlay" role="dialog" aria-modal="true" aria-label="بطاقة المشاركة">
+    <div class="share-box">
+      <h3>🎨 بطاقتك القرائية</h3>
+      <canvas id="shareCanvas" width="520" height="280"></canvas>
+      <div class="share-actions">
+        <a id="shareDownload" class="share-download-btn" download="taybaa-card.png">⬇️ تحميل البطاقة</a>
+        <button class="share-close-btn" id="shareClose">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/user-system.js?v=25"></script>
+  <script src="js/achievements.js?v=25"></script>
+
+  <script>
+  (function () {
+    'use strict';
+
+    /* ── Theme ──────────────────────────────────────────────── */
+    const themeBtn = document.getElementById('themeBtn');
+    themeBtn.addEventListener('click', () => {
+      const c = document.documentElement.getAttribute('data-theme') || 'light';
+      const n = c === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', n);
+      localStorage.setItem('taybaa-theme', n);
+      themeBtn.textContent = n === 'dark' ? '☀️' : '🌙';
+    });
+    themeBtn.textContent = (document.documentElement.getAttribute('data-theme')||'light') === 'dark' ? '☀️' : '🌙';
+
+    /* ── Club posts storage ─────────────────────────────────── */
+    // TODO (KV): replace with fetch('/api/club/posts') when KV env is available
+    // Data shape: { id, userId, userName, text, createdAt, likes: [], replies: [{id,userId,userName,text,createdAt}] }
+    const POSTS_KEY = 'taybaa-club-posts';
+    function getPosts() { try { return JSON.parse(localStorage.getItem(POSTS_KEY) || '[]'); } catch { return []; } }
+    function savePosts(p) { localStorage.setItem(POSTS_KEY, JSON.stringify(p)); }
+
+    /* ── Helpers ──────────────────────────────────────────────── */
+    function escHtml(s) {
+      return String(s ?? '').replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+    function avatarColor(name) {
+      const colors = ['#B1373F','#5a7a3a','#2a5298','#7a4a1e','#3a6a7a'];
+      return colors[(name||'').charCodeAt(0) % colors.length];
+    }
+    function fmtDate(iso) {
+      return new Date(iso).toLocaleDateString('ar-LY', { year:'numeric', month:'long', day:'numeric' });
+    }
+
+    /* ── Render ───────────────────────────────────────────────── */
+    const user = typeof USER !== 'undefined' ? USER.current() : null;
+
+    function renderPosts() {
+      const posts = getPosts();
+      const container = document.getElementById('forumPosts');
+      const empty = document.getElementById('forumEmpty');
+      if (!posts.length) { empty.style.display = ''; return; }
+      empty.style.display = 'none';
+
+      container.innerHTML = posts.slice().reverse().map(p => {
+        const likedByMe = user && (p.likes||[]).includes(user.username);
+        const repliesHtml = (p.replies||[]).map(r => `
+          <div class="forum-reply">
+            <div class="forum-post-header">
+              <div class="forum-avatar" style="background:${avatarColor(r.userName)};width:28px;height:28px;font-size:.85rem;">${escHtml((r.userName||'?')[0])}</div>
+              <span class="forum-post-name">${escHtml(r.userName)}</span>
+              <span class="forum-post-date">${fmtDate(r.createdAt)}</span>
+            </div>
+            <p class="forum-post-text" style="font-size:.92rem;">${escHtml(r.text)}</p>
+          </div>`).join('');
+
+        return `
+          <div class="forum-post" data-post-id="${escHtml(p.id)}">
+            <div class="forum-post-header">
+              <div class="forum-avatar" style="background:${avatarColor(p.userName)};">${escHtml((p.userName||'?')[0])}</div>
+              <div>
+                <div class="forum-post-name">${escHtml(p.userName)}</div>
+              </div>
+              <span class="forum-post-date">${fmtDate(p.createdAt)}</span>
+            </div>
+            <p class="forum-post-text">${escHtml(p.text)}</p>
+            <div class="forum-post-actions">
+              <button class="forum-like-btn${likedByMe?' liked':''}" data-pid="${escHtml(p.id)}">
+                ♥ ${(p.likes||[]).length || ''}
+              </button>
+              ${user ? `<button class="forum-reply-btn" data-pid="${escHtml(p.id)}">💬 ردّ</button>` : ''}
+            </div>
+            ${repliesHtml ? `<div class="forum-replies">${repliesHtml}</div>` : ''}
+            ${user ? `
+              <div class="forum-reply-compose" id="rc-${escHtml(p.id)}">
+                <textarea class="forum-reply-textarea" rows="2"
+                  placeholder="أضف ردّك هنا..."
+                  aria-label="ردّك"></textarea>
+                <button class="forum-reply-submit" data-pid="${escHtml(p.id)}" >✉️ إرسال</button>
+              </div>` : ''}
+          </div>`;
+      }).join('');
+
+      // Bind likes
+      container.querySelectorAll('.forum-like-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (!user) return;
+          const pid = btn.dataset.pid;
+          const posts2 = getPosts();
+          const post = posts2.find(p => p.id === pid);
+          if (!post) return;
+          post.likes = post.likes || [];
+          if (post.likes.includes(user.username)) {
+            post.likes = post.likes.filter(u => u !== user.username);
+          } else {
+            post.likes.push(user.username);
+          }
+          savePosts(posts2);
+          renderPosts();
+        });
+      });
+
+      // Bind reply toggle
+      container.querySelectorAll('.forum-reply-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const pid = btn.dataset.pid;
+          const rc = document.getElementById(`rc-${pid}`);
+          if (rc) rc.classList.toggle('open');
+        });
+      });
+
+      // Bind reply submit
+      container.querySelectorAll('.forum-reply-submit').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const pid = btn.dataset.pid;
+          const rc = document.getElementById(`rc-${pid}`);
+          const ta = rc?.querySelector('textarea');
+          const text = ta?.value.trim();
+          if (!text || !user) return;
+          const posts2 = getPosts();
+          const post = posts2.find(p => p.id === pid);
+          if (!post) return;
+          post.replies = post.replies || [];
+          post.replies.push({
+            id: `rp-${Date.now()}`,
+            userId: user.username, userName: user.displayName || user.username,
+            text, createdAt: new Date().toISOString()
+          });
+          savePosts(posts2);
+          renderPosts();
+        });
+      });
+    }
+
+    /* ── Login note + compose ────────────────────────────────── */
+    const loginNote = document.getElementById('forumLoginNote');
+    const forumText = document.getElementById('forumText');
+    const forumSubmit = document.getElementById('forumSubmit');
+
+    if (user) {
+      loginNote.textContent = `تكتب باسم: ${user.displayName || user.username}`;
+      forumText.disabled = false;
+      forumText.addEventListener('input', () => {
+        forumSubmit.disabled = !forumText.value.trim();
+      });
+      forumSubmit.addEventListener('click', () => {
+        const text = forumText.value.trim();
+        if (!text) return;
+        const posts = getPosts();
+        posts.push({
+          id: `p-${Date.now()}`,
+          userId: user.username,
+          userName: user.displayName || user.username,
+          text, createdAt: new Date().toISOString(),
+          likes: [], replies: []
+        });
+        savePosts(posts);
+        forumText.value = '';
+        forumSubmit.disabled = true;
+        renderPosts();
+      });
+    } else {
+      loginNote.innerHTML = 'للمشاركة في النقاش، <a href="book.html" onclick="history.back()“>سجّل دخولك</a> أولاً.';
+      forumText.disabled = true;
+      forumSubmit.disabled = true;
+    }
+
+    renderPosts();
+
+    /* ── Share Card (canvas) ────────────────────────────────── */
+    function drawShareCard(title, author) {
+      const canvas = document.getElementById('shareCanvas');
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width, H = canvas.height;
+
+      // Background
+      const bg = ctx.createLinearGradient(0, 0, W, H);
+      bg.addColorStop(0, '#2a1810');
+      bg.addColorStop(.5, '#3a2412');
+      bg.addColorStop(1, '#1a0f08');
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, W, H);
+
+      // Dot grid
+      ctx.fillStyle = 'rgba(184,153,104,.12)';
+      for (let x = 12; x < W; x += 18) {
+        for (let y = 12; y < H; y += 18) {
+          ctx.beginPath(); ctx.arc(x, y, 1, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+
+      // Gold border
+      ctx.strokeStyle = '#B89968';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(12, 12, W - 24, H - 24);
+
+      // Inner accent line
+      ctx.strokeStyle = 'rgba(184,153,104,.3)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(18, 18, W - 36, H - 36);
+
+      // Stars
+      ctx.fillStyle = '#B89968';
+      ctx.font = 'bold 14px serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('★ ★ ★', W / 2, 50);
+
+      // Arabic label
+      ctx.fillStyle = 'rgba(250,246,238,.6)';
+      ctx.font = '14px Cairo, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('قرأتُه على المكتبة الطيبة', W / 2, 80);
+
+      // Book title (RTL canvas text)
+      ctx.fillStyle = '#FAF6EE';
+      ctx.font = 'bold 28px serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(title || 'الأيّام', W / 2, 130);
+
+      // Author
+      ctx.fillStyle = '#B89968';
+      ctx.font = 'italic 18px serif';
+      ctx.fillText('لـ ' + (author || 'طه حسين'), W / 2, 162);
+
+      // Divider
+      ctx.strokeStyle = 'rgba(184,153,104,.5)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(W * .25, 182); ctx.lineTo(W * .75, 182);
+      ctx.stroke();
+
+      // Flag + tagline
+      ctx.fillStyle = 'rgba(250,246,238,.85)';
+      ctx.font = '13px Cairo, sans-serif';
+      ctx.fillText('🇱🇾 من ليبيا للوطن العربي', W / 2, 208);
+
+      // URL
+      ctx.fillStyle = 'rgba(184,153,104,.65)';
+      ctx.font = '12px monospace';
+      ctx.fillText('taybaa-library.pages.dev', W / 2, 240);
+
+      // Update download link
+      const dl = document.getElementById('shareDownload');
+      dl.href = canvas.toDataURL('image/png');
+    }
+
+    document.getElementById('openShareBtn')?.addEventListener('click', () => {
+      drawShareCard('الأيّام', 'طه حسين');
+      document.getElementById('shareOverlay').classList.add('open');
+    });
+    document.getElementById('shareClose')?.addEventListener('click', () => {
+      document.getElementById('shareOverlay').classList.remove('open');
+    });
+    document.getElementById('shareOverlay')?.addEventListener('click', e => {
+      if (e.target === e.currentTarget) e.currentTarget.classList.remove('open');
+    });
+
+    // Expose share card generator globally for other pages
+    window.SHARE_CARD = { draw: drawShareCard };
+  })();
+  </script>
+</body>
+</html>
