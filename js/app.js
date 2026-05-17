@@ -127,7 +127,7 @@
 
     function bookCardHTML(book) {
         const icon = CONFIG.categoryIcons[book.category] || CONFIG.defaultCategoryIcon || '📚';
-        const publisher = CONFIG.publisherShort || 'دار المكتبة الطيبة';
+        const publisher = CONFIG.publisherShort || 'دار مكتبة ليبيا الطيبة';
         const hasFile = !!(book.pdf || book.html);
         const isFav = (typeof FAVS !== 'undefined') && FAVS.has(book.id);
         const fallback = `<div class="book-cover-fallback" aria-hidden="true">
