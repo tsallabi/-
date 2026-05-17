@@ -6,8 +6,8 @@
     <meta name="theme-color" content="#FAF6EE">
     <title>المكتبة الطيبة — من طرابلس إلى العالم العربي</title>
 
-    <link rel="stylesheet" href="css/design-system.css?v=24">
-    <link rel="stylesheet" href="css/homepage-v2.css?v=24">
+    <link rel="stylesheet" href="css/design-system.css?v=25">
+    <link rel="stylesheet" href="css/homepage-v2.css?v=25">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -299,8 +299,60 @@
             border-color: #5a7a3a;
             transform: translateY(-1px);
         }
-        .snc-nav-link-label { }
-        @media (max-width: 480px) { .snc-nav-link-label { display: none; } }
+
+        /* Community nav link */
+        .community-nav-link {
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+            font-family: 'Reem Kufi', sans-serif;
+            font-size: .88rem;
+            font-weight: 600;
+            color: #7a4a1e;
+            background: rgba(184,153,104,.08);
+            border: 1px solid rgba(184,153,104,.35);
+            padding: .5rem 1rem;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: all 280ms ease;
+            white-space: nowrap;
+        }
+        .community-nav-link:hover {
+            background: rgba(184,153,104,.18);
+            border-color: #B89968;
+            color: #B89968;
+            transform: translateY(-1px);
+        }
+
+        /* Profile nav link */
+        .profile-nav-link {
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+            font-family: 'Reem Kufi', sans-serif;
+            font-size: .88rem;
+            font-weight: 600;
+            color: var(--text-muted, #5a6a7a);
+            background: transparent;
+            border: 1px solid var(--border, rgba(184,153,104,.3));
+            padding: .5rem 1rem;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: all 280ms ease;
+            white-space: nowrap;
+        }
+        .profile-nav-link:hover {
+            border-color: #B89968;
+            color: #B89968;
+            background: rgba(184,153,104,.08);
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 480px) {
+            .snc-nav-link-label,
+            .community-nav-label,
+            .profile-nav-label { display: none; }
+        }
 
         @media (max-width: 640px) {
             .hero-arch {
@@ -326,7 +378,7 @@
 <body>
 
     <header style="position:sticky;top:0;z-index:50;backdrop-filter:blur(16px);background:color-mix(in srgb, var(--bg-elevated) 90%, transparent);border-bottom:1px solid var(--border);padding:1rem 0;">
-        <div class="container" style="display:flex;align-items:center;gap:1rem;">
+        <div class="container" style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;">
             <a href="index.html" style="display:flex;align-items:center;gap:.75rem;text-decoration:none;color:var(--text);">
                 <span style="width:42px;height:42px;border-radius:10px;background:var(--ink-900);color:var(--parchment-100);display:grid;place-items:center;font-family:'Reem Kufi',sans-serif;font-weight:700;font-size:1.2rem;">ط</span>
                 <div style="line-height:1.1;">
@@ -335,11 +387,21 @@
                 </div>
             </a>
             <div style="flex:1;"></div>
-            <input class="input input-search" type="search" placeholder="ابحث عن كتاب، مؤلف، أو موضوع..." style="max-width:340px;" id="searchInput">
+            <input class="input input-search" type="search" placeholder="ابحث عن كتاب، مؤلف، أو موضوع..." style="max-width:280px;" id="searchInput">
             <!-- 🌿 Sanctuary link -->
             <a href="sanctuary.html" class="snc-nav-link" title="واحة القراءة — يومياتي وأهدافي">
                 🌿
                 <span class="snc-nav-link-label">واحتي</span>
+            </a>
+            <!-- 👥 Community link -->
+            <a href="reading-club.html" class="community-nav-link" title="نادي القراءة الشهري">
+                👥
+                <span class="community-nav-label">المجتمع</span>
+            </a>
+            <!-- Profile link -->
+            <a href="profile.html" class="profile-nav-link" id="profileNavLink" title="صفحتي الشخصية">
+                👤
+                <span class="profile-nav-label">صفحتي</span>
             </a>
             <a href="favorites.html" class="btn btn-ghost" title="مفضّلتي">♥</a>
             <button class="btn btn-ghost" id="themeBtn" type="button">🌙</button>
@@ -445,8 +507,9 @@
         </div>
     </footer>
 
-    <script src="js/user-system.js?v=24"></script>
-    <script src="js/homepage-v2.js?v=24"></script>
+    <script src="js/user-system.js?v=25"></script>
+    <script src="js/achievements.js?v=25"></script>
+    <script src="js/homepage-v2.js?v=25"></script>
     <script>
         document.getElementById('themeBtn')?.addEventListener('click', () => {
             const c = document.documentElement.getAttribute('data-theme') || 'light';
@@ -462,6 +525,14 @@
             const href = e.currentTarget.getAttribute('href');
             if (href?.startsWith('#')) { e.preventDefault(); document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' }); }
         });
+        // Show display name on profile nav link if logged in
+        (function() {
+            const u = typeof USER !== 'undefined' ? USER.current() : null;
+            if (u) {
+                const lbl = document.querySelector('.profile-nav-label');
+                if (lbl) lbl.textContent = u.displayName || u.username;
+            }
+        })();
     </script>
 </body>
 </html>
