@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#FAF6EE">
-  <title>صفحتي — المكتبة الطيبة</title>
+  <title>صفحتي — مكتبة ليبيا الطيبة</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -235,9 +235,167 @@
       background: linear-gradient(135deg, var(--gold), #d4af37);
       color: #1a0f08; border-radius: 12px;
       font-family: 'Aref Ruqaa', serif; font-weight: 700; font-size: 1rem;
-      text-decoration: none; transition: all .2s;
+      text-decoration: none; transition: all .2s; cursor: pointer; border: 0;
     }
     .pf-guest-link:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(184,153,104,.35); }
+    .pf-guest-secondary {
+      display: inline-block; margin-top: 1rem;
+      font-size: .85rem; color: var(--text-muted);
+      text-decoration: none; font-family: 'Cairo', sans-serif;
+    }
+    .pf-guest-secondary:hover { color: var(--gold); }
+
+    /* ═══════ Auth modal ═══════ */
+    .auth-modal-backdrop {
+        position: fixed; inset: 0; z-index: 9999;
+        background: rgba(15,27,45,.55);
+        backdrop-filter: blur(6px);
+        display: none;
+        align-items: center; justify-content: center;
+        padding: 1rem;
+        animation: authFade .25s ease-out;
+    }
+    .auth-modal-backdrop.open { display: flex; }
+    @keyframes authFade { from { opacity: 0; } to { opacity: 1; } }
+
+    .auth-modal {
+        background: var(--bg-elevated, #FFFFFF);
+        border: 1px solid var(--border, rgba(184,153,104,.25));
+        border-radius: 20px;
+        box-shadow: 0 30px 80px rgba(15,27,45,.3);
+        max-width: 440px; width: 100%;
+        max-height: 92vh; overflow-y: auto;
+        padding: 2rem 1.75rem;
+        font-family: 'Aref Ruqaa', 'Amiri', serif;
+        position: relative;
+    }
+    .auth-modal-close {
+        position: absolute; top: .75rem; left: .75rem;
+        background: transparent; border: 0; cursor: pointer;
+        width: 36px; height: 36px; border-radius: 50%;
+        color: var(--text-muted, #5a6a7a);
+        font-size: 1.4rem; line-height: 1;
+        transition: all .2s;
+    }
+    .auth-modal-close:hover { background: rgba(184,153,104,.12); color: var(--text); }
+
+    .auth-title {
+        font-family: 'Aref Ruqaa', serif;
+        font-size: 1.6rem; font-weight: 700;
+        color: var(--text);
+        text-align: center; margin: 0 0 .35rem;
+    }
+    .auth-subtitle {
+        font-family: 'Amiri', serif;
+        font-size: .95rem; font-style: italic;
+        color: var(--text-muted);
+        text-align: center; margin: 0 0 1.5rem;
+    }
+
+    .auth-google-btn {
+        display: flex; align-items: center; justify-content: center;
+        gap: .6rem; width: 100%;
+        padding: .9rem;
+        background: #FFFFFF;
+        color: #1F1F1F;
+        border: 1px solid #DADCE0;
+        border-radius: 12px;
+        font-family: 'Aref Ruqaa', 'Amiri', serif;
+        font-size: 1rem; font-weight: 700;
+        cursor: pointer; transition: all .2s;
+    }
+    .auth-google-btn:hover { box-shadow: 0 4px 14px rgba(0,0,0,.12); transform: translateY(-1px); }
+    .auth-google-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+    .auth-divider {
+        display: flex; align-items: center;
+        margin: 1.25rem 0;
+        color: var(--text-muted); font-size: .8rem;
+        font-family: 'Cairo', sans-serif;
+    }
+    .auth-divider::before, .auth-divider::after {
+        content: ''; flex: 1; height: 1px;
+        background: var(--border);
+    }
+    .auth-divider span { padding: 0 .85rem; }
+
+    .auth-field { margin-bottom: .85rem; }
+    .auth-field label {
+        display: block; margin-bottom: .35rem;
+        font-family: 'Aref Ruqaa', serif;
+        font-size: .9rem; font-weight: 700;
+        color: var(--text);
+    }
+    .auth-field input {
+        width: 100%;
+        padding: .7rem .9rem;
+        font-family: 'Cairo', sans-serif;
+        font-size: 1rem;
+        color: var(--text);
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        transition: all .2s;
+    }
+    .auth-field input:focus {
+        outline: 0;
+        border-color: var(--gold);
+        box-shadow: 0 0 0 3px rgba(184,153,104,.18);
+    }
+
+    .auth-submit-btn {
+        width: 100%;
+        padding: .85rem;
+        background: linear-gradient(135deg, #0F1B2D, #2A3B57);
+        color: #FAF6EE;
+        border: 0;
+        border-radius: 12px;
+        font-family: 'Aref Ruqaa', 'Amiri', serif;
+        font-size: 1.05rem; font-weight: 700;
+        cursor: pointer; transition: all .2s;
+        margin-top: .35rem;
+    }
+    .auth-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(15,27,45,.25); }
+    .auth-submit-btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+    .auth-toggle {
+        margin-top: 1rem; text-align: center;
+        font-family: 'Cairo', sans-serif; font-size: .9rem;
+        color: var(--text-muted);
+    }
+    .auth-toggle button {
+        background: none; border: 0; cursor: pointer;
+        color: var(--gold); font-weight: 700;
+        font-family: 'Aref Ruqaa', serif; font-size: .95rem;
+        padding: 0 .25rem;
+    }
+    .auth-toggle button:hover { text-decoration: underline; }
+
+    .auth-error {
+        margin: .5rem 0 .75rem;
+        padding: .65rem .85rem;
+        background: rgba(177,55,63,.08);
+        border: 1px solid rgba(177,55,63,.3);
+        border-radius: 10px;
+        color: #B1373F;
+        font-family: 'Cairo', sans-serif;
+        font-size: .88rem;
+        display: none;
+    }
+    .auth-error.show { display: block; }
+
+    .auth-info {
+        margin: .5rem 0 .75rem;
+        padding: .65rem .85rem;
+        background: rgba(74,107,58,.08);
+        border: 1px solid rgba(74,107,58,.3);
+        border-radius: 10px;
+        color: #4A6B3A;
+        font-family: 'Cairo', sans-serif;
+        font-size: .85rem;
+        display: none;
+    }
+    .auth-info.show { display: block; }
   </style>
 </head>
 <body>
@@ -245,12 +403,12 @@
   <!-- Nav -->
   <nav class="pf-nav">
     <div class="pf-nav-inner">
-      <a href="v2.html" class="pf-logo">
+      <a href="/" class="pf-logo">
         <span class="pf-logo-mark">ط</span>
-        <span>المكتبة الطيبة</span>
+        <span>مكتبة ليبيا الطيبة</span>
       </a>
       <div class="nav-spacer"></div>
-      <a href="v2.html" class="nav-back">→ الرئيسية</a>
+      <a href="/" class="nav-back">→ الرئيسية</a>
       <button class="nav-theme-btn" id="themeBtn" aria-label="تبديل الثيم">🌙</button>
     </div>
   </nav>
@@ -259,8 +417,55 @@
     <!-- Filled by JS -->
   </main>
 
-  <script src="js/user-system.js?v=25"></script>
-  <script src="js/achievements.js?v=25"></script>
+  <!-- ═══════ Auth Modal ═══════ -->
+  <div class="auth-modal-backdrop" id="authModalBackdrop" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+      <div class="auth-modal">
+          <button class="auth-modal-close" id="authCloseBtn" aria-label="إغلاق">✕</button>
+          <h2 class="auth-title" id="authTitle">تسجيل الدخول</h2>
+          <p class="auth-subtitle" id="authSubtitle">مرحباً بعودتك إلى المكتبة</p>
+
+          <button class="auth-google-btn" id="authGoogleBtn" type="button">
+              <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/>
+                  <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/>
+                  <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/>
+                  <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571.001-.001.002-.001.003-.002l6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/>
+              </svg>
+              <span>تسجيل الدخول بـGoogle</span>
+          </button>
+
+          <div class="auth-divider"><span>أو</span></div>
+
+          <div class="auth-error" id="authError"></div>
+          <div class="auth-info" id="authInfo"></div>
+
+          <form id="authForm">
+              <div class="auth-field" id="fieldDisplayName" style="display:none;">
+                  <label for="authDisplayName">اسم العرض</label>
+                  <input type="text" id="authDisplayName" autocomplete="name" placeholder="كيف ينادونك القرّاء؟">
+              </div>
+              <div class="auth-field">
+                  <label for="authEmail">البريد الإلكتروني أو اسم المستخدم</label>
+                  <input type="text" id="authEmail" autocomplete="username" required>
+              </div>
+              <div class="auth-field">
+                  <label for="authPassword">كلمة السرّ</label>
+                  <input type="password" id="authPassword" autocomplete="current-password" required minlength="4">
+              </div>
+              <button type="submit" class="auth-submit-btn" id="authSubmitBtn">دخول</button>
+          </form>
+
+          <div class="auth-toggle">
+              <span id="authToggleText">ليس لديك حساب؟</span>
+              <button type="button" id="authToggleBtn">إنشاء حساب جديد</button>
+          </div>
+      </div>
+  </div>
+
+  <script src="js/config.js?v=28"></script>
+  <script src="js/firebase-auth.js?v=28"></script>
+  <script src="js/user-system.js?v=28"></script>
+  <script src="js/achievements.js?v=28"></script>
 
   <script>
   (function () {
@@ -276,6 +481,114 @@
       themeBtn.textContent = n === 'dark' ? '☀️' : '🌙';
     });
     themeBtn.textContent = (document.documentElement.getAttribute('data-theme')||'light') === 'dark' ? '☀️' : '🌙';
+
+    /* ── Auth modal wiring (reusable) ──────────────────────────────── */
+    const backdrop = document.getElementById('authModalBackdrop');
+    const closeBtn = document.getElementById('authCloseBtn');
+    const googleBtn = document.getElementById('authGoogleBtn');
+    const form = document.getElementById('authForm');
+    const titleEl = document.getElementById('authTitle');
+    const subEl = document.getElementById('authSubtitle');
+    const toggleText = document.getElementById('authToggleText');
+    const toggleBtn = document.getElementById('authToggleBtn');
+    const submitBtn = document.getElementById('authSubmitBtn');
+    const fieldDisplayName = document.getElementById('fieldDisplayName');
+    const errorEl = document.getElementById('authError');
+    const infoEl = document.getElementById('authInfo');
+    let mode = 'login';
+
+    function openAuthModal() {
+      sessionStorage.setItem('returnUrl', location.href);
+      backdrop.classList.add('open');
+      document.getElementById('authEmail')?.focus();
+      showError(''); showInfo('');
+    }
+    function closeAuthModal() { backdrop.classList.remove('open'); }
+    function showError(m) { if (!m) { errorEl.classList.remove('show'); errorEl.textContent=''; return; } errorEl.textContent = m; errorEl.classList.add('show'); }
+    function showInfo(m)  { if (!m) { infoEl.classList.remove('show');  infoEl.textContent='';  return; } infoEl.textContent = m;  infoEl.classList.add('show'); }
+    function setMode(next) {
+      mode = next;
+      if (mode === 'signup') {
+        titleEl.textContent = 'إنشاء حساب جديد';
+        subEl.textContent = 'انضمّ إلى مجتمع القرّاء';
+        submitBtn.textContent = 'إنشاء الحساب';
+        fieldDisplayName.style.display = 'block';
+        toggleText.textContent = 'لديك حساب بالفعل؟';
+        toggleBtn.textContent = 'تسجيل الدخول';
+        document.getElementById('authPassword').setAttribute('autocomplete', 'new-password');
+      } else {
+        titleEl.textContent = 'تسجيل الدخول';
+        subEl.textContent = 'مرحباً بعودتك إلى المكتبة';
+        submitBtn.textContent = 'دخول';
+        fieldDisplayName.style.display = 'none';
+        toggleText.textContent = 'ليس لديك حساب؟';
+        toggleBtn.textContent = 'إنشاء حساب جديد';
+        document.getElementById('authPassword').setAttribute('autocomplete', 'current-password');
+      }
+      showError(''); showInfo('');
+    }
+    closeBtn?.addEventListener('click', closeAuthModal);
+    backdrop?.addEventListener('click', e => { if (e.target === backdrop) closeAuthModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && backdrop.classList.contains('open')) closeAuthModal(); });
+    toggleBtn?.addEventListener('click', () => setMode(mode === 'login' ? 'signup' : 'login'));
+
+    googleBtn?.addEventListener('click', async () => {
+      showError('');
+      if (typeof FBAUTH === 'undefined' || !FBAUTH.isConfigured()) {
+        showError('دخول Google غير مفعّل حاليّاً. الرجاء استخدام اسم مستخدم وكلمة سرّ بدلاً من ذلك.');
+        return;
+      }
+      try {
+        googleBtn.disabled = true;
+        const session = await FBAUTH.signInGoogle();
+        await USER.setSession(session);
+        showInfo('تم تسجيل الدخول. جارٍ التحويل...');
+        setTimeout(() => location.reload(), 400);
+      } catch (err) {
+        showError('تعذّر تسجيل الدخول بـGoogle: ' + (err.message || err));
+      } finally { googleBtn.disabled = false; }
+    });
+
+    form?.addEventListener('submit', async e => {
+      e.preventDefault(); showError('');
+      const email = document.getElementById('authEmail').value.trim();
+      const password = document.getElementById('authPassword').value;
+      const displayName = document.getElementById('authDisplayName').value.trim();
+      if (!email || !password) { showError('املأ جميع الحقول'); return; }
+      submitBtn.disabled = true;
+      try {
+        if (mode === 'signup') {
+          if (typeof FBAUTH !== 'undefined' && FBAUTH.isConfigured()) {
+            const session = await FBAUTH.signUpEmail(email, password, displayName || email.split('@')[0]);
+            await USER.setSession(session);
+            showInfo('تم إنشاء الحساب. جارٍ التحويل...');
+            setTimeout(() => location.reload(), 500);
+          } else {
+            showError('إنشاء الحسابات الجديدة يحتاج إلى Firebase. يرجى مراجعة المالك لتفعيله.');
+          }
+        } else {
+          const looksLikeEmail = email.includes('@');
+          if (looksLikeEmail && typeof FBAUTH !== 'undefined' && FBAUTH.isConfigured()) {
+            const session = await FBAUTH.signInEmail(email, password);
+            await USER.setSession(session);
+          } else {
+            const session = await USER.login(email, password);
+            if (!session) {
+              showError('اسم المستخدم أو كلمة السرّ غير صحيحة');
+              submitBtn.disabled = false;
+              return;
+            }
+          }
+          showInfo('تم تسجيل الدخول. جارٍ التحويل...');
+          setTimeout(() => location.reload(), 400);
+        }
+      } catch (err) {
+        showError(err.message || String(err));
+      } finally { submitBtn.disabled = false; }
+    });
+
+    // Expose openAuthModal globally so other handlers can use it
+    window.openAuthModal = openAuthModal;
 
     /* ── User ──────────────────────────────────────────────────── */
     const main = document.getElementById('profileMain');
@@ -297,8 +610,12 @@
           <div class="pf-guest-icon">📚</div>
           <h1 class="pf-guest-title">صفحتك تنتظرك</h1>
           <p class="pf-guest-sub">سجّل دخولك لترى إحصائيّاتك وإنجازاتك وسجلّ نشاطك القرائي.</p>
-          <a href="v2.html" class="pf-guest-link">→ العودة وتسجيل الدخول</a>
+          <button type="button" class="pf-guest-link" id="pfOpenLogin">تسجيل الدخول</button>
+          <div><a href="/" class="pf-guest-secondary">→ العودة إلى الصفحة الرئيسية</a></div>
         </div>`;
+      document.getElementById('pfOpenLogin')?.addEventListener('click', openAuthModal);
+      // Auto-open modal if ?login=1 in URL
+      if (/[?&]login=1\b/.test(location.search)) openAuthModal();
       return;
     }
 
