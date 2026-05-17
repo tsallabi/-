@@ -1,6 +1,6 @@
 /**
- * reader-luxury.js — المكتبة الطيبة Wave 2
- * Luxury reading sanctuary features · RTL Arabic · v=25
+ * reader-luxury.js — مكتبة ليبيا الطيبة Wave 2
+ * Luxury reading sanctuary features · RTL Arabic · v=28
  *
  * Features:
  *  1. 4-colour text highlights (localStorage)
@@ -651,7 +651,7 @@
 
     if (barTitle)  barTitle.textContent  = bookTitle  || 'جارٍ التحميل...';
     if (barAuthor) barAuthor.textContent = bookAuthor || '';
-    document.title = (bookTitle || 'قارئ') + ' — المكتبة الطيبة';
+    document.title = (bookTitle || 'قارئ') + ' — مكتبة ليبيا الطيبة';
 
     // ── Toolbar wiring ──────────────────────────────────────────
     document.getElementById('backBtn')?.addEventListener('click', () => history.back());
@@ -736,7 +736,7 @@
           bookAuthor = data.author || bookAuthor;
           if (barTitle)  barTitle.textContent  = bookTitle;
           if (barAuthor) barAuthor.textContent = bookAuthor;
-          document.title = bookTitle + ' — المكتبة الطيبة';
+          document.title = bookTitle + ' — مكتبة ليبيا الطيبة';
           if (data.pdf) startPdfLoad(data.pdf);
           else showError('لا يوجد ملف PDF مرتبط بهذا الكتاب.');
         })
@@ -844,7 +844,7 @@
     readerMessage.innerHTML = `
       <h2>الكتاب غير متاح</h2>
       <p>${msg}</p>
-      <p><a href="index.html">العودة إلى الصفحة الرئيسية</a></p>`;
+      <p><a href="/">العودة إلى الصفحة الرئيسية</a></p>`;
     readerMessage.style.display = 'block';
   }
 
