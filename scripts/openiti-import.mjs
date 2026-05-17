@@ -13,6 +13,9 @@
  * Usage:
  *   node scripts/openiti-import.mjs              # default 500
  *   node scripts/openiti-import.mjs 2000
+ *
+ * Auth: set GITHUB_TOKEN env var to raise rate-limit from 10/min to 5000/hr.
+ * (GitHub Actions provides GITHUB_TOKEN automatically.)
  */
 
 import fs from 'node:fs/promises';
@@ -25,8 +28,19 @@ const EXTRA_FILE = path.join(DATA_DIR, 'books-extra-3.json');
 
 const GH_SEARCH = 'https://api.github.com/search/code';
 const REPO = 'OpenITI/RELEASE';
+const GH_TOKEN = process.env.GITHUB_TOKEN || '';
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function ghHeaders() {
+    const h = {
+        'User-Agent': 'TaybaaLibrary/3.0',
+        'Accept': 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28'
+    };
+    if (GH_TOKEN) h['Authorization'] = `Bearer ${GH_TOKEN}`;
+    return h;
+}
 
 /**
  * بحث GitHub Code API — يوجد ملفات OpenITI .completed
@@ -34,10 +48,11 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 async function searchGitHub(query) {
     const url = `${GH_SEARCH}?q=${encodeURIComponent(query)}+repo:${REPO}&per_page=100`;
     try {
-        const r = await fetch(url, {
-            headers: { 'User-Agent': 'TaybaaLibrary/3.0', 'Accept': 'application/vnd.github+json' }
-        });
-        if (!r.ok) return [];
+        const r = await fetch(url, { headers: ghHeaders() });
+        if (!r.ok) {
+            console.log(`   ⚠️ GitHub API ${r.status} ${r.statusText}`);
+            return [];
+        }
         const data = await r.json();
         return data.items || [];
     } catch { return []; }
@@ -92,7 +107,8 @@ async function loadExisting() {
 
 async function main() {
     const target = parseInt(process.argv[2] || '500');
-    console.log(`📜 OpenITI importer — هدف: ${target} نصّ إسلامي أكاديمي\n`);
+    console.log(`📜 OpenITI importer — هدف: ${target} نصّ إسلامي أكاديمي`);
+    console.log(`🔑 GitHub auth: ${GH_TOKEN ? 'enabled (5000/hr)' : 'DISABLED (10/min — set GITHUB_TOKEN)'}\n`);
 
     const existing = await loadExisting();
     const existingIds = new Set(existing.filter(b => b.source === 'openiti').map(b => b.id));
@@ -122,12 +138,16 @@ async function main() {
                 console.log(`   ✓ [${fresh.length}] ${item.name.slice(0, 60)}`);
             }
         }
-        await sleep(2000);  // GitHub Search API rate limit (10/min unauthenticated)
+        // With auth: 30 search-requests/min. Without: 10/min. Keep a safe gap.
+        await sleep(GH_TOKEN ? 2200 : 6500);
     }
 
     if (!fresh.length) {
-        console.log('\n⚠️ لم يتم جلب أي ملفات. GitHub API حدّ rate limit (10/دقيقة)');
-        console.log('   توجد بدائل: استنساخ المستودع والبحث فيه محليّاً:');
+        console.log('\n⚠️ لم يتم جلب أي ملفات.');
+        if (!GH_TOKEN) {
+            console.log('   💡 لرفع الحدّ: صدِّر GITHUB_TOKEN قبل التشغيل (5000/ساعة بدل 10/دقيقة).');
+        }
+        console.log('   بديل: استنساخ المستودع والبحث محليّاً:');
         console.log('   git clone https://github.com/OpenITI/RELEASE');
         return;
     }
