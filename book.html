@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1a0f08">
     <title>تفاصيل الكتاب — المكتبة الطيبة</title>
-    <link rel="stylesheet" href="css/style.css?v=25">
+    <link rel="stylesheet" href="css/style.css?v=27">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:wght@700&family=Aref+Ruqaa:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&family=Cairo:wght@400;600;700;900&family=Amiri:wght@700&family=Aref+Ruqaa:wght@400;700&display=swap" rel="stylesheet">
     <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('taybaa-theme') || 'dark');</script>
     <style>
         .book-publisher { display: inline-flex; align-items: center; gap: .5rem; margin: .85rem 0 1.2rem; padding: .55rem 1.15rem; background: linear-gradient(135deg, rgba(107,68,35,.12), rgba(184,148,31,.15)); border: 1px solid rgba(184,148,31,.45); border-radius: 999px; font-family: 'Aref Ruqaa', 'Amiri', serif; font-size: .95rem; color: var(--text); }
@@ -50,6 +50,37 @@
         .vip-lock-btn:hover { border-color: #ce1126; color: #ce1126; background: rgba(206,17,38,.05); }
         .vip-lock-btn.vip-style:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-soft); }
 
+        /* Admin: per-detail hide button */
+        .admin-hide-bar {
+            margin-top: 1rem;
+            padding: .85rem 1rem;
+            background: rgba(177,55,63,.06);
+            border: 1px dashed rgba(177,55,63,.45);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .75rem;
+        }
+        .admin-hide-bar-label {
+            font-family: 'Aref Ruqaa', serif;
+            color: #B1373F;
+            font-size: .92rem;
+        }
+        .admin-hide-bar-btn {
+            padding: .45rem 1rem;
+            background: #B1373F;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background .2s;
+        }
+        .admin-hide-bar-btn:hover { background: #8d2127; }
+        .admin-hide-bar-btn.is-hidden { background: #5a7a3a; }
+
         /* ═══════════════════════════════════════════════════════════
            Reviews panel styles
            ═══════════════════════════════════════════════════════════ */
@@ -86,7 +117,7 @@
             padding: .6rem 1.1rem;
         }
         .rv-avg-score {
-            font-family: 'Reem Kufi', 'Aref Ruqaa', serif;
+            font-family: 'Aref Ruqaa', 'Reem Kufi', serif;
             font-size: 1.6rem;
             font-weight: 700;
             color: #B89968;
@@ -115,7 +146,7 @@
             border-radius: 50%;
             display: grid;
             place-items: center;
-            font-family: 'Reem Kufi', sans-serif;
+            font-family: 'Aref Ruqaa', sans-serif;
             font-weight: 700;
             font-size: 1.1rem;
             color: #fff;
@@ -332,6 +363,12 @@
                     <button id="favBtn" type="button" class="fav-btn-detail">♡ أضف للمفضّلة</button>
                 </div>
 
+                <!-- Admin-only hide/unhide control (shown by js/admin-role.js) -->
+                <div id="adminHideBar" class="admin-hide-bar" hidden>
+                    <span class="admin-hide-bar-label">🛡️ المسؤول: التحكم بظهور هذا الكتاب</span>
+                    <button type="button" class="admin-hide-bar-btn" id="adminHideBarBtn">إخفاء</button>
+                </div>
+
                 <div class="soon-notice" id="soonNotice" hidden>
                     <strong>📖 قريباً في المكتبة</strong><br>
                     هذا الكتاب مدرج في فهرس المكتبة، وسيتوفّر للقراءة والتحميل بعد رفع نسخته الرسمية على أرشيف الدار.
@@ -360,15 +397,16 @@
         </div>
     </footer>
 
-    <script src="js/config.js?v=25"></script>
-    <script src="js/cover-resolver.js?v=25"></script>
-    <script src="js/data.js?v=25"></script>
-    <script src="js/firebase-counter.js?v=25"></script>
-    <script src="js/user-system.js?v=25"></script>
-    <script src="js/achievements.js?v=25"></script>
-    <script src="js/reviews.js?v=25"></script>
-    <script src="js/book.js?v=25"></script>
-    <script src="js/profile.js?v=25"></script>
+    <script src="js/config.js?v=27"></script>
+    <script src="js/cover-resolver.js?v=27"></script>
+    <script src="js/data.js?v=27"></script>
+    <script src="js/firebase-counter.js?v=27"></script>
+    <script src="js/user-system.js?v=27"></script>
+    <script src="js/achievements.js?v=27"></script>
+    <script src="js/admin-role.js?v=27"></script>
+    <script src="js/reviews.js?v=27"></script>
+    <script src="js/book.js?v=27"></script>
+    <script src="js/profile.js?v=27"></script>
     <script>
         /* ── Mount reviews after book.js reveals the bookDetail article ── */
         (function () {
@@ -387,6 +425,37 @@
                 }
             });
             obs.observe(detail, { attributes: true, attributeFilter: ['hidden'] });
+        })();
+
+        /* ── Admin: wire hide/unhide bar after admin-role module is ready ── */
+        (async function () {
+            const params = new URLSearchParams(location.search);
+            const bookId = params.get('id') || params.get('bookId');
+            if (!bookId) return;
+            try {
+                if (window.ADMIN_ROLE && window.ADMIN_ROLE.ready) await window.ADMIN_ROLE.ready;
+            } catch (_) {}
+            if (!window.IS_ADMIN) return;
+            const bar = document.getElementById('adminHideBar');
+            const btn = document.getElementById('adminHideBarBtn');
+            if (!bar || !btn) return;
+            bar.hidden = false;
+            function refresh() {
+                const hidden = window.isBookHidden && window.isBookHidden(bookId);
+                btn.textContent = hidden ? 'إعادة الإظهار' : 'إخفاء';
+                btn.classList.toggle('is-hidden', !!hidden);
+            }
+            refresh();
+            btn.addEventListener('click', () => {
+                const hidden = window.isBookHidden && window.isBookHidden(bookId);
+                if (hidden) {
+                    if (window.adminUnhideBook) window.adminUnhideBook(bookId);
+                } else {
+                    if (!confirm('حذف الكتاب من المكتبة؟')) return;
+                    if (window.adminHideBook) window.adminHideBook(bookId);
+                }
+                refresh();
+            });
         })();
     </script>
 </body>
