@@ -1,15 +1,23 @@
 /**
  * sanctuary.js — واحة القراءة · المكتبة الطيبة
- * Reading Sanctuary wellness layer · RTL Arabic · v=24
+ * Reading Sanctuary wellness layer · RTL Arabic · v=27
  *
  * Features:
  *  A) Reading Goal + gold SVG progress ring
  *  B) Reading Streak tracker
- *  C) Ambient Sounds panel (UI ready — audio assets need CDN URLs)
+ *  C) Ambient Sounds panel — PROCEDURAL Web Audio (no MP3 files needed)
  *  D) Slow Read / تأمّل auto-scroll mode
  *  E) Breathing Cue (4-7-8 pattern)
  *  F) End-of-Session Reflection overlay
  *  G) Public SANCTUARY API for sanctuary.html dashboard
+ *
+ * v=27: Replaced HTML <audio> + MP3 placeholders with WebAudio synthesis.
+ *       Every ambient track is now generated live in the browser:
+ *         - rain     → white noise → lowpass @ 1kHz
+ *         - fountain → pink noise  → bandpass @ 800Hz + delay reverb
+ *         - breath   → 220Hz sine modulated by 0.25Hz LFO
+ *         - page     → short noise burst with decay envelope (loops every 4s)
+ *         - silence  → stops everything
  *
  * Zero dependencies · Pure vanilla JS · localStorage only
  * Respects prefers-reduced-motion throughout
@@ -60,7 +68,6 @@
     const cur = goalTodayMinutes();
     const next = cur + m;
     lsSet(goalTodayKey(), next);
-    // Check if we just crossed the threshold — mark goal met
     if (cur < goalTarget() && next >= goalTarget()) {
       _markGoalMetToday();
     }
@@ -69,13 +76,12 @@
 
   function _markGoalMetToday() {
     lsSet(`taybaa-goal-met-${todayKey()}`, true);
-    // Recalculate streak
     _updateStreak();
   }
 
   function goalMetToday() { return !!lsGet(`taybaa-goal-met-${todayKey()}`, false); }
 
-  /* SVG Ring rendering — pure inline SVG, no external assets */
+  /* SVG Ring rendering */
   function buildGoalRing(pct, size) {
     size = size || 72;
     const r = (size / 2) - 6;
@@ -93,7 +99,7 @@
         transform="rotate(-90 ${size/2} ${size/2})"
         style="transition:stroke-dashoffset .6s ease;"/>
       <text x="50%" y="50%" text-anchor="middle" dominant-baseline="central"
-        font-family="Reem Kufi,Cairo,sans-serif" font-size="${size * 0.2}px"
+        font-family="Aref Ruqaa,Reem Kufi,sans-serif" font-size="${size * 0.2}px"
         fill="#B89968" font-weight="700">${Math.round(pct * 100)}%</text>
     </svg>`;
   }
@@ -108,7 +114,7 @@
     for (let i = 0; i >= -365; i--) {
       const met = lsGet(`taybaa-goal-met-${dayKey(i)}`, false);
       if (met) streak++;
-      else if (i < 0) break; // gap — stop counting backwards
+      else if (i < 0) break;
     }
     lsSet(STREAK_KEY, streak);
     return streak;
@@ -117,69 +123,237 @@
   function getStreak() { return lsGet(STREAK_KEY, 0); }
 
   /* ═══════════════════════════════════════════════════════════════
-   * C) AMBIENT SOUNDS
-   * ═══════════════════════════════════════════════════════════════ */
-  /*
-   * AUDIO ASSETS NOTE:
-   * The URLs below are placeholder paths. Replace them with real CDN URLs
-   * of royalty-free audio files before deploying to production.
-   *
-   * Recommended sources (all royalty-free):
-   *   - https://freesound.org  (Creative Commons)
-   *   - https://pixabay.com/sound-effects/
-   *   - Self-hosted in /assets/sounds/
-   *
-   * TODO (assets team): upload .mp3 files to /assets/sounds/ and update these paths:
+   * C) AMBIENT SOUNDS — PROCEDURAL via Web Audio API
+   * ═══════════════════════════════════════════════════════════════
+   * No external MP3 files required. Each track is synthesised at runtime
+   * from noise + filter chains. ConvolverNode is avoided in favour of a
+   * cheap delay-based pseudo-reverb where helpful.
    */
   const AMBIENT_TRACKS = [
-    { id: 'rain',     label: 'مطر هادئ',       icon: '🌧️', src: '/assets/sounds/rain.mp3' },
-    { id: 'fountain', label: 'نافورة',          icon: '⛲', src: '/assets/sounds/fountain.mp3' },
-    { id: 'page',     label: 'صفحة تُقلب',      icon: '📜', src: '/assets/sounds/page-turn.mp3' },
-    { id: 'doves',    label: 'حمام أندلسي',     icon: '🕊️', src: '/assets/sounds/doves.mp3' },
-    { id: 'silence',  label: 'صمت',             icon: '🔇', src: null }
+    { id: 'rain',     label: 'مطر هادئ',       icon: '🌧️' },
+    { id: 'fountain', label: 'نافورة',          icon: '⛲' },
+    { id: 'breath',   label: 'حمام أنفاس',      icon: '🌬️' },
+    { id: 'page',     label: 'صفحة تُقلب',      icon: '📜' },
+    { id: 'silence',  label: 'صمت',             icon: '🔇' }
   ];
 
-  let _ambientActive = null; // track id
-  const _audioEls = {};
+  let _audioCtx = null;
+  let _masterGain = null;
+  let _activeNodes = []; // every node currently producing sound — easy to tear down
+  let _ambientActive = null;
+  let _pageInterval = null;
 
-  function _getAudio(trackId) {
-    if (!_audioEls[trackId]) {
-      const track = AMBIENT_TRACKS.find(t => t.id === trackId);
-      if (!track || !track.src) return null;
-      const a = document.createElement('audio');
-      a.src = track.src;
-      a.loop = true;
-      a.volume = 0.35;
-      a.preload = 'none';
-      _audioEls[trackId] = a;
+  function _getAudioContext() {
+    if (_audioCtx) return _audioCtx;
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return null;
+    _audioCtx = new Ctx();
+    _masterGain = _audioCtx.createGain();
+    _masterGain.gain.value = lsGet('taybaa-ambient-vol', 0.35);
+    _masterGain.connect(_audioCtx.destination);
+    return _audioCtx;
+  }
+
+  /* Build a long noise buffer once and reuse */
+  let _whiteNoiseBuffer = null;
+  function _whiteNoise() {
+    const ctx = _getAudioContext();
+    if (!ctx) return null;
+    if (!_whiteNoiseBuffer) {
+      const seconds = 4;
+      const buffer = ctx.createBuffer(1, ctx.sampleRate * seconds, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+      _whiteNoiseBuffer = buffer;
     }
-    return _audioEls[trackId];
+    const src = ctx.createBufferSource();
+    src.buffer = _whiteNoiseBuffer;
+    src.loop = true;
+    return src;
+  }
+
+  /* Paul Kellet pink noise approximation */
+  let _pinkNoiseBuffer = null;
+  function _pinkNoise() {
+    const ctx = _getAudioContext();
+    if (!ctx) return null;
+    if (!_pinkNoiseBuffer) {
+      const seconds = 4;
+      const buffer = ctx.createBuffer(1, ctx.sampleRate * seconds, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+      for (let i = 0; i < data.length; i++) {
+        const white = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        b3 = 0.86650 * b3 + white * 0.3104856;
+        b4 = 0.55000 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.0168980;
+        data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+        b6 = white * 0.115926;
+      }
+      _pinkNoiseBuffer = buffer;
+    }
+    const src = ctx.createBufferSource();
+    src.buffer = _pinkNoiseBuffer;
+    src.loop = true;
+    return src;
+  }
+
+  function _stopAllAudio() {
+    _activeNodes.forEach(n => {
+      try { if (n.stop) n.stop(); if (n.disconnect) n.disconnect(); } catch (_) {}
+    });
+    _activeNodes = [];
+    if (_pageInterval) { clearInterval(_pageInterval); _pageInterval = null; }
+  }
+
+  /* مطر — white noise → lowpass @ 1kHz + slight LFO on the cutoff */
+  function _startRain() {
+    const ctx = _getAudioContext();
+    if (!ctx) return;
+    const src = _whiteNoise();
+    if (!src) return;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 1000;
+    filter.Q.value = 0.7;
+    // Subtle modulation so it doesn't sound static
+    const lfo = ctx.createOscillator();
+    lfo.frequency.value = 0.15;
+    const lfoGain = ctx.createGain();
+    lfoGain.gain.value = 220;
+    lfo.connect(lfoGain).connect(filter.frequency);
+    const trackGain = ctx.createGain();
+    trackGain.gain.value = 0.85;
+    src.connect(filter).connect(trackGain).connect(_masterGain);
+    src.start();
+    lfo.start();
+    _activeNodes.push(src, filter, lfo, lfoGain, trackGain);
+  }
+
+  /* نافورة — pink noise → bandpass @ 800Hz + simple delay reverb */
+  function _startFountain() {
+    const ctx = _getAudioContext();
+    if (!ctx) return;
+    const src = _pinkNoise();
+    if (!src) return;
+    const bp = ctx.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.frequency.value = 800;
+    bp.Q.value = 1.2;
+    const trackGain = ctx.createGain();
+    trackGain.gain.value = 0.5;
+    // Simple delay-based pseudo reverb (cheaper than ConvolverNode)
+    const delay = ctx.createDelay(1.5);
+    delay.delayTime.value = 0.18;
+    const feedback = ctx.createGain();
+    feedback.gain.value = 0.35;
+    delay.connect(feedback).connect(delay);
+    const wetGain = ctx.createGain();
+    wetGain.gain.value = 0.4;
+    delay.connect(wetGain).connect(_masterGain);
+    src.connect(bp);
+    bp.connect(trackGain).connect(_masterGain);
+    bp.connect(delay);
+    src.start();
+    _activeNodes.push(src, bp, trackGain, delay, feedback, wetGain);
+  }
+
+  /* حمام أنفاس — 220Hz sine, 0.25Hz LFO controlling amplitude (4s breath cycle) */
+  function _startBreath() {
+    const ctx = _getAudioContext();
+    if (!ctx) return;
+    const carrier = ctx.createOscillator();
+    carrier.type = 'sine';
+    carrier.frequency.value = 220;
+    const ampGain = ctx.createGain();
+    ampGain.gain.value = 0; // controlled by LFO
+    const lfo = ctx.createOscillator();
+    lfo.type = 'sine';
+    lfo.frequency.value = 0.25; // one breath every 4s
+    const lfoDepth = ctx.createGain();
+    lfoDepth.gain.value = 0.18; // peak amplitude
+    // Add a DC offset so the gain oscillates between ~0 and ~0.36 instead of -0.18..+0.18
+    const dc = ctx.createConstantSource();
+    dc.offset.value = 0.18;
+    lfo.connect(lfoDepth);
+    lfoDepth.connect(ampGain.gain);
+    dc.connect(ampGain.gain);
+    carrier.connect(ampGain).connect(_masterGain);
+    carrier.start();
+    lfo.start();
+    dc.start();
+    _activeNodes.push(carrier, ampGain, lfo, lfoDepth, dc);
+  }
+
+  /* صفحة تُقلب — short filtered-noise envelope every ~4 seconds */
+  function _startPageFlip() {
+    const ctx = _getAudioContext();
+    if (!ctx) return;
+    function fire() {
+      const src = _whiteNoise();
+      if (!src) return;
+      const hp = ctx.createBiquadFilter();
+      hp.type = 'highpass';
+      hp.frequency.value = 1800;
+      const lp = ctx.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.value = 6000;
+      const env = ctx.createGain();
+      const t = ctx.currentTime;
+      env.gain.setValueAtTime(0.0001, t);
+      env.gain.exponentialRampToValueAtTime(0.5, t + 0.02);
+      env.gain.exponentialRampToValueAtTime(0.0001, t + 0.45);
+      src.connect(hp).connect(lp).connect(env).connect(_masterGain);
+      src.start(t);
+      src.stop(t + 0.5);
+      // Auto-cleanup after this one fires
+      setTimeout(() => {
+        try { src.disconnect(); hp.disconnect(); lp.disconnect(); env.disconnect(); } catch (_) {}
+      }, 600);
+    }
+    fire(); // first one immediately
+    _pageInterval = setInterval(fire, 3500 + Math.random() * 1500);
   }
 
   function ambientPlay(trackId) {
-    // Stop previous
-    if (_ambientActive && _ambientActive !== trackId) {
-      const prev = _getAudio(_ambientActive);
-      if (prev) { prev.pause(); prev.currentTime = 0; }
-    }
-    _ambientActive = trackId === 'silence' ? null : trackId;
-    if (trackId === 'silence' || !trackId) {
+    // Stop everything currently playing
+    _stopAllAudio();
+    if (!trackId || trackId === 'silence') {
       _ambientActive = null;
       lsSet('taybaa-ambient', null);
       return;
     }
+    // If we re-clicked the same active track, treat as toggle-off
+    if (_ambientActive === trackId) {
+      _ambientActive = null;
+      lsSet('taybaa-ambient', null);
+      return;
+    }
+    _ambientActive = trackId;
     lsSet('taybaa-ambient', trackId);
-    const audio = _getAudio(trackId);
-    if (audio) {
-      audio.play().catch(() => {
-        // Autoplay blocked — show a gentle hint
-        showSancToast('اضغط مرة أخرى لتشغيل الصوت');
-      });
+    // Ensure context resumed (some browsers start it suspended)
+    const ctx = _getAudioContext();
+    if (ctx && ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
+    }
+    switch (trackId) {
+      case 'rain':     _startRain();      break;
+      case 'fountain': _startFountain();  break;
+      case 'breath':   _startBreath();    break;
+      case 'page':     _startPageFlip();  break;
+      default: break;
     }
   }
 
   function ambientSetVolume(v) {
-    Object.values(_audioEls).forEach(a => { if (a) a.volume = v; });
+    const ctx = _getAudioContext();
+    if (_masterGain && ctx) {
+      // Smooth ramp to avoid clicks
+      _masterGain.gain.setTargetAtTime(Math.max(0, Math.min(1, v)), ctx.currentTime, 0.05);
+    }
     lsSet('taybaa-ambient-vol', v);
   }
 
@@ -187,23 +361,20 @@
    * D) SLOW READ / تأمّل MODE
    * ═══════════════════════════════════════════════════════════════ */
   let _slowReadActive = false;
-  let _slowReadSpeed = 1; // px per second
+  let _slowReadSpeed = 1;
   let _slowReadRaf = null;
   let _slowReadLast = null;
 
   function slowReadToggle() {
     _slowReadActive = !_slowReadActive;
     lsSet('taybaa-slow-read', _slowReadActive);
-    if (_slowReadActive) {
-      _startSlowRead();
-    } else {
-      _stopSlowRead();
-    }
+    if (_slowReadActive) _startSlowRead();
+    else _stopSlowRead();
     _updateSlowReadBtn();
   }
 
   function _startSlowRead() {
-    if (REDUCED) return; // respect prefers-reduced-motion — button is still active
+    if (REDUCED) return;
     _slowReadLast = null;
     function tick(ts) {
       if (!_slowReadActive) return;
@@ -236,19 +407,18 @@
    * ═══════════════════════════════════════════════════════════════ */
   let _breathShown = false;
   let _breathDisabled = lsGet('taybaa-breath-disabled', false);
-  const BREATH_EVERY_N_PAGES = 10; // Show breathing cue every N pages
+  const BREATH_EVERY_N_PAGES = 10;
 
   function maybeShowBreath(pageNum) {
     if (_breathDisabled || _breathShown) return;
     if (pageNum !== 1 && pageNum % BREATH_EVERY_N_PAGES !== 0) return;
     _breathShown = true;
     _showBreathingOverlay();
-    // Allow re-triggering after 5 min
     setTimeout(() => { _breathShown = false; }, 5 * 60 * 1000);
   }
 
   function _showBreathingOverlay() {
-    if (REDUCED) return; // Honour prefers-reduced-motion
+    if (REDUCED) return;
     const existing = document.getElementById('snc-breath-overlay');
     if (existing) existing.remove();
 
@@ -276,7 +446,6 @@
       overlay.remove();
     };
 
-    // 4-7-8 cycle × 2
     const ring = document.getElementById('snc-breath-ring');
     const text = document.getElementById('snc-breath-text');
     const phases = [
@@ -298,7 +467,6 @@
       delay += phase.dur;
     });
 
-    // Auto-dismiss after full cycle + small buffer
     setTimeout(() => {
       const el = document.getElementById('snc-breath-overlay');
       if (el) { el.style.opacity = '0'; setTimeout(() => el.remove(), 400); }
@@ -344,7 +512,7 @@
 
   function _showReflectionOverlay() {
     if (_sessionShown) return;
-    if (_sessionMinutes < 2) return; // Only show after ≥ 2 min reading
+    if (_sessionMinutes < 2) return;
     _sessionShown = true;
 
     const overlay = document.createElement('div');
@@ -375,7 +543,6 @@
       </div>`;
     document.body.appendChild(overlay);
 
-    // Star interaction
     let _selectedStars = 0;
     const starBtns = overlay.querySelectorAll('.snc-star');
     starBtns.forEach(btn => {
@@ -395,7 +562,6 @@
       showSancToast('تمت إضافة تأمّلك إلى يوميّاتك 🌿');
     };
 
-    // Animate in
     requestAnimationFrame(() => overlay.classList.add('snc-visible'));
   }
 
@@ -404,7 +570,7 @@
   }
 
   /* ═══════════════════════════════════════════════════════════════
-   * SESSION MINUTE TRACKING (ties A, F, streak together)
+   * SESSION MINUTE TRACKING
    * ═══════════════════════════════════════════════════════════════ */
   let _sessionTimer = null;
 
@@ -412,7 +578,7 @@
     if (_sessionTimer) return;
     _sessionTimer = setInterval(() => {
       if (document.hidden) return;
-      _sessionMinutes += 10 / 60; // 10-second ticks
+      _sessionMinutes += 10 / 60;
       const added = goalAddMinutes(10 / 60);
       _updateGoalWidget();
       _updateStreakBadge();
@@ -423,7 +589,6 @@
     if (_sessionTimer) { clearInterval(_sessionTimer); _sessionTimer = null; }
   }
 
-  /* ─── Total / week / month aggregate minutes ─────────────────── */
   function getTotalMinutes() {
     let total = 0;
     try {
@@ -439,17 +604,13 @@
 
   function getWeekMinutes() {
     let total = 0;
-    for (let i = 0; i >= -6; i--) {
-      total += lsGet(`taybaa-goal-${dayKey(i)}`, 0);
-    }
+    for (let i = 0; i >= -6; i--) total += lsGet(`taybaa-goal-${dayKey(i)}`, 0);
     return total;
   }
 
   function getMonthMinutes() {
     let total = 0;
-    for (let i = 0; i >= -29; i--) {
-      total += lsGet(`taybaa-goal-${dayKey(i)}`, 0);
-    }
+    for (let i = 0; i >= -29; i--) total += lsGet(`taybaa-goal-${dayKey(i)}`, 0);
     return total;
   }
 
@@ -469,35 +630,26 @@
   }
 
   /* ═══════════════════════════════════════════════════════════════
-   * WIDGET RENDERING — injected into reader.html toolbar
+   * WIDGET RENDERING
    * ═══════════════════════════════════════════════════════════════ */
   function _buildSanctuaryBar() {
     const bar = document.createElement('div');
     bar.id = 'snc-bar';
     bar.innerHTML = `
-      <!-- Goal Ring mini -->
       <button class="snc-bar-btn" id="snc-goal-btn" title="هدفي اليومي" aria-label="هدفي اليومي">
         <span id="snc-goal-ring-mini"></span>
       </button>
-
-      <!-- Streak badge -->
       <div id="snc-streak-badge" class="snc-streak-badge" aria-live="polite"></div>
-
-      <!-- Slow Read toggle -->
       <button class="snc-bar-btn" id="snc-slow-btn"
         title="وضع التأمّل — قراءة بطيئة" aria-label="وضع القراءة البطيئة">
         <span class="snc-lotus" aria-hidden="true">🪷</span>
         <span class="snc-bar-label">تأمّل</span>
       </button>
-
-      <!-- Ambient sound toggle -->
       <button class="snc-bar-btn" id="snc-ambient-btn"
         title="الأصوات المحيطة" aria-label="الأصوات المحيطة">
         <span aria-hidden="true">🎵</span>
         <span class="snc-bar-label">أصوات</span>
       </button>
-
-      <!-- Sanctuary link -->
       <a href="sanctuary.html" class="snc-bar-btn" title="واحتي" aria-label="لوحة الواحة">
         <span aria-hidden="true">🌿</span>
         <span class="snc-bar-label">واحتي</span>
@@ -556,7 +708,7 @@
           <input type="range" class="snc-vol-slider" id="snc-vol-slider"
             min="0" max="1" step="0.05" value="${vol}" aria-label="مستوى الصوت">
         </div>
-        <p class="snc-ambient-disclaimer">⚠️ ملاحظة: ملفات الصوت تحتاج إلى رفع من فريق المحتوى.</p>
+        <p class="snc-ambient-disclaimer">✨ الأصوات مولّدة محلياً عبر متصفّحك — لا حاجة لأي ملفات.</p>
         <button class="snc-btn snc-btn-ghost snc-panel-close" id="snc-ambient-close">إغلاق</button>
       </div>`;
     return panel;
@@ -565,16 +717,12 @@
   /* ─── Update functions ─────────────────────────────────────────── */
   function _updateGoalWidget() {
     const pct = Math.min(1, goalTodayMinutes() / goalTarget());
-    // Mini ring in bar
     const mini = document.getElementById('snc-goal-ring-mini');
     if (mini) mini.innerHTML = buildGoalRing(pct, 32);
-    // Large ring in panel
     const large = document.getElementById('snc-goal-ring-large');
     if (large) large.innerHTML = buildGoalRing(pct, 120);
-    // Stat text
     const stat = document.querySelector('#snc-goal-panel .snc-goal-stat');
     if (stat) stat.textContent = `${Math.round(goalTodayMinutes())} / ${goalTarget()} دقيقة`;
-    // Goal value display
     const valEl = document.getElementById('snc-goal-value');
     if (valEl) valEl.textContent = goalTarget();
   }
@@ -619,11 +767,9 @@
   }
 
   /* ═══════════════════════════════════════════════════════════════
-   * INTEGRATION — hook into reader-luxury.js events
+   * INTEGRATION
    * ═══════════════════════════════════════════════════════════════ */
   function _hookIntoReader() {
-    // Intercept page changes to fire breathing cue
-    // We watch for changes to the pageInput value
     const pageInput = document.getElementById('pageInput');
     if (pageInput) {
       const observer = new MutationObserver(() => {
@@ -631,7 +777,6 @@
         if (!isNaN(p)) maybeShowBreath(p);
       });
       observer.observe(pageInput, { attributes: true, attributeFilter: ['value'] });
-      // Also hook value property setter
       const proto = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
       const _origSet = proto.set;
       Object.defineProperty(pageInput, 'value', {
@@ -645,7 +790,6 @@
       });
     }
 
-    // Session end detection
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
         _stopSessionTimer();
@@ -657,7 +801,6 @@
 
     window.addEventListener('beforeunload', () => {
       _stopSessionTimer();
-      // Synchronously save but can't show overlay on beforeunload
     });
   }
 
@@ -665,10 +808,8 @@
    * DOM INJECTION & EVENT WIRING
    * ═══════════════════════════════════════════════════════════════ */
   function init() {
-    // Only inject into reader page
     if (!document.getElementById('luxBar') && !document.getElementById('pdfCanvas')) return;
 
-    // Build sanctuary bar and inject below luxBar
     const luxBar = document.getElementById('luxBar');
     const sancBar = _buildSanctuaryBar();
     if (luxBar && luxBar.parentNode) {
@@ -677,7 +818,6 @@
       document.body.prepend(sancBar);
     }
 
-    // Build panels
     const goalPanel = _buildGoalPanel();
     const ambientPanel = _buildAmbientPanel();
     const slowPanel = _buildSlowReadControls();
@@ -685,22 +825,17 @@
     document.body.appendChild(ambientPanel);
     document.body.appendChild(slowPanel);
 
-    // Initial renders
     _updateGoalWidget();
     _updateStreakBadge();
     _updateSlowReadBtn();
 
-    // Restore ambient state
     const savedAmbient = lsGet('taybaa-ambient', null);
     if (savedAmbient) {
-      // Don't auto-play on init (browser policy), just visually mark active
       const trackBtns = document.querySelectorAll('.snc-track-btn');
       trackBtns.forEach(b => b.classList.toggle('snc-track-active', b.dataset.id === savedAmbient));
     }
 
-    // ── Event wiring ────────────────────────────────────────────
-
-    // Goal panel
+    /* Goal panel */
     document.getElementById('snc-goal-btn').addEventListener('click', (e) => {
       e.stopPropagation();
       const p = document.getElementById('snc-goal-panel');
@@ -718,44 +853,37 @@
       _updateGoalWidget();
     });
 
-    // Slow read
+    /* Slow read */
     document.getElementById('snc-slow-btn').addEventListener('click', (e) => {
       e.stopPropagation();
       const p = document.getElementById('snc-slow-controls');
-      if (p.hasAttribute('hidden')) {
-        p.removeAttribute('hidden');
-      } else {
-        p.setAttribute('hidden', '');
-      }
+      if (p.hasAttribute('hidden')) p.removeAttribute('hidden');
+      else p.setAttribute('hidden', '');
     });
     document.getElementById('snc-slow-close').addEventListener('click', () =>
       document.getElementById('snc-slow-controls').setAttribute('hidden', '')
     );
     document.getElementById('snc-slow-minus').addEventListener('click', () => {
       _slowReadSpeed = Math.max(0.2, _slowReadSpeed - 0.2);
-      document.getElementById('snc-slow-value').textContent =
-        _slowReadSpeed.toFixed(1) + ' px/s';
+      document.getElementById('snc-slow-value').textContent = _slowReadSpeed.toFixed(1) + ' px/s';
     });
     document.getElementById('snc-slow-plus').addEventListener('click', () => {
       _slowReadSpeed = Math.min(10, _slowReadSpeed + 0.2);
-      document.getElementById('snc-slow-value').textContent =
-        _slowReadSpeed.toFixed(1) + ' px/s';
+      document.getElementById('snc-slow-value').textContent = _slowReadSpeed.toFixed(1) + ' px/s';
     });
-    // Long-press / double-click on slow btn to toggle actual scroll
     document.getElementById('snc-slow-btn').addEventListener('dblclick', slowReadToggle);
-    // Single click with panel closed = toggle
     let _slowBtnTimer = null;
     document.getElementById('snc-slow-btn').addEventListener('click', (e) => {
       const p = document.getElementById('snc-slow-controls');
-      if (!p.hasAttribute('hidden')) return; // panel opened — don't toggle
+      if (!p.hasAttribute('hidden')) return;
       clearTimeout(_slowBtnTimer);
       _slowBtnTimer = setTimeout(slowReadToggle, 250);
     });
     document.getElementById('snc-slow-btn').addEventListener('dblclick', (e) => {
-      clearTimeout(_slowBtnTimer); // cancel single-click toggle
+      clearTimeout(_slowBtnTimer);
     });
 
-    // Ambient panel
+    /* Ambient panel */
     document.getElementById('snc-ambient-btn').addEventListener('click', (e) => {
       e.stopPropagation();
       const p = document.getElementById('snc-ambient-panel');
@@ -766,18 +894,17 @@
     );
     document.querySelectorAll('.snc-track-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.snc-track-btn').forEach(b =>
-          b.classList.remove('snc-track-active')
-        );
-        btn.classList.add('snc-track-active');
-        ambientPlay(btn.dataset.id);
+        const targetId = btn.dataset.id;
+        const willStop = (_ambientActive === targetId) || targetId === 'silence';
+        document.querySelectorAll('.snc-track-btn').forEach(b => b.classList.remove('snc-track-active'));
+        if (!willStop) btn.classList.add('snc-track-active');
+        ambientPlay(targetId);
       });
     });
     document.getElementById('snc-vol-slider').addEventListener('input', (e) => {
       ambientSetVolume(+e.target.value);
     });
 
-    // Close panels on outside click
     document.addEventListener('click', (e) => {
       ['snc-goal-panel', 'snc-ambient-panel', 'snc-slow-controls'].forEach(id => {
         const panel = document.getElementById(id);
@@ -793,13 +920,8 @@
       });
     });
 
-    // Hook into reader
     _hookIntoReader();
-
-    // Start session timer if we have a book
     if (_bookId) _startSessionTimer();
-
-    // Breathing cue on page 1
     setTimeout(() => maybeShowBreath(1), 4000);
   }
 
@@ -818,15 +940,16 @@
     getMonthMinutes,
     getCurrentBooks,
     buildGoalRing,
-    /* Helpers used by sanctuary.html heatmap */
     getDayMinutes:   (offsetDays) => lsGet(`taybaa-goal-${dayKey(offsetDays)}`, 0),
     getDayGoalMet:   (offsetDays) => !!lsGet(`taybaa-goal-met-${dayKey(offsetDays)}`, false),
     lsGet,
     lsSet,
-    dayKey
+    dayKey,
+    /* Audio control (also useful from sanctuary.html if needed) */
+    ambientPlay,
+    ambientSetVolume
   };
 
-  /* ─── Boot ──────────────────────────────────────────────────── */
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
