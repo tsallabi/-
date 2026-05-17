@@ -1,11 +1,19 @@
 /**
  * الصفحة الرئيسيّة الفاخرة — تستخدم Cloudflare Pages Functions API
- * v26: ترتيب الفئات يُقدّم فئات ريادة الأعمال وتطوير الذات أوّلاً
+ * v27: + admin role detection, hidden-book filtering, restricted-category gating
  */
 
 (async function() {
     const API = '/api';
     let JOURNEYS_CACHE = [];
+
+    // Wait for admin-role module so we know IS_ADMIN before rendering cards
+    try {
+        if (window.ADMIN_ROLE && window.ADMIN_ROLE.ready) await window.ADMIN_ROLE.ready;
+    } catch (_) {}
+    const IS_ADMIN = !!window.IS_ADMIN;
+    const isHidden = (id) => (typeof window.isBookHidden === 'function') ? window.isBookHidden(id) : false;
+    const canSeeCat = (n) => (typeof window.canSeeRestrictedCategory === 'function') ? window.canSeeRestrictedCategory(n) : true;
 
     // ===== الترحيب الديناميكي =====
     const greetingEl = document.getElementById('greeting');
@@ -46,7 +54,9 @@
         if (r.ok) {
             const stats = await r.json();
             updateCounter('statBooks', stats.totalBooks);
-            updateCounter('statCategories', stats.categories.length);
+            // Filter categories shown in stats counter to exclude restricted ones the user can't see
+            const visibleCats = (stats.categories || []).filter(c => canSeeCat(c.name));
+            updateCounter('statCategories', visibleCats.length);
             const readers = 12400 + Math.floor((Date.now() / 86400000) % 1000);
             updateCounter('statReaders', readers);
         }
@@ -56,10 +66,13 @@
     try {
         const r = await fetch(`${API}/featured`);
         if (r.ok) {
-            const featured = await r.json();
+            let featured = await r.json();
+            // Filter out restricted categories + (for non-admins) hidden books
+            featured = featured.filter(b => canSeeCat(b.category) && (IS_ADMIN || !isHidden(b.id)));
             const el = document.getElementById('featuredBooks');
             if (el && featured.length) {
                 el.innerHTML = featured.slice(0, 12).map(b => bookCard(b)).join('');
+                wireAdminHideButtons(el);
             }
         }
     } catch (_) {}
@@ -91,7 +104,10 @@
     try {
         const r = await fetch(`${API}/categories`);
         if (r.ok) {
-            const categories = await r.json();
+            let categories = await r.json();
+            // Gate: hide restricted categories from non-allowlisted users
+            categories = categories.filter(c => canSeeCat(c.name));
+
             const el = document.getElementById('categoriesGrid');
             if (el) {
                 const icons = {
@@ -108,15 +124,16 @@
                     'إدارة الأعمال': '📊',
                     'التسويق': '📣',
                     'القيادة': '👑',
+                    'القيادة والإدارة': '👑',
                     'المال والاستثمار': '💰',
                     'الاستثمار والمال': '💰',
+                    'الإدارة المالية': '💰',
                     'العلوم والمعرفة': '🔬',
                     'الشعر': '✍️',
                     'كتب الأطفال': '🧸'
                 };
 
                 // ===== Wave 5: إعادة ترتيب — فئات ريادة الأعمال أوّلاً =====
-                // قائمة التفضيل (الترتيب مهمّ). نطابق بمرونة لاحتواء اختلافات التسمية.
                 const PRIORITY = [
                     ['ريادة الأعمال'],
                     ['تطوير الذات', 'تطوير الذات والنجاح'],
@@ -161,14 +178,19 @@
             surpriseBtn.disabled = true;
             const original = surpriseBtn.innerHTML;
             surpriseBtn.textContent = '⏳ أبحث، اصبر...';
-            try {
-                const r = await fetch(`${API}/books/random`);
-                if (r.ok) {
-                    const book = await r.json();
-                    location.href = `book.html?id=${encodeURIComponent(book.id)}`;
-                    return;
-                }
-            } catch (e) {}
+            // Try up to 5 random picks to avoid hidden/restricted books
+            for (let attempt = 0; attempt < 5; attempt++) {
+                try {
+                    const r = await fetch(`${API}/books/random`);
+                    if (r.ok) {
+                        const book = await r.json();
+                        if (book && canSeeCat(book.category) && (IS_ADMIN || !isHidden(book.id))) {
+                            location.href = `book.html?id=${encodeURIComponent(book.id)}`;
+                            return;
+                        }
+                    }
+                } catch (e) {}
+            }
             surpriseBtn.innerHTML = original;
             surpriseBtn.disabled = false;
         });
@@ -227,6 +249,7 @@
         m.querySelector('.taybaa-modal-body').innerHTML = bodyHTML;
         m.classList.add('is-open');
         document.body.style.overflow = 'hidden';
+        wireAdminHideButtons(m);
     }
 
     function closeModal() {
@@ -236,14 +259,18 @@
     }
 
     function booksGrid(books) {
-        if (!books || !books.length) {
+        // Apply filters before rendering
+        const filtered = (books || []).filter(b =>
+            canSeeCat(b.category) && (IS_ADMIN || !isHidden(b.id))
+        );
+        if (!filtered.length) {
             return `<div class="taybaa-modal-empty">
                 <div class="taybaa-modal-empty-icon">📚</div>
                 <p>لا توجد كتب في هذه الباقة بعد.</p>
                 <p class="taybaa-modal-empty-hint">المكتبة تنمو يوميّاً — تابعنا قريباً.</p>
             </div>`;
         }
-        return `<div class="taybaa-modal-books">${books.map(b => bookCard(b)).join('')}</div>`;
+        return `<div class="taybaa-modal-books">${filtered.map(b => bookCard(b)).join('')}</div>`;
     }
 
     async function openJourneyModal(journey) {
@@ -262,6 +289,10 @@
     }
 
     async function openCategoryModal(name) {
+        if (!canSeeCat(name)) {
+            openModal(name, '', '<div class="taybaa-modal-empty"><div class="taybaa-modal-empty-icon">🔒</div><p>هذا القسم غير متاح حالياً.</p></div>');
+            return;
+        }
         openModal(name, 'تصفّح كتب هذا القسم', '<p class="taybaa-modal-loading">جارٍ تحميل الكتب...</p>');
         try {
             const r = await fetch(`${API}/books?category=${encodeURIComponent(name)}&limit=30&sortBy=views`);
@@ -280,8 +311,14 @@
         const cover = b.cover || '';
         const safeTitle = escape(b.title || '');
         const safeAuthor = escape(b.author || 'مجهول');
+        const bookHidden = isHidden(b.id);
+        const dimClass = (IS_ADMIN && bookHidden) ? ' book-spine-admin-hidden' : '';
+        const adminBtn = IS_ADMIN
+            ? `<button type="button" class="admin-hide-btn" data-id="${escape(b.id)}" title="حذف الكتاب">×</button>`
+            : '';
         return `
-            <a class="book-spine" href="book.html?id=${encodeURIComponent(b.id)}">
+            <a class="book-spine${dimClass}" href="book.html?id=${encodeURIComponent(b.id)}" data-book-id="${escape(b.id)}" style="position:relative;">
+                ${adminBtn}
                 <div class="book-spine-cover">
                     ${cover ? `<img src="${escape(cover)}" alt="${safeTitle}" loading="lazy" onerror="this.style.display='none'">` : ''}
                     <div class="book-spine-fallback font-amiri">${safeTitle}</div>
@@ -291,6 +328,27 @@
                     <div class="book-spine-author">${safeAuthor}</div>
                 </div>
             </a>`;
+    }
+
+    function wireAdminHideButtons(rootEl) {
+        if (!IS_ADMIN || !rootEl) return;
+        rootEl.querySelectorAll('.admin-hide-btn').forEach(btn => {
+            if (btn._wired) return;
+            btn._wired = true;
+            btn.addEventListener('click', e => {
+                e.preventDefault();
+                e.stopPropagation();
+                const id = btn.dataset.id;
+                if (!id) return;
+                if (!confirm('حذف الكتاب من المكتبة؟')) return;
+                try { window.adminHideBook && window.adminHideBook(id); } catch (_) {}
+                const card = btn.closest('.book-spine, .book-card');
+                if (card) {
+                    card.classList.add('admin-fade-out');
+                    setTimeout(() => card.remove(), 400);
+                }
+            });
+        });
     }
 
     function escape(s) {
