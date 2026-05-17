@@ -57,7 +57,7 @@
         return showNotFound();
     }
 
-    document.title = `${book.title} — المكتبة الطيبة`;
+    document.title = `${book.title} — مكتبة ليبيا الطيبة`;
     els.loading.hidden = true;
     els.detail.hidden = false;
 
@@ -122,7 +122,7 @@
     async function renderCoverFrame(book) {
         if (!els.coverFrame) return;
         const icon = (CONFIG.categoryIcons && CONFIG.categoryIcons[book.category]) || CONFIG.defaultCategoryIcon || '📚';
-        const publisher = CONFIG.publisherShort || 'دار المكتبة الطيبة';
+        const publisher = CONFIG.publisherShort || 'دار مكتبة ليبيا الطيبة';
         els.coverFrame.innerHTML = `<div class="book-cover-fallback" aria-hidden="true">
             <div class="cf-top"><span class="cf-icon">${icon}</span></div>
             <div class="cf-mid"><h3 class="cf-title">${escapeHTML(book.title)}</h3></div>
