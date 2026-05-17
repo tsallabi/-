@@ -52,7 +52,7 @@
         if (typeof CONFIG === 'undefined' || !CONFIG.firebase || !CONFIG.firebase.enabled) return;
         if (document.querySelector('script[data-fb-auth-loader]')) return;
         const s = document.createElement('script');
-        s.src = pathPrefix() + 'js/firebase-auth.js?v=11';
+        s.src = pathPrefix() + 'js/firebase-auth.js?v=28';
         s.setAttribute('data-fb-auth-loader', '1');
         document.head.appendChild(s);
     }
@@ -100,7 +100,7 @@
             html += `<button id="logoutBtn" class="vip-lock-btn" type="button" style="margin-top:.5rem;">🚪 تسجيل خروج</button>`;
         } else {
             html += `
-                <p class="profile-status">أهلاً بك في <strong>المكتبة الطيبة</strong></p>
+                <p class="profile-status">أهلاً بك في <strong>مكتبة ليبيا الطيبة</strong></p>
                 <p class="profile-tagline">سجّل دخولك لحفظ المفضّلة ومتابعة القراءة</p>`;
 
             if (fbEnabled) {
