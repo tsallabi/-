@@ -1,0 +1,22 @@
+Trigger: Business/Entrepreneurship Import Wave 5
+Date: 2026-05-17
+Target: +3000 books in entrepreneurship, self-development, business management, marketing, leadership
+Triggered by: User request — focus library on entrepreneurship trend
+
+Categories (each is a separate bulk-import-archive.mjs step in .github/workflows/business-import.yml):
+  - ريادة الأعمال           (500)
+  - تطوير الذات              (500)
+  - التنمية البشرية          (500)
+  - إدارة الأعمال            (500)
+  - القيادة                   (400)
+  - التسويق                   (400)
+  - فن البيع                  (300)
+  - الاستثمار والمال         (300)
+  - النجاح والتحفيز          (400)
+  - الإدارة المالية          (300)
+  - الموارد البشرية          (200)
+  - المهارات الناعمة         (200)
+  + openiti retry (now with GITHUB_TOKEN auth — 5000/hr)
+  + hindawi retry (now with rotating UAs + IA fallback)
+
+Total target: ~4,500 imports (after dedup, expect ~3,000 net new books).
