@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#FAF6EE">
+  <title>صفحتي — المكتبة الطيبة</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;600;700&family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <script>(function(){ const t=localStorage.getItem('taybaa-theme')||'light'; document.documentElement.setAttribute('data-theme',t); })();</script>
+
+  <style>
+    /* ═══ Tokens ════════════════════════════════════════════════ */
+    :root {
+      --parchment: #FAF6EE; --ink: #0F1B2D;
+      --red: #B1373F; --gold: #B89968;
+      --gold-soft: rgba(184,153,104,.12);
+      --border: rgba(184,153,104,.25);
+      --border-strong: rgba(184,153,104,.45);
+      --bg: #FAF6EE; --bg-subtle: rgba(184,153,104,.07);
+      --bg-elevated: #FFFFFF;
+      --text: #0F1B2D; --text-muted: #5a6a7a; --text-soft: #8a9aaa;
+    }
+    [data-theme="dark"] {
+      --bg: #0F1B2D; --bg-subtle: rgba(184,153,104,.07);
+      --bg-elevated: #1a2a3d;
+      --text: #FAF6EE; --text-muted: #9aacb8; --text-soft: #6a7e8a;
+      --border: rgba(184,153,104,.2); --border-strong: rgba(184,153,104,.4);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: 'Cairo', system-ui, sans-serif;
+      direction: rtl; min-height: 100vh; line-height: 1.6;
+    }
+
+    /* ═══ Nav ════════════════════════════════════════════════ */
+    .pf-nav {
+      position: sticky; top: 0; z-index: 50;
+      background: color-mix(in srgb, var(--bg) 92%, transparent);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      padding: .75rem 1.25rem;
+    }
+    .pf-nav-inner { max-width: 860px; margin: 0 auto; display: flex; align-items: center; gap: .75rem; }
+    .pf-logo {
+      font-family: 'Reem Kufi', sans-serif; font-weight: 700; font-size: 1rem;
+      color: var(--text); text-decoration: none;
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .pf-logo-mark {
+      width: 34px; height: 34px; border-radius: 8px;
+      background: var(--ink); color: var(--parchment);
+      display: grid; place-items: center; font-weight: 700; font-size: 1rem; flex-shrink: 0;
+    }
+    [data-theme="dark"] .pf-logo-mark { background: var(--gold); color: var(--ink); }
+    .nav-spacer { flex: 1; }
+    .nav-back {
+      font-size: .85rem; color: var(--text-muted); text-decoration: none;
+      font-family: 'Reem Kufi', sans-serif; font-weight: 600;
+      padding: .4rem .85rem; border-radius: 10px;
+      border: 1px solid var(--border); background: var(--bg-subtle);
+      transition: all .2s;
+    }
+    .nav-back:hover { color: var(--gold); border-color: var(--gold); }
+    .nav-theme-btn {
+      width: 36px; height: 36px; border-radius: 10px;
+      border: 1px solid var(--border); background: var(--bg-subtle);
+      color: var(--text); cursor: pointer; display: grid;
+      place-items: center; font-size: 1rem; transition: all .2s;
+    }
+    .nav-theme-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ═══ Hero card ═════════════════════════════════════════════ */
+    .container { max-width: 860px; margin: 0 auto; padding: 0 1.25rem; }
+    .pf-hero {
+      margin: 2rem 0;
+      background: linear-gradient(135deg, #2a1810 0%, #3a2412 40%, #1a0f08 100%);
+      border: 1px solid rgba(184,153,104,.4);
+      border-radius: 24px; padding: 2.5rem 2rem;
+      display: flex; align-items: center; gap: 2rem;
+      position: relative; overflow: hidden;
+    }
+    @media (max-width: 560px) { .pf-hero { flex-direction: column; align-items: flex-start; gap: 1.25rem; padding: 1.75rem 1.25rem; } }
+    .pf-hero::before {
+      content: ''; position: absolute; inset: 0;
+      background-image: radial-gradient(circle, rgba(184,153,104,.1) 1px, transparent 1px);
+      background-size: 16px 16px; pointer-events: none;
+    }
+    .pf-avatar-wrap { flex-shrink: 0; position: relative; z-index: 1; }
+    .pf-avatar {
+      width: 84px; height: 84px; border-radius: 50%;
+      display: grid; place-items: center;
+      font-family: 'Aref Ruqaa', serif; font-size: 2.2rem;
+      color: #1a0f08; font-weight: 700;
+      background: linear-gradient(135deg, var(--gold), #d4af37);
+      box-shadow: 0 0 0 3px rgba(184,153,104,.4), 0 8px 24px rgba(0,0,0,.3);
+    }
+    .pf-hero-body { flex: 1; position: relative; z-index: 1; }
+    .pf-name {
+      font-family: 'Aref Ruqaa', 'Amiri', serif;
+      font-size: 1.8rem; font-weight: 700;
+      color: #FAF6EE; line-height: 1.2; margin-bottom: .4rem;
+      display: flex; align-items: center; gap: .6rem;
+    }
+    .pf-edit-btn {
+      background: none; border: none; color: rgba(250,246,238,.4);
+      cursor: pointer; font-size: .9rem; padding: 0;
+      transition: color .2s;
+    }
+    .pf-edit-btn:hover { color: var(--gold); }
+    .pf-member-since {
+      font-size: .82rem; color: rgba(250,246,238,.55);
+      font-family: 'Cairo', sans-serif; margin-bottom: .5rem;
+    }
+    .pf-badge {
+      display: inline-flex; align-items: center; gap: .4rem;
+      background: rgba(184,153,104,.12); border: 1px solid rgba(184,153,104,.35);
+      border-radius: 999px; padding: .35rem .85rem;
+      font-family: 'Cairo', sans-serif; font-size: .8rem;
+      color: var(--gold);
+    }
+    .pf-edit-inline {
+      display: none; flex-direction: column; gap: .5rem;
+    }
+    .pf-edit-inline.open { display: flex; }
+    .pf-edit-input {
+      background: rgba(250,246,238,.08); border: 1px solid rgba(184,153,104,.5);
+      border-radius: 8px; color: #FAF6EE;
+      font-family: 'Aref Ruqaa', serif; font-size: 1.1rem;
+      padding: .5rem .85rem; direction: rtl; width: min(280px, 100%);
+    }
+    .pf-edit-input:focus { outline: none; border-color: var(--gold); }
+    .pf-save-btn {
+      align-self: flex-start; padding: .4rem 1rem;
+      background: var(--gold); color: #1a0f08;
+      border: none; border-radius: 8px; font-weight: 700;
+      font-family: 'Cairo', sans-serif; font-size: .85rem;
+      cursor: pointer;
+    }
+
+    /* ═══ Stats grid ═══════════════════════════════════════════ */
+    .pf-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem; margin: 1.75rem 0;
+    }
+    .pf-stat {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 1.25rem 1rem;
+      text-align: center;
+      transition: border-color .2s, transform .2s;
+    }
+    .pf-stat:hover { border-color: var(--gold); transform: translateY(-2px); }
+    .pf-stat-val {
+      font-family: 'Aref Ruqaa', 'Reem Kufi', serif;
+      font-size: 2rem; font-weight: 700;
+      color: var(--gold); display: block;
+      line-height: 1;
+    }
+    .pf-stat-label {
+      font-size: .78rem; color: var(--text-muted);
+      font-family: 'Cairo', sans-serif; margin-top: .35rem;
+    }
+
+    /* ═══ Section title ═════════════════════════════════════════ */
+    .section-title {
+      font-family: 'Aref Ruqaa', 'Amiri', serif;
+      font-size: 1.3rem; font-weight: 700;
+      color: var(--text); margin: 2rem 0 1rem;
+      display: flex; align-items: center; gap: .5rem;
+    }
+
+    /* ═══ Achievement grid ════════════════════════════════════════ */
+    .ach-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: .85rem; margin-bottom: 2rem;
+    }
+
+    /* ═══ Activity feed ═══════════════════════════════════════════ */
+    .pf-feed {
+      display: flex; flex-direction: column; gap: .75rem;
+      margin-bottom: 3rem;
+    }
+    .pf-feed-item {
+      display: flex; align-items: flex-start; gap: .85rem;
+      background: var(--bg-elevated); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1rem 1.25rem;
+      transition: border-color .2s;
+    }
+    .pf-feed-item:hover { border-color: rgba(184,153,104,.4); }
+    .pf-feed-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: var(--bg-subtle); border: 1px solid var(--border);
+      display: grid; place-items: center; font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .pf-feed-body { flex: 1; }
+    .pf-feed-text {
+      font-family: 'Amiri', serif; font-size: .95rem;
+      color: var(--text); line-height: 1.6;
+    }
+    .pf-feed-text a { color: var(--gold); text-decoration: none; }
+    .pf-feed-text a:hover { text-decoration: underline; }
+    .pf-feed-date {
+      font-size: .72rem; color: var(--text-soft);
+      font-family: 'Cairo', sans-serif; margin-top: .25rem;
+    }
+    .pf-empty {
+      text-align: center; padding: 2.5rem;
+      color: var(--text-muted);
+      font-family: 'Amiri', serif; font-style: italic;
+    }
+
+    /* ═══ Not logged in state ══════════════════════════════════════ */
+    .pf-guest {
+      text-align: center; padding: 4rem 1.5rem;
+    }
+    .pf-guest-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .pf-guest-title {
+      font-family: 'Aref Ruqaa', serif; font-size: 1.5rem;
+      color: var(--text); margin-bottom: .75rem;
+    }
+    .pf-guest-sub {
+      font-family: 'Amiri', serif; font-style: italic;
+      font-size: 1rem; color: var(--text-muted); margin-bottom: 1.5rem;
+    }
+    .pf-guest-link {
+      display: inline-block; padding: .75rem 2rem;
+      background: linear-gradient(135deg, var(--gold), #d4af37);
+      color: #1a0f08; border-radius: 12px;
+      font-family: 'Aref Ruqaa', serif; font-weight: 700; font-size: 1rem;
+      text-decoration: none; transition: all .2s;
+    }
+    .pf-guest-link:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(184,153,104,.35); }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav class="pf-nav">
+    <div class="pf-nav-inner">
+      <a href="v2.html" class="pf-logo">
+        <span class="pf-logo-mark">ط</span>
+        <span>المكتبة الطيبة</span>
+      </a>
+      <div class="nav-spacer"></div>
+      <a href="v2.html" class="nav-back">→ الرئيسية</a>
+      <button class="nav-theme-btn" id="themeBtn" aria-label="تبديل الثيم">🌙</button>
+    </div>
+  </nav>
+
+  <main class="container" id="profileMain">
+    <!-- Filled by JS -->
+  </main>
+
+  <script src="js/user-system.js?v=25"></script>
+  <script src="js/achievements.js?v=25"></script>
+
+  <script>
+  (function () {
+    'use strict';
+
+    /* ── Theme ────────────────────────────────────────────────── */
+    const themeBtn = document.getElementById('themeBtn');
+    themeBtn.addEventListener('click', () => {
+      const c = document.documentElement.getAttribute('data-theme') || 'light';
+      const n = c === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', n);
+      localStorage.setItem('taybaa-theme', n);
+      themeBtn.textContent = n === 'dark' ? '☀️' : '🌙';
+    });
+    themeBtn.textContent = (document.documentElement.getAttribute('data-theme')||'light') === 'dark' ? '☀️' : '🌙';
+
+    /* ── User ──────────────────────────────────────────────────── */
+    const main = document.getElementById('profileMain');
+    const user = typeof USER !== 'undefined' ? USER.current() : null;
+
+    function escHtml(s) {
+      return String(s ?? '').replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+    function fmtDate(iso) {
+      if (!iso) return '';
+      return new Date(iso).toLocaleDateString('ar-LY', { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    /* ── Not logged in ──────────────────────────────────────────── */
+    if (!user) {
+      main.innerHTML = `
+        <div class="pf-guest">
+          <div class="pf-guest-icon">📚</div>
+          <h1 class="pf-guest-title">صفحتك تنتظرك</h1>
+          <p class="pf-guest-sub">سجّل دخولك لترى إحصائيّاتك وإنجازاتك وسجلّ نشاطك القرائي.</p>
+          <a href="v2.html" class="pf-guest-link">→ العودة وتسجيل الدخول</a>
+        </div>`;
+      return;
+    }
+
+    /* ── Gather data ──────────────────────────────────────────── */
+    // Member since
+    const memberSince = user.loginAt
+      ? fmtDate(user.loginAt)
+      : 'قارئ مخضرم';
+
+    // Books read (from READING history)
+    let booksRead = [];
+    const prefix = `taybaa-read-${user.username}-`;
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith(prefix)) {
+        const bookId = k.slice(prefix.length);
+        try {
+          const obj = JSON.parse(localStorage.getItem(k));
+          booksRead.push({ bookId, page: obj.page, ts: obj.ts });
+        } catch (_) {}
+      }
+    }
+    booksRead.sort((a, b) => b.ts - a.ts);
+
+    // Reviews written
+    let reviewsWritten = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('taybaa-reviews-')) {
+        try {
+          const revs = JSON.parse(localStorage.getItem(k) || '[]');
+          revs.filter(r => r.userId === user.username).forEach(r => reviewsWritten.push(r));
+        } catch (_) {}
+      }
+    }
+    reviewsWritten.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    // Achievements earned
+    const earned = typeof ACHIEVEMENTS !== 'undefined' ? ACHIEVEMENTS.getEarned() : [];
+
+    // Minutes (from sanctuary)
+    let totalMins = 0;
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('taybaa-day-')) {
+          const v = JSON.parse(localStorage.getItem(k) || '{}');
+          totalMins += Number(v.minutes || 0);
+        }
+      }
+    } catch (_) {}
+
+    // Streak
+    let streak = 0;
+    try {
+      if (typeof SANCTUARY !== 'undefined' && SANCTUARY.getStreak) streak = SANCTUARY.getStreak();
+    } catch (_) {}
+
+    // Categories explored
+    let cats = [];
+    try { cats = JSON.parse(localStorage.getItem('taybaa-read-categories') || '[]'); } catch { cats = []; }
+
+    // Favs
+    let favs = [];
+    try {
+      const fkey = `taybaa-favs-${user.username}`;
+      favs = JSON.parse(localStorage.getItem(fkey) || '[]');
+    } catch { favs = []; }
+
+    /* ── Render ────────────────────────────────────────────────── */
+    const avatarLetter = (user.displayName || user.username || 'ق')[0];
+
+    main.innerHTML = `
+
+      <!-- Hero card -->
+      <div class="pf-hero">
+        <div class="pf-avatar-wrap">
+          <div class="pf-avatar" aria-label="صورة المستخدم" role="img">${escHtml(avatarLetter)}</div>
+        </div>
+        <div class="pf-hero-body">
+          <div class="pf-name" id="pfNameDisplay">
+            <span>${escHtml(user.displayName || user.username)}</span>
+            <button class="pf-edit-btn" id="pfEditToggle" title="تعديل الاسم" aria-label="تعديل الاسم">✏️</button>
+          </div>
+          <div class="pf-edit-inline" id="pfEditInline">
+            <input class="pf-edit-input" id="pfNameInput" type="text"
+              value="${escHtml(user.displayName || user.username)}"
+              placeholder="اكتب اسمك الذي يظهر للآخرين"
+              maxlength="40" aria-label="اسم العرض">
+            <button class="pf-save-btn" id="pfSaveName">✓ حفظ</button>
+          </div>
+          <div class="pf-member-since">عضو منذ: ${escHtml(memberSince)}</div>
+          <div class="pf-badge">📚 ${escHtml(user.username)}</div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="pf-stats">
+        <div class="pf-stat">
+          <span class="pf-stat-val" id="statBooksVal">${booksRead.length}</span>
+          <div class="pf-stat-label">كتب مفتوحة</div>
+        </div>
+        <div class="pf-stat">
+          <span class="pf-stat-val">${Math.round(totalMins)}</span>
+          <div class="pf-stat-label">دقيقة قراءة</div>
+        </div>
+        <div class="pf-stat">
+          <span class="pf-stat-val">${streak}</span>
+          <div class="pf-stat-label">أيّام متتالية</div>
+        </div>
+        <div class="pf-stat">
+          <span class="pf-stat-val">${cats.length}</span>
+          <div class="pf-stat-label">فئات مستكشفة</div>
+        </div>
+        <div class="pf-stat">
+          <span class="pf-stat-val">${favs.length}</span>
+          <div class="pf-stat-label">كتب مفضّلة</div>
+        </div>
+        <div class="pf-stat">
+          <span class="pf-stat-val">${earned.length}</span>
+          <div class="pf-stat-label">إنجاز محرَز</div>
+        </div>
+      </div>
+
+      <!-- Achievements -->
+      <h2 class="section-title">🏅 إنجازاتي</h2>
+      <div class="ach-grid" id="achGrid"></div>
+
+      <!-- Activity feed -->
+      <h2 class="section-title">📌 آخر النشاط</h2>
+      <div class="pf-feed" id="activityFeed"></div>
+    `;
+
+    /* ── Achievement grid ───────────────────────────────────── */
+    if (typeof ACHIEVEMENTS !== 'undefined') {
+      ACHIEVEMENTS.renderGrid('achGrid');
+    }
+
+    /* ── Activity feed ───────────────────────────────────────── */
+    const feedEl = document.getElementById('activityFeed');
+    // Build unified activity list
+    const activities = [];
+
+    booksRead.slice(0, 10).forEach(b => activities.push({
+      type: 'book', ts: b.ts,
+      icon: '📖',
+      text: `فتحتَ <a href="reader.html?id=${encodeURIComponent(b.bookId)}">${escHtml(b.bookId)}</a> عند الصفحة ${b.page}`,
+      date: fmtDate(new Date(b.ts).toISOString())
+    }));
+
+    reviewsWritten.slice(0, 5).forEach(r => activities.push({
+      type: 'review', ts: new Date(r.createdAt).getTime(),
+      icon: '⭐',
+      text: `كتبتَ تقييماً لكتاب بتقييم ${'★'.repeat(r.rating)}`,
+      date: fmtDate(r.createdAt)
+    }));
+
+    earned.slice(0, 8).forEach(e => {
+      const def = typeof ACHIEVEMENTS !== 'undefined'
+        ? ACHIEVEMENTS.catalogue.find(a => a.id === e.id) : null;
+      activities.push({
+        type: 'achievement', ts: new Date(e.earnedAt).getTime(),
+        icon: def ? def.icon : '🏅',
+        text: `حصلتَ على إنجاز <strong>${escHtml(def ? def.title : e.id)}</strong>`,
+        date: fmtDate(e.earnedAt)
+      });
+    });
+
+    activities.sort((a, b) => b.ts - a.ts);
+
+    if (feedEl) {
+      if (!activities.length) {
+        feedEl.innerHTML = '<div class="pf-empty">ابدأ رحلتك القرائيّة لتظهر النشاطات هنا.</div>';
+      } else {
+        feedEl.innerHTML = activities.slice(0, 20).map(a => `
+          <div class="pf-feed-item">
+            <div class="pf-feed-icon" aria-hidden="true">${a.icon}</div>
+            <div class="pf-feed-body">
+              <div class="pf-feed-text">${a.text}</div>
+              <div class="pf-feed-date">${a.date}</div>
+            </div>
+          </div>`).join('');
+      }
+    }
+
+    /* ── Inline edit name ───────────────────────────────────────── */
+    document.getElementById('pfEditToggle')?.addEventListener('click', () => {
+      const inline = document.getElementById('pfEditInline');
+      const display = document.getElementById('pfNameDisplay');
+      if (inline.classList.contains('open')) {
+        inline.classList.remove('open');
+      } else {
+        inline.classList.add('open');
+        document.getElementById('pfNameInput')?.focus();
+      }
+    });
+
+    document.getElementById('pfSaveName')?.addEventListener('click', () => {
+      const input = document.getElementById('pfNameInput');
+      const newName = input?.value.trim();
+      if (!newName) return;
+      // Update session
+      const session = USER.current();
+      if (!session) return;
+      session.displayName = newName;
+      USER.setSession(session);
+      // Update display
+      const nameSpan = document.querySelector('#pfNameDisplay span');
+      if (nameSpan) nameSpan.textContent = newName;
+      document.getElementById('pfEditInline')?.classList.remove('open');
+    });
+
+  })();
+  </script>
+</body>
+</html>
