@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#FAF6EE">
-    <title>المكتبة الطيبة — من طرابلس إلى العالم العربي</title>
+    <title>المكتبة الطيبة — كتب ريادة الأعمال وتطوير الذات</title>
+    <meta name="description" content="المكتبة الطيبة — أكبر مكتبة عربية متخصّصة في ريادة الأعمال وتطوير الذات. أكثر من 8,000 كتاب موثّق في الأعمال والقيادة والاستثمار.">
+    <meta name="keywords" content="ريادة الأعمال, تطوير الذات, إدارة الأعمال, التسويق, القيادة, الاستثمار, كتب عربية, مكتبة عربية">
 
-    <link rel="stylesheet" href="css/design-system.css?v=25">
-    <link rel="stylesheet" href="css/homepage-v2.css?v=25">
+    <link rel="stylesheet" href="css/design-system.css?v=26">
+    <link rel="stylesheet" href="css/homepage-v2.css?v=26">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -90,11 +92,11 @@
         }
 
         .hero-wordmark {
-            font-family: 'Reem Kufi', sans-serif;
-            font-weight: 800;
+            font-family: 'Aref Ruqaa', 'Reem Kufi', serif;
+            font-weight: 700;
             font-size: clamp(2.8rem, 8vw, 6rem);
-            line-height: 1.02;
-            color: #0F1B2D;
+            line-height: 1.05;
+            color: #B89968;
             margin: 0;
             letter-spacing: -.005em;
             text-shadow:
@@ -103,7 +105,7 @@
                 0 0 40px rgba(255,255,255,.95),
                 0 0 60px rgba(255,255,255,.8),
                 0 0 90px rgba(255,255,255,.5),
-                0 2px 4px rgba(15,27,45,.3);
+                0 2px 4px rgba(74,45,14,.45);
             opacity: 0;
             animation: rise-fade 700ms ease-out .8s forwards;
         }
@@ -144,67 +146,51 @@
         }
 
         .hero-tagline {
-            font-family: 'Amiri', serif;
-            font-style: italic;
+            font-family: 'Aref Ruqaa', 'Amiri', serif;
+            font-style: normal;
             font-weight: 700;
             font-size: clamp(1.55rem, 2.8vw, 2.1rem);
-            color: #0e1830;
+            color: #FFFFFF;
             max-width: 42ch;
             margin: 0 auto 1.5rem;
             line-height: 1.75;
             letter-spacing: -.005em;
             text-shadow:
-                0 0  4px #FFFFFF,
-                0 0  8px #FFFFFF,
-                0 0 14px #FFFFFF,
-                0 0 22px rgba(255,255,255,.98),
-                0 0 32px rgba(255,255,255,.9),
-                0 0 48px rgba(255,255,255,.75),
-                0 0 70px rgba(255,255,255,.5),
-                0 2px 4px rgba(14,24,48,.4);
+                0 0  4px rgba(15,27,45,.85),
+                0 0  8px rgba(15,27,45,.7),
+                0 0 14px rgba(15,27,45,.55),
+                0 0 22px rgba(15,27,45,.4),
+                0 2px 4px rgba(0,0,0,.5);
             opacity: 0;
             animation: rise-fade 600ms ease-out 1.3s forwards;
         }
         .hero-tagline strong {
-            color: #8a1825;
+            color: #FFE9B0;
             font-style: normal;
             font-weight: 800;
             text-shadow:
-                0 0  4px #FFFFFF,
-                0 0  8px #FFFFFF,
-                0 0 14px #FFFFFF,
-                0 0 22px rgba(255,255,255,.98),
-                0 0 32px rgba(255,255,255,.85),
-                0 0 48px rgba(255,255,255,.6),
-                0 2px 4px rgba(108,18,28,.5);
+                0 0  4px rgba(15,27,45,.9),
+                0 0  8px rgba(15,27,45,.7),
+                0 0 14px rgba(108,18,28,.5),
+                0 2px 4px rgba(0,0,0,.55);
         }
 
         .hero-origin {
-            display: inline-flex;
-            align-items: center;
-            gap: .85rem;
-            font-family: 'Aref Ruqaa', serif;
-            font-weight: 700;
-            color: #3a1f08;
-            font-size: clamp(1.2rem, 1.8vw, 1.45rem);
+            display: inline-block;
+            font-family: 'Cairo', 'Reem Kufi', sans-serif;
+            font-weight: 500;
+            color: #FAF6EE;
+            font-size: clamp(.98rem, 1.4vw, 1.15rem);
+            line-height: 1.75;
+            max-width: 60ch;
             margin: 0 auto 1.75rem;
             text-shadow:
-                0 0  4px #FFFFFF,
-                0 0  8px #FFFFFF,
-                0 0 14px #FFFFFF,
-                0 0 22px rgba(255,255,255,.98),
-                0 0 32px rgba(255,255,255,.85),
-                0 0 48px rgba(255,255,255,.6),
-                0 1px 2px rgba(58,31,8,.4);
+                0 0  4px rgba(15,27,45,.85),
+                0 0  8px rgba(15,27,45,.65),
+                0 0 14px rgba(15,27,45,.5),
+                0 1px 2px rgba(0,0,0,.5);
             opacity: 0;
             animation: rise-fade 500ms ease-out 1.5s forwards;
-        }
-        .hero-origin::before, .hero-origin::after {
-            content: '◆'; color: #B89968; font-size: .7em;
-            text-shadow:
-                0 0 6px #FFFFFF,
-                0 0 12px #FFFFFF,
-                0 0 18px rgba(255,255,255,.85);
         }
 
         .hero-actions {
@@ -365,13 +351,154 @@
             }
             .hero-wordmark { font-size: clamp(2.4rem, 12vw, 3.5rem); }
             .hero-tagline { font-size: clamp(1.25rem, 5vw, 1.55rem); max-width: 95%; }
-            .hero-origin  { font-size: clamp(1.05rem, 4vw, 1.2rem); }
+            .hero-origin  { font-size: clamp(.92rem, 3.6vw, 1.05rem); }
         }
         @media (prefers-reduced-motion: reduce) {
             .hero-arch-bg, .hero-eyebrow, .hero-wordmark,
             .hero-rule, .hero-tagline, .hero-origin, .hero-actions {
                 animation: none !important; opacity: 1 !important; transform: none !important;
             }
+        }
+
+        /* ===== رحلة الريادي — Featured Entrepreneurship Strip ===== */
+        .featured-entrepreneurship {
+            padding: clamp(2.5rem, 6vh, 4.5rem) 0;
+            background:
+                linear-gradient(180deg, rgba(250,246,238,1) 0%, rgba(245,238,222,1) 100%);
+            border-top: 1px solid rgba(184,153,104,.18);
+            border-bottom: 1px solid rgba(184,153,104,.18);
+            position: relative;
+        }
+        .featured-entrepreneurship::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(184,153,104,.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(156,31,45,.04) 0%, transparent 40%);
+            pointer-events: none;
+        }
+        .featured-entrepreneurship .container {
+            position: relative;
+            z-index: 1;
+        }
+        .featured-entrepreneurship h2 {
+            font-family: 'Aref Ruqaa', 'Reem Kufi', serif;
+            font-weight: 700;
+            font-size: clamp(1.8rem, 4vw, 2.6rem);
+            color: #B89968;
+            text-align: center;
+            margin: 0 0 .5rem;
+            letter-spacing: -.01em;
+        }
+        .ent-subtitle {
+            font-family: 'Amiri', serif;
+            font-style: italic;
+            font-size: clamp(1rem, 1.6vw, 1.2rem);
+            color: #7a5c2f;
+            text-align: center;
+            margin: 0 auto 2.25rem;
+            max-width: 50ch;
+            line-height: 1.7;
+        }
+        .ent-tracks {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+        }
+        .ent-track {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 1.75rem 1.25rem;
+            background: rgba(255, 252, 244, .85);
+            border: 1.5px solid rgba(184,153,104,.35);
+            border-radius: 6px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 320ms cubic-bezier(.4,0,.2,1);
+            position: relative;
+            overflow: hidden;
+            box-shadow:
+                0 2px 6px rgba(74,45,14,.06),
+                inset 0 0 0 1px rgba(255,255,255,.5);
+        }
+        .ent-track::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #B89968, transparent);
+            opacity: .7;
+        }
+        .ent-track:hover {
+            transform: translateY(-4px);
+            border-color: #B89968;
+            background: #FFFCF4;
+            box-shadow:
+                0 12px 28px -8px rgba(184,153,104,.45),
+                0 0 0 1px rgba(184,153,104,.5),
+                0 0 32px rgba(255,229,176,.4);
+        }
+        .ent-track:hover .ent-icon {
+            transform: scale(1.12);
+        }
+        .ent-icon {
+            font-size: 2em;
+            line-height: 1;
+            margin-bottom: .85rem;
+            display: inline-block;
+            transition: transform 320ms cubic-bezier(.4,0,.2,1);
+            filter: drop-shadow(0 2px 4px rgba(74,45,14,.15));
+        }
+        .ent-track h3 {
+            font-family: 'Aref Ruqaa', 'Reem Kufi', serif;
+            font-weight: 700;
+            font-size: clamp(1.15rem, 1.8vw, 1.4rem);
+            color: #B89968;
+            margin: 0 0 .4rem;
+            letter-spacing: -.005em;
+        }
+        .ent-track p {
+            font-family: 'Cairo', sans-serif;
+            font-size: .92rem;
+            color: #7a5c2f;
+            margin: 0;
+            line-height: 1.55;
+        }
+
+        @media (max-width: 768px) {
+            .ent-tracks {
+                grid-template-columns: none;
+                grid-auto-flow: column;
+                grid-auto-columns: 78%;
+                overflow-x: auto;
+                scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch;
+                gap: 1rem;
+                padding: .5rem .25rem 1.25rem;
+                margin: 0 -1rem;
+                padding-inline: 1rem;
+                scrollbar-width: thin;
+                scrollbar-color: rgba(184,153,104,.5) transparent;
+            }
+            .ent-tracks::-webkit-scrollbar {
+                height: 6px;
+            }
+            .ent-tracks::-webkit-scrollbar-thumb {
+                background: rgba(184,153,104,.5);
+                border-radius: 3px;
+            }
+            .ent-track {
+                scroll-snap-align: start;
+                padding: 1.5rem 1rem;
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .ent-track, .ent-icon { transition: none !important; }
+            .ent-track:hover { transform: none !important; }
+            .ent-track:hover .ent-icon { transform: none !important; }
         }
     </style>
 </head>
@@ -414,23 +541,63 @@
             <div class="hero-arch-overlay"></div>
 
             <div class="hero-top">
-                <p class="hero-eyebrow">منذ ١٤٤٧ هـ · من طرابلس الغرب</p>
+                <p class="hero-eyebrow">المكتبة الطيبة · منذ ١٤٤٧ هـ · من طرابلس الغرب</p>
                 <h1 id="wordmark" class="hero-wordmark">
-                    المكتبة<span class="accent">الطيبة</span>
+                    تتعلّم. تبني. تنجح.
                 </h1>
                 <div class="hero-rule" aria-hidden="true"><span></span></div>
             </div>
 
             <div class="hero-bottom">
                 <p class="hero-tagline">
-                    من تحت <strong>قوس طرابلس</strong>،
-                    حيث الحضارات تتعانق منذ ألفي عام،
-                    نفتح أبواب المعرفة لكلّ قارئ عربيّ.
+                    المكتبة الطيبة — <strong>رحلتك من الفكرة إلى الإنجاز</strong>
                 </p>
-                <p class="hero-origin">🇱🇾 من ليبيا · إلى الوطن العربيّ</p>
+                <p class="hero-origin">
+                    أكثر من 8,000 كتاب موثّق: ريادة الأعمال، تطوير الذات، الإدارة، التسويق،
+                    وكلّ ما يحتاجه عقل العربي المعاصر.
+                </p>
                 <div class="hero-actions">
                     <a href="#shelves" class="arch-cta">📚 ادخل المكتبة</a>
                     <button class="arch-ghost" id="surpriseBtn" type="button">🎲 فاجئني بكتاب</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="featured-entrepreneurship" aria-labelledby="ent-title">
+            <div class="container">
+                <h2 id="ent-title">🚀 رحلة الريادي</h2>
+                <p class="ent-subtitle">خرائط طريق وأدلة عملية من رواد الأعمال</p>
+                <div class="ent-tracks">
+                    <a href="category.html?cat=ريادة%20الأعمال" class="ent-track">
+                        <span class="ent-icon">💡</span>
+                        <h3>ابتكر فكرتك</h3>
+                        <p>ريادة الأعمال والابتكار</p>
+                    </a>
+                    <a href="category.html?cat=إدارة%20الأعمال" class="ent-track">
+                        <span class="ent-icon">⚙️</span>
+                        <h3>ابنِ مشروعك</h3>
+                        <p>إدارة الأعمال والقيادة</p>
+                    </a>
+                    <a href="category.html?cat=التسويق" class="ent-track">
+                        <span class="ent-icon">📣</span>
+                        <h3>سوّق نفسك</h3>
+                        <p>التسويق وفن البيع</p>
+                    </a>
+                    <a href="category.html?cat=الاستثمار%20والمال" class="ent-track">
+                        <span class="ent-icon">💰</span>
+                        <h3>نمِّ رأسمالك</h3>
+                        <p>الاستثمار والإدارة المالية</p>
+                    </a>
+                    <a href="category.html?cat=تطوير%20الذات" class="ent-track">
+                        <span class="ent-icon">🎯</span>
+                        <h3>طوّر ذاتك</h3>
+                        <p>تطوير الذات والمهارات</p>
+                    </a>
+                    <a href="category.html?cat=القيادة" class="ent-track">
+                        <span class="ent-icon">👑</span>
+                        <h3>قُد فريقك</h3>
+                        <p>القيادة والإدارة</p>
+                    </a>
                 </div>
             </div>
         </section>
@@ -507,9 +674,9 @@
         </div>
     </footer>
 
-    <script src="js/user-system.js?v=25"></script>
-    <script src="js/achievements.js?v=25"></script>
-    <script src="js/homepage-v2.js?v=25"></script>
+    <script src="js/user-system.js?v=26"></script>
+    <script src="js/achievements.js?v=26"></script>
+    <script src="js/homepage-v2.js?v=26"></script>
     <script>
         document.getElementById('themeBtn')?.addEventListener('click', () => {
             const c = document.documentElement.getAttribute('data-theme') || 'light';
