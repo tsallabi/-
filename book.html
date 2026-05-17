@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1a0f08">
     <title>تفاصيل الكتاب — المكتبة الطيبة</title>
-    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/style.css?v=25">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:wght@700&family=Aref+Ruqaa:wght@700&display=swap" rel="stylesheet">
@@ -20,7 +20,7 @@
         .fav-btn-detail:hover { border-color: #ce1126; color: #ce1126; transform: translateY(-1px); }
         .fav-btn-detail.is-fav { background: linear-gradient(135deg, #ce1126, #8b1a1a); color: #fff; border-color: #ce1126; }
 
-        /* Profile (مكرر) */
+        /* Profile */
         .profile-wrap { position: relative; flex-shrink: 0; }
         .profile-btn { width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-subtle); color: var(--text); display: grid; place-items: center; transition: all .2s; cursor: pointer; }
         .profile-btn:hover { border-color: var(--gold); background: var(--gold-soft); color: var(--gold); transform: translateY(-1px); }
@@ -49,6 +49,212 @@
         .vip-lock-btn { width: 100%; padding: .7rem 1rem; border: 1px solid var(--border-strong); border-radius: 10px; background: var(--bg-subtle); color: var(--text); font-family: inherit; font-weight: 700; cursor: pointer; transition: all .2s; font-size: .95rem; }
         .vip-lock-btn:hover { border-color: #ce1126; color: #ce1126; background: rgba(206,17,38,.05); }
         .vip-lock-btn.vip-style:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-soft); }
+
+        /* ═══════════════════════════════════════════════════════════
+           Reviews panel styles
+           ═══════════════════════════════════════════════════════════ */
+        .rv-panel {
+            margin: 2.5rem 0 0;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(250,246,238,.06), rgba(184,153,104,.04));
+            border: 1px solid var(--border-strong, rgba(184,153,104,.35));
+            border-radius: 20px;
+        }
+        .rv-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border, rgba(184,153,104,.2));
+        }
+        .rv-heading {
+            font-family: 'Aref Ruqaa', 'Amiri', serif;
+            font-size: 1.3rem;
+            color: var(--text);
+            margin: 0;
+        }
+        .rv-avg {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            background: linear-gradient(135deg, rgba(184,153,104,.15), rgba(184,153,104,.08));
+            border: 1px solid rgba(184,153,104,.4);
+            border-radius: 14px;
+            padding: .6rem 1.1rem;
+        }
+        .rv-avg-score {
+            font-family: 'Reem Kufi', 'Aref Ruqaa', serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #B89968;
+            line-height: 1;
+        }
+        .rv-avg-stars { font-size: 1rem; }
+        .rv-avg-count { font-size: .8rem; color: var(--text-muted); font-family: 'Cairo', sans-serif; }
+
+        .rv-list { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.75rem; }
+        .rv-item {
+            background: var(--bg-subtle, rgba(250,246,238,.05));
+            border: 1px solid var(--border, rgba(184,153,104,.18));
+            border-radius: 14px;
+            padding: 1rem 1.25rem;
+            transition: border-color .2s;
+        }
+        .rv-item:hover { border-color: rgba(184,153,104,.4); }
+        .rv-item-header {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            margin-bottom: .6rem;
+        }
+        .rv-avatar {
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-family: 'Reem Kufi', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #fff;
+            flex-shrink: 0;
+        }
+        .rv-item-meta { flex: 1; }
+        .rv-item-name {
+            display: block;
+            font-weight: 700;
+            font-size: .9rem;
+            color: var(--text);
+            margin-bottom: .15rem;
+        }
+        .rv-item-stars { font-size: .9rem; }
+        .rv-item-date { font-size: .75rem; color: var(--text-muted); white-space: nowrap; }
+        .rv-item-text {
+            margin: 0;
+            font-family: 'Amiri', serif;
+            font-size: 1rem;
+            line-height: 1.8;
+            color: var(--text);
+        }
+        .rv-empty {
+            text-align: center;
+            color: var(--text-muted);
+            font-family: 'Amiri', serif;
+            font-style: italic;
+            font-size: 1rem;
+            padding: 1.5rem 0;
+        }
+
+        /* Form */
+        .rv-form-wrap {
+            background: var(--bg-subtle, rgba(250,246,238,.04));
+            border: 1px dashed var(--border-strong, rgba(184,153,104,.4));
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+        .rv-form-title {
+            font-family: 'Aref Ruqaa', 'Amiri', serif;
+            font-size: 1.1rem;
+            color: var(--text);
+            margin: 0 0 1rem;
+        }
+        .rv-edit-note {
+            font-size: .82rem;
+            color: #B89968;
+            margin: -.5rem 0 .75rem;
+            font-family: 'Cairo', sans-serif;
+        }
+        .rv-star-picker {
+            display: flex;
+            gap: .25rem;
+            margin-bottom: .5rem;
+        }
+        .rv-star-btn {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            padding: 0 .15rem;
+            line-height: 1;
+            transition: transform .15s, color .15s;
+        }
+        .rv-star-btn:hover { transform: scale(1.2); }
+        @media (prefers-reduced-motion: reduce) { .rv-star-btn:hover { transform: none; } }
+        .rv-star-hint {
+            font-size: .8rem;
+            color: var(--text-muted);
+            margin: 0 0 .85rem;
+            font-family: 'Cairo', sans-serif;
+            height: 1em;
+        }
+        .rv-textarea {
+            width: 100%;
+            box-sizing: border-box;
+            background: var(--bg-elevated, rgba(255,255,255,.04));
+            border: 1px solid var(--border, rgba(184,153,104,.3));
+            border-radius: 12px;
+            color: var(--text);
+            font-family: 'Amiri', serif;
+            font-size: 1rem;
+            line-height: 1.8;
+            padding: .85rem 1rem;
+            resize: vertical;
+            transition: border-color .2s, box-shadow .2s;
+            direction: rtl;
+        }
+        .rv-textarea:focus {
+            outline: none;
+            border-color: #B89968;
+            box-shadow: 0 0 0 3px rgba(184,153,104,.18);
+        }
+        .rv-form-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: .75rem;
+            gap: 1rem;
+        }
+        .rv-char-count { font-size: .75rem; color: var(--text-soft); font-family: 'Cairo', sans-serif; }
+        .rv-submit-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            padding: .65rem 1.4rem;
+            background: linear-gradient(135deg, #B89968, #d4af37);
+            color: #1a0f08;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Aref Ruqaa', 'Cairo', serif;
+            font-weight: 700;
+            font-size: .95rem;
+            cursor: pointer;
+            transition: all .2s;
+        }
+        .rv-submit-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(184,153,104,.35); }
+        .rv-submit-btn:disabled { opacity: .45; cursor: not-allowed; }
+        .rv-form-error {
+            margin: .6rem 0 0;
+            color: #B1373F;
+            font-size: .82rem;
+            font-family: 'Cairo', sans-serif;
+        }
+        .rv-login-prompt {
+            text-align: center;
+            padding: 1.25rem;
+            color: var(--text-muted);
+            font-family: 'Amiri', serif;
+            font-style: italic;
+            font-size: 1rem;
+        }
+        .rv-login-link {
+            color: #B89968;
+            font-weight: 700;
+            text-decoration: underline;
+            cursor: pointer;
+            font-style: normal;
+        }
     </style>
 </head>
 <body>
@@ -136,6 +342,9 @@
         <section class="book-text" id="descriptionSection" hidden><h2>📌 نبذة عن الكتاب</h2><p id="bookDescription"></p></section>
         <section class="book-text" id="introSection" hidden><h2>📝 المقدمة</h2><p id="bookIntro"></p></section>
 
+        <!-- Reviews panel — populated by js/reviews.js after book loads -->
+        <div id="reviewsContainer" hidden></div>
+
         <p class="empty-state" id="loadingState"><span class="spinner"></span> جارٍ تحميل بيانات الكتاب...</p>
         <p class="empty-state" id="notFoundState" hidden>عذراً، لم يتم العثور على هذا الكتاب. <a href="index.html">عُد للرئيسية</a></p>
     </main>
@@ -151,12 +360,34 @@
         </div>
     </footer>
 
-    <script src="js/config.js?v=10"></script>
-    <script src="js/cover-resolver.js?v=10"></script>
-    <script src="js/data.js?v=10"></script>
-    <script src="js/firebase-counter.js?v=10"></script>
-    <script src="js/user-system.js?v=10"></script>
-    <script src="js/book.js?v=10"></script>
-    <script src="js/profile.js?v=10"></script>
+    <script src="js/config.js?v=25"></script>
+    <script src="js/cover-resolver.js?v=25"></script>
+    <script src="js/data.js?v=25"></script>
+    <script src="js/firebase-counter.js?v=25"></script>
+    <script src="js/user-system.js?v=25"></script>
+    <script src="js/achievements.js?v=25"></script>
+    <script src="js/reviews.js?v=25"></script>
+    <script src="js/book.js?v=25"></script>
+    <script src="js/profile.js?v=25"></script>
+    <script>
+        /* ── Mount reviews after book.js reveals the bookDetail article ── */
+        (function () {
+            const params = new URLSearchParams(location.search);
+            const bookId = params.get('id') || params.get('bookId');
+
+            // book.js sets bookDetail to visible; observe that
+            const detail = document.getElementById('bookDetail');
+            if (!bookId || !detail) return;
+
+            const obs = new MutationObserver(() => {
+                if (!detail.hidden) {
+                    obs.disconnect();
+                    const rc = document.getElementById('reviewsContainer');
+                    if (rc) { rc.hidden = false; REVIEWS.render('reviewsContainer', bookId); }
+                }
+            });
+            obs.observe(detail, { attributes: true, attributeFilter: ['hidden'] });
+        })();
+    </script>
 </body>
 </html>
