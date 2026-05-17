@@ -61,7 +61,7 @@ bash bulk-all.sh 200
 ```bash
 # إعداد Git (مرّة واحدة)
 git config --global user.email "bot@taybaa-library.com"
-git config --global user.name "Taybaa Library Bot"
+git config --global user.name "Taybaa Libya Library Bot"
 
 # إنشاء SSH key لـGitHub
 ssh-keygen -t ed25519 -C "vps@taybaa"

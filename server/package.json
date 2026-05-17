@@ -1,7 +1,7 @@
 {
   "name": "taybaa-library-server",
   "version": "1.0.0",
-  "description": "Backend API for المكتبة الطيبة — books, search, users, annotations",
+  "description": "Backend API for مكتبة ليبيا الطيبة — books, search, users, annotations",
   "type": "module",
   "main": "index.mjs",
   "scripts": {

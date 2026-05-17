@@ -1,10 +1,10 @@
-/* المكتبة الطيبة — إعدادات */
+/* مكتبة ليبيا الطيبة — إعدادات */
 
 const CONFIG = {
-    siteName: 'المكتبة الطيبة',
+    siteName: 'مكتبة ليبيا الطيبة',
     siteTag: 'TAYBAA · LIBRARY',
-    publisher: 'دار نشر المكتبة الطيبة',
-    publisherShort: 'دار المكتبة الطيبة',
+    publisher: 'دار نشر مكتبة ليبيا الطيبة',
+    publisherShort: 'دار مكتبة ليبيا الطيبة',
 
     dataSource: 'json',
     sheetId: '',

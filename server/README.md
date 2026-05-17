@@ -1,4 +1,4 @@
-# المكتبة الطيبة — Backend API
+# مكتبة ليبيا الطيبة — Backend API
 
 Node.js + Express server لتوفير endpoints للواجهة الأماميّة.
 
