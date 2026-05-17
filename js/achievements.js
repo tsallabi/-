@@ -1,5 +1,5 @@
 /**
- * نظام الإنجازات — المكتبة الطيبة (Wave 3)
+ * نظام الإنجازات — مكتبة ليبيا الطيبة (Wave 3)
  * =====================================================
  * المخزن: localStorage مفتاح taybaa-achievements-{userId}
  * واجهة عامة: window.ACHIEVEMENTS.trigger(id)
@@ -292,7 +292,7 @@ const ACHIEVEMENTS = (function () {
     // If on reader page, hook events
     if (document.getElementById('pdfCanvas')) hookReaderEvents();
     // If on homepage, bump arch visit
-    if (location.pathname.endsWith('v2.html') || location.pathname === '/' || location.pathname.endsWith('index.html')) bumpArchVisit();
+    if (location.pathname === '/' || location.pathname.endsWith('index.html') || location.pathname.endsWith('v2.html')) bumpArchVisit();
   }
 
   // Auto-init when DOM is ready
