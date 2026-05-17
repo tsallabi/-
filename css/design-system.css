@@ -148,7 +148,7 @@ html {
 
 body {
     margin: 0;
-    font-family: 'Cairo', 'Amiri', 'Tajawal', system-ui, -apple-system, sans-serif;
+    font-family: 'Tajawal', 'Cairo', 'Amiri', system-ui, -apple-system, sans-serif;
     font-size: 16px;
     line-height: 1.75;
     color: var(--text);
@@ -161,6 +161,92 @@ body {
     overflow-x: hidden;
 }
 
+/* ============================================================
+   === ✦ Aref Ruqaa — الخط الزخرفي الموحّد للعناوين ✦ ===
+   ============================================================
+   يُطبَّق على كل العناوين الزخرفية في الموقع.
+   النص العادي والأزرار والإدخالات تحتفظ بـ 'Tajawal' / 'Cairo'.
+*/
+h1,
+h2,
+h3,
+.section-title,
+.section-title h2,
+.section-title h3,
+.card-title,
+.book-title,
+.book-spine-title,
+.category-name,
+.category-tile-name,
+.nav-brand,
+.modal-title,
+.taybaa-modal-title,
+.hero h1,
+.hero h2,
+.hero-title,
+.hero-wordmark,
+.hero-tagline,
+.ent-track h3,
+.featured-entrepreneurship h2,
+.snc-dash-title,
+.snc-panel-title,
+.snc-reflect-title,
+.journey-title,
+.pf-name,
+.pf-guest-title,
+.pf-stat-val,
+.logo-title {
+    font-family: 'Aref Ruqaa', 'Amiri', serif;
+    font-weight: 700;
+    letter-spacing: -0.005em;
+}
+
+/* وزن أخف (400) للعناوين الأصغر والبطاقات */
+h3,
+.card-title,
+.book-title,
+.book-spine-title,
+.category-name,
+.category-tile-name,
+.ent-track h3,
+.journey-title,
+.snc-panel-title {
+    font-weight: 400;
+}
+
+/* تأكيد: الجسم والأزرار والإدخالات تبقى Sans-serif مقروء */
+body,
+p,
+li,
+a,
+span,
+small,
+em,
+strong,
+input,
+textarea,
+select,
+button,
+.btn,
+.input,
+.search-box,
+.search-box input,
+.book-spine-author,
+.book-author,
+.book-detail-author,
+.category-tile-count,
+.book-meta,
+.book-meta-list,
+.section-subtitle,
+.section-sub,
+.hero-eyebrow,
+.hero-origin,
+.daily-quote-card .quote-author,
+.profile-status,
+.profile-note {
+    font-family: 'Tajawal', 'Cairo', 'Amiri', system-ui, -apple-system, sans-serif;
+}
+
 /* === فئات الخط العربي === */
 .font-amiri { font-family: 'Amiri', 'Aref Ruqaa', serif; }
 .font-kufi { font-family: 'Reem Kufi', 'Aref Ruqaa', sans-serif; }
@@ -168,7 +254,7 @@ body {
 .font-cairo { font-family: 'Cairo', sans-serif; }
 
 .text-display {
-    font-family: 'Reem Kufi', 'Aref Ruqaa', sans-serif;
+    font-family: 'Aref Ruqaa', 'Reem Kufi', sans-serif;
     font-weight: 700;
     letter-spacing: -0.01em;
     line-height: 1.15;
@@ -177,14 +263,14 @@ body {
 .text-display-2 { font-size: clamp(2rem, 4.5vw, 3.5rem); }
 
 .text-heading {
-    font-family: 'Reem Kufi', 'Aref Ruqaa', sans-serif;
+    font-family: 'Aref Ruqaa', 'Reem Kufi', sans-serif;
     font-weight: 700;
     line-height: 1.25;
     color: var(--text);
 }
 .text-h1 { font-size: clamp(1.75rem, 3vw, 2.5rem); }
 .text-h2 { font-size: clamp(1.4rem, 2.5vw, 1.85rem); }
-.text-h3 { font-size: 1.2rem; }
+.text-h3 { font-size: 1.2rem; font-weight: 400; }
 
 .text-body { font-size: 1rem; line-height: 1.75; }
 .text-lead { font-size: 1.15rem; line-height: 1.7; color: var(--text-muted); }
@@ -290,7 +376,7 @@ body {
     justify-content: center;
     gap: var(--space-2);
     padding: var(--space-3) var(--space-5);
-    font-family: inherit;
+    font-family: 'Tajawal', 'Cairo', sans-serif;
     font-size: .95rem;
     font-weight: 600;
     color: var(--text);
@@ -355,6 +441,7 @@ body {
     background: var(--bg-subtle);
     color: var(--text-muted);
     border-radius: var(--radius-full);
+    font-family: 'Tajawal', 'Cairo', sans-serif;
 }
 
 .badge-gold {
@@ -377,7 +464,7 @@ body {
 .input {
     width: 100%;
     padding: var(--space-3) var(--space-4);
-    font-family: inherit;
+    font-family: 'Tajawal', 'Cairo', sans-serif;
     font-size: 1rem;
     color: var(--text);
     background: var(--bg-elevated);
@@ -442,7 +529,7 @@ body {
     margin-bottom: var(--space-5);
 }
 .section-title h2 {
-    font-family: 'Reem Kufi', sans-serif;
+    font-family: 'Aref Ruqaa', 'Amiri', serif;
     font-size: clamp(1.4rem, 2.5vw, 1.85rem);
     font-weight: 700;
     margin: 0;
@@ -457,6 +544,63 @@ body {
     color: var(--text-muted);
     font-size: .95rem;
     font-weight: 500;
+    font-family: 'Tajawal', 'Cairo', sans-serif;
+}
+
+/* ============================================================
+   === شارة المسؤول والتحكم بالكتب (Admin badges) ===
+   ============================================================ */
+.admin-hide-btn {
+    position: absolute;
+    top: .5rem;
+    left: .5rem;
+    z-index: 6;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid rgba(177,55,63,.5);
+    background: rgba(255,255,255,.92);
+    color: #B1373F;
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: all 200ms ease;
+    padding: 0;
+    font-family: inherit;
+}
+.admin-hide-btn:hover {
+    background: #B1373F;
+    color: #fff;
+    border-color: #B1373F;
+    transform: scale(1.1);
+}
+.book-card-admin-hidden,
+.book-spine-admin-hidden {
+    position: relative;
+    opacity: .45;
+}
+.book-card-admin-hidden::after,
+.book-spine-admin-hidden::after {
+    content: 'محذوف';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #B1373F;
+    color: #fff;
+    font-family: 'Aref Ruqaa', serif;
+    font-size: .7rem;
+    padding: .15rem .55rem;
+    border-radius: 999px;
+    z-index: 5;
+    pointer-events: none;
+}
+.admin-fade-out {
+    animation: admin-fade-out 380ms cubic-bezier(.25, .8, .25, 1) forwards;
+}
+@keyframes admin-fade-out {
+    to { opacity: 0; transform: scale(.92); }
 }
 
 /* === دعم prefers-reduced-motion === */
