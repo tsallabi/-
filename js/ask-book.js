@@ -1,6 +1,6 @@
 /**
  * js/ask-book.js  —  Wave 4 "اسأل الكتاب" (Ask the Book)
- * Luxury RTL Arabic chat panel for المكتبة الطيبة
+ * Luxury RTL Arabic chat panel for مكتبة ليبيا الطيبة
  *
  * Depends on:
  *   - window.__taybaaReader  (exposed by reader-luxury.js)
