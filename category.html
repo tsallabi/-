@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#FAF6EE">
+  <title>قسم — المكتبة الطيبة</title>
+  <meta name="description" content="تصفّح كتب قسم معيّن في المكتبة الطيبة">
+
+  <link rel="stylesheet" href="css/design-system.css?v=27">
+  <link rel="stylesheet" href="css/homepage-v2.css?v=27">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Tajawal:wght@400;500;700&family=Cairo:wght@400;600;700&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('taybaa-theme') || 'light');</script>
+
+  <style>
+    .cat-hero {
+      background: linear-gradient(180deg, var(--parchment-200) 0%, var(--parchment-100) 100%);
+      padding: 3rem 0 2rem;
+      text-align: center;
+      border-bottom: 1px solid rgba(184,153,104,.18);
+    }
+    .cat-eyebrow {
+      font-family: 'Reem Kufi', sans-serif;
+      color: var(--text-muted);
+      font-size: .85rem;
+      letter-spacing: .25em;
+      margin: 0 0 .75rem;
+    }
+    .cat-title {
+      font-family: 'Aref Ruqaa', 'Amiri', serif;
+      font-weight: 700;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      color: #B89968;
+      margin: 0 0 .5rem;
+    }
+    .cat-count {
+      font-family: 'Amiri', serif;
+      font-style: italic;
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      margin: 0;
+    }
+    .cat-back {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      margin: 1.25rem auto 0;
+      padding: .55rem 1.1rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      color: var(--text);
+      text-decoration: none;
+      font-family: 'Tajawal', 'Cairo', sans-serif;
+      font-weight: 600;
+      font-size: .92rem;
+      transition: all 280ms ease;
+    }
+    .cat-back:hover { border-color: #B89968; color: #B89968; }
+
+    .cat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1.5rem;
+      padding: 2rem 0 4rem;
+    }
+    .cat-empty,
+    .cat-loading {
+      text-align: center;
+      padding: 4rem 1.5rem;
+      font-family: 'Amiri', serif;
+      color: var(--text-muted);
+      font-style: italic;
+      font-size: 1.1rem;
+    }
+    .cat-restricted {
+      max-width: 540px;
+      margin: 4rem auto;
+      padding: 2.5rem 2rem;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      text-align: center;
+    }
+    .cat-restricted h2 {
+      font-family: 'Aref Ruqaa', 'Amiri', serif;
+      color: #B89968;
+      font-size: 1.5rem;
+      margin: 0 0 .75rem;
+    }
+    .cat-restricted p {
+      font-family: 'Amiri', serif;
+      font-style: italic;
+      color: var(--text-muted);
+      margin: 0 0 1.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header style="position:sticky;top:0;z-index:50;backdrop-filter:blur(16px);background:color-mix(in srgb, var(--bg-elevated) 90%, transparent);border-bottom:1px solid var(--border);padding:1rem 0;">
+    <div class="container" style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;">
+      <a href="v2.html" style="display:flex;align-items:center;gap:.75rem;text-decoration:none;color:var(--text);">
+        <span style="width:42px;height:42px;border-radius:10px;background:var(--ink-900);color:var(--parchment-100);display:grid;place-items:center;font-family:'Reem Kufi',sans-serif;font-weight:700;font-size:1.2rem;">ط</span>
+        <div style="line-height:1.1;">
+          <div style="font-family:'Reem Kufi',sans-serif;font-weight:700;font-size:1.15rem;">المكتبة الطيبة</div>
+          <div style="font-size:.7rem;color:var(--text-muted);letter-spacing:.15em;">TAYBAA · TRIPOLI</div>
+        </div>
+      </a>
+      <div style="flex:1;"></div>
+      <a href="v2.html" class="btn btn-ghost" title="عودة للرئيسية">→ الرئيسية</a>
+      <button class="btn btn-ghost" id="themeBtn" type="button">🌙</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="cat-hero">
+      <div class="container">
+        <p class="cat-eyebrow">المكتبة الطيبة · قسم</p>
+        <h1 class="cat-title" id="catTitle">جارٍ التحميل...</h1>
+        <p class="cat-count" id="catCount"></p>
+        <a class="cat-back" href="v2.html">← العودة للرئيسية</a>
+      </div>
+    </section>
+
+    <section class="container">
+      <div class="cat-grid" id="catGrid">
+        <div class="cat-loading">⏳ جارٍ تحضير الكتب...</div>
+      </div>
+    </section>
+  </main>
+
+  <footer style="padding:3rem 0 2rem;border-top:1px solid var(--border);margin-top:2rem;background:var(--bg-elevated);text-align:center;">
+    <div class="container">
+      <p style="font-size:.85rem;color:var(--text-soft);margin:0;">
+        © <span id="year">2026</span> المكتبة الطيبة · من ليبيا · لخدمة العلم والثقافة العربيّة
+      </p>
+    </div>
+  </footer>
+
+  <script src="js/user-system.js?v=27"></script>
+  <script src="js/admin-role.js?v=27"></script>
+  <script>
+  (async function () {
+    'use strict';
+
+    const params = new URLSearchParams(location.search);
+    const requestedCat = params.get('cat') || '';
+    const gridEl  = document.getElementById('catGrid');
+    const titleEl = document.getElementById('catTitle');
+    const countEl = document.getElementById('catCount');
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Theme toggle
+    document.getElementById('themeBtn')?.addEventListener('click', () => {
+      const c = document.documentElement.getAttribute('data-theme') || 'light';
+      const n = c === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', n);
+      localStorage.setItem('taybaa-theme', n);
+    });
+
+    if (!requestedCat) {
+      titleEl.textContent = 'لم يُحدّد قسم';
+      gridEl.innerHTML = '<div class="cat-empty">يرجى تحديد قسم من الصفحة الرئيسيّة.</div>';
+      return;
+    }
+    document.title = `${requestedCat} — المكتبة الطيبة`;
+    titleEl.textContent = requestedCat;
+
+    // Wait for admin-role module (ready promise) and then check gate
+    async function checkGate() {
+      try {
+        if (window.ADMIN_ROLE && window.ADMIN_ROLE.ready) await window.ADMIN_ROLE.ready;
+      } catch (_) {}
+      if (typeof window.canSeeRestrictedCategory === 'function') {
+        if (!window.canSeeRestrictedCategory(requestedCat)) {
+          // Not allowed — show polite placeholder
+          document.querySelector('main').innerHTML = `
+            <div class="cat-restricted">
+              <h2>هذا القسم غير متاح</h2>
+              <p>عذراً، هذا القسم محجوز وغير متاح للعرض العام حالياً.</p>
+              <a class="cat-back" href="v2.html">← العودة للرئيسية</a>
+            </div>`;
+          return false;
+        }
+      }
+      return true;
+    }
+    const allowed = await checkGate();
+    if (!allowed) return;
+
+    // Fetch books for this category
+    try {
+      const r = await fetch(`/api/books?category=${encodeURIComponent(requestedCat)}&limit=200&sortBy=views`);
+      if (!r.ok) throw new Error('API failed');
+      const data = await r.json();
+      let books = (data.books || []);
+
+      // Apply admin hidden-book filter (non-admins see filtered, admins see all w/ dimming)
+      const isAdmin = !!window.IS_ADMIN;
+      if (!isAdmin && typeof window.isBookHidden === 'function') {
+        books = books.filter(b => !window.isBookHidden(b.id));
+      }
+
+      countEl.textContent = `${books.length} كتاب في هذا القسم`;
+
+      if (!books.length) {
+        gridEl.innerHTML = '<div class="cat-empty">لا توجد كتب في هذا القسم بعد. تابعنا قريباً.</div>';
+        return;
+      }
+
+      gridEl.innerHTML = books.map(b => renderCard(b, isAdmin)).join('');
+
+      // Wire admin delete buttons
+      if (isAdmin) {
+        gridEl.querySelectorAll('.admin-hide-btn').forEach(btn => {
+          btn.addEventListener('click', e => {
+            e.preventDefault();
+            e.stopPropagation();
+            const id = btn.dataset.id;
+            if (!id) return;
+            if (!confirm('حذف الكتاب من المكتبة؟')) return;
+            try { window.adminHideBook && window.adminHideBook(id); } catch(_) {}
+            const card = btn.closest('.book-spine');
+            if (card) {
+              card.classList.add('admin-fade-out');
+              setTimeout(() => card.remove(), 400);
+            }
+          });
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      gridEl.innerHTML = '<div class="cat-empty">تعذّر تحميل الكتب، حاول لاحقاً.</div>';
+    }
+
+    function renderCard(b, isAdmin) {
+      const hidden = typeof window.isBookHidden === 'function' ? window.isBookHidden(b.id) : false;
+      const dimClass = (isAdmin && hidden) ? ' book-spine-admin-hidden' : '';
+      const adminBtn = isAdmin
+        ? `<button type="button" class="admin-hide-btn" data-id="${esc(b.id)}" title="حذف الكتاب">×</button>`
+        : '';
+      const cover = b.cover || '';
+      const safeTitle = esc(b.title || '');
+      const safeAuthor = esc(b.author || 'مجهول');
+      return `
+        <a class="book-spine${dimClass}" href="book.html?id=${encodeURIComponent(b.id)}" style="position:relative;">
+          ${adminBtn}
+          <div class="book-spine-cover">
+            ${cover ? `<img src="${esc(cover)}" alt="${safeTitle}" loading="lazy" onerror="this.style.display='none'">` : ''}
+            <div class="book-spine-fallback">${safeTitle}</div>
+          </div>
+          <div class="book-spine-info">
+            <div class="book-spine-title">${safeTitle}</div>
+            <div class="book-spine-author">${safeAuthor}</div>
+          </div>
+        </a>`;
+    }
+
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+        ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])
+      );
+    }
+  })();
+  </script>
+</body>
+</html>
