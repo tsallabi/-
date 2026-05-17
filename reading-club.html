@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#FAF6EE">
-  <title>نادي المكتبة الطيبة — المكتبة الطيبة</title>
+  <title>نادي مكتبة ليبيا الطيبة — مكتبة ليبيا الطيبة</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -427,12 +427,12 @@
   <!-- ─── Nav ──────────────────────────────────────────────────── -->
   <nav class="club-nav">
     <div class="club-nav-inner">
-      <a href="v2.html" class="club-logo">
+      <a href="/" class="club-logo">
         <span class="club-logo-mark">ط</span>
-        <span>المكتبة الطيبة</span>
+        <span>مكتبة ليبيا الطيبة</span>
       </a>
       <div class="nav-spacer"></div>
-      <a href="v2.html" class="nav-back">→ الرئيسية</a>
+      <a href="/" class="nav-back">→ الرئيسية</a>
       <button class="nav-theme-btn" id="themeBtn" aria-label="تبديل الثيم">🌙</button>
     </div>
   </nav>
@@ -441,7 +441,7 @@
   <div class="club-hero">
     <div class="club-hero-badge">📖 نادي القراءة</div>
     <h1 class="club-hero-title">
-      نادي <span class="accent">المكتبة الطيبة</span>
+      نادي <span class="accent">مكتبة ليبيا الطيبة</span>
     </h1>
     <p class="club-hero-sub">
       كتاب واحد كلّ شهر — نقرأه معاً ونتناقشه بعمق
@@ -541,8 +541,8 @@
     </div>
   </div>
 
-  <script src="js/user-system.js?v=25"></script>
-  <script src="js/achievements.js?v=25"></script>
+  <script src="js/user-system.js?v=28"></script>
+  <script src="js/achievements.js?v=28"></script>
 
   <script>
   (function () {
@@ -623,7 +623,7 @@
                 <textarea class="forum-reply-textarea" rows="2"
                   placeholder="أضف ردّك هنا..."
                   aria-label="ردّك"></textarea>
-                <button class="forum-reply-submit" data-pid="${escHtml(p.id)}" >✉️ إرسال</button>
+                <button class="forum-reply-submit" data-pid="${escHtml(p.id)}" >✉️ إرسال</button>
               </div>` : ''}
           </div>`;
       }).join('');
@@ -707,7 +707,7 @@
         renderPosts();
       });
     } else {
-      loginNote.innerHTML = 'للمشاركة في النقاش، <a href="book.html" onclick="history.back()“>سجّل دخولك</a> أولاً.';
+      loginNote.innerHTML = 'للمشاركة في النقاش، <a href="profile.html?login=1">سجّل دخولك</a> أولاً.';
       forumText.disabled = true;
       forumSubmit.disabled = true;
     }
@@ -756,7 +756,7 @@
       ctx.fillStyle = 'rgba(250,246,238,.6)';
       ctx.font = '14px Cairo, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('قرأتُه على المكتبة الطيبة', W / 2, 80);
+      ctx.fillText('قرأتُه على مكتبة ليبيا الطيبة', W / 2, 80);
 
       // Book title (RTL canvas text)
       ctx.fillStyle = '#FAF6EE';
