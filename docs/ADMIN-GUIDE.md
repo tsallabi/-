@@ -1,4 +1,4 @@
-# دليل الإدارة — المكتبة الطيبة
+# دليل الإدارة — مكتبة ليبيا الطيبة
 
 هذا الدليل يشرح كيفية ضبط حسابات المسؤولين، إخفاء الكتب، وحجب الأقسام
 المقيّدة عن الزوّار العاديّين.
@@ -117,7 +117,7 @@
 - `js/book.js` — يحجب صفحة الكتاب إذا كان مقيّداً أو مخفيّاً
 - `category.html` — صفحة قسم مستقلة مع حماية الفئات المقيّدة
 - `functions/api/admin/hide.js` — endpoint POST (stub حاليّاً)
-- `book.html`, `v2.html` — تضمين `js/admin-role.js` وزر الإخفاء
+- `book.html`, `index.html` — تضمين `js/admin-role.js` وزر الإخفاء
 
 > **تذكير أخير:** افتح `data/admin-config.json` الآن واستبدل
 > `REPLACE_WITH_OWNER_EMAIL@example.com` ببريدك الفعلي، ثم اعمل commit
