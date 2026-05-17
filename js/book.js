@@ -32,12 +32,30 @@
 
     if (!id) return showNotFound();
 
+    // Wait for admin-role module to finish loading (so IS_ADMIN, isBookHidden and
+    // canSeeRestrictedCategory are reliable before we render the book).
+    try {
+        if (window.ADMIN_ROLE && window.ADMIN_ROLE.ready) await window.ADMIN_ROLE.ready;
+    } catch (_) {}
+
     let books;
     try { books = await DATA.loadBooks(); } catch (err) { console.error(err); return showNotFound(); }
     books = DATA.filterForViewer(books);
 
     const book = DATA.findById(books, id);
     if (!book) return showNotFound();
+
+    // Restricted-category gate (Wave 27)
+    if (typeof window.canSeeRestrictedCategory === 'function' &&
+        !window.canSeeRestrictedCategory(book.category)) {
+        return showNotFound();
+    }
+
+    // Hidden-book gate: non-admins can't view hidden books even if they hit the URL directly
+    const IS_ADMIN = !!window.IS_ADMIN;
+    if (!IS_ADMIN && typeof window.isBookHidden === 'function' && window.isBookHidden(book.id)) {
+        return showNotFound();
+    }
 
     document.title = `${book.title} — المكتبة الطيبة`;
     els.loading.hidden = true;
