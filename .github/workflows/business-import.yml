@@ -1,0 +1,128 @@
+name: Business & Self-Development Import
+on:
+  workflow_dispatch:
+  push:
+    branches: ['claude/online-library-design-ROC6E']
+    paths: ['.triggers/business-import.txt']
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/online-library-design-ROC6E
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install deps
+        working-directory: scripts
+        run: npm install --no-package-lock || true
+
+      - name: baseline
+        id: baseline
+        run: |
+          count=$(node -e "const fs=require('fs');let t=0;for(const f of ['data/books-sample.json','data/books-extra-1.json','data/books-extra-2.json','data/books-extra-3.json'])try{t+=JSON.parse(fs.readFileSync(f,'utf8')).books.length}catch{};console.log(t)")
+          echo "before=$count" >> "$GITHUB_OUTPUT"
+          echo "=== BASELINE: $count books ==="
+
+      # Business / entrepreneurship priorities — each 500 books
+      - name: 'ريادة الأعمال'
+        working-directory: scripts
+        run: node bulk-import-archive.mjs "ريادة الأعمال" 500
+        continue-on-error: true
+
+      - name: 'تطوير الذات'
+        working-directory: scripts
+        run: node bulk-import-archive.mjs "تطوير الذات" 500
+        continue-on-error: true
+
+      - name: 'التنمية البشرية'
+        working-directory: scripts
+        run: node bulk-import-archive.mjs "التنمية البشرية" 500
+        continue-on-error: true
+
+      - name: 'إدارة الأعمال'
+        working-directory: scripts
+        run: node bulk-import-archive.mjs "إدارة الأعمال" 500
+        continue-on-error: true
+
+      - name: 'القيادة'
+        working-directory: scripts
+        run: node bulk-import-archive.mjs "القيادة" 400
+        continue-on-error: true
+
+      - name: 'التسويق'
+        working-directory: scripts
+        run: node bulk-import-archive.mjs "التسويق" 400
+        continue-on-error: true
+
+      - name: 'فن البيع'
+        working-directory: scripts
+        run: node bulk-import-archive.mjs "فن البيع" 300
+        continue-on-error: true
+
+      - name: 'الاستثمار والمال'
+        working-directory: scripts
+        run: node bulk-import-archive.mjs "الاستثمار والمال" 300
+        continue-on-error: true
+
+      - name: 'النجاح والتحفيز'
+        working-directory: scripts
+        run: node bulk-import-archive.mjs "النجاح والتحفيز" 400
+        continue-on-error: true
+
+      - name: 'الإدارة المالية'
+        working-directory: scripts
+        run: node bulk-import-archive.mjs "الإدارة المالية" 300
+        continue-on-error: true
+
+      - name: 'الموارد البشرية'
+        working-directory: scripts
+        run: node bulk-import-archive.mjs "الموارد البشرية" 200
+        continue-on-error: true
+
+      - name: 'المهارات الناعمة'
+        working-directory: scripts
+        run: node bulk-import-archive.mjs "المهارات الناعمة" 200
+        continue-on-error: true
+
+      # Retry the previously-failed ones with the new fixes
+      - name: 'openiti retry (now with auth)'
+        working-directory: scripts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node openiti-import.mjs 500
+        continue-on-error: true
+
+      - name: 'hindawi retry (now with UA rotation)'
+        working-directory: scripts
+        run: node hindawi-import.mjs 500
+        continue-on-error: true
+
+      - name: Commit imported books (rebase-and-retry)
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/books-extra-3.json data/books-sample.json data/books-extra-1.json data/books-extra-2.json data/shamela-books.json 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "No changes to commit"; exit 0
+          fi
+          AFTER=$(node -e "const fs=require('fs');let t=0;for(const f of ['data/books-sample.json','data/books-extra-1.json','data/books-extra-2.json','data/books-extra-3.json'])try{t+=JSON.parse(fs.readFileSync(f,'utf8')).books.length}catch{};console.log(t)")
+          BEFORE="${{ steps.baseline.outputs.before }}"
+          ADDED=$((AFTER - BEFORE))
+          git commit -m "feat(import-business): add ${ADDED} business/self-dev books (${BEFORE} → ${AFTER} total)"
+          for attempt in 1 2 3 4 5; do
+            if git push origin claude/online-library-design-ROC6E; then echo "pushed"; break; fi
+            git fetch origin claude/online-library-design-ROC6E
+            git rebase origin/claude/online-library-design-ROC6E || (git checkout --theirs data/ 2>/dev/null; git add data/; git rebase --continue || git rebase --skip)
+            [ "$attempt" -eq 5 ] && exit 1
+            sleep $((attempt * 5))
+          done
