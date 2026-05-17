@@ -1,9 +1,9 @@
 /**
- * المكتبة الطيبة — Design System v2 "المخطوطة"
+ * مكتبة ليبيا الطيبة — Design System v2 "المخطوطة"
  *
  * لغة بصريّة: ورق العاج + حبر بحري + أحمر هندي + فواصل ذهبيّة
  * إيقاع: 380ms (إيقاع تقليب الصفحة التقليدي)
- * خطوط: Amiri للجسم + Reem Kufi للعناوين
+ * خطوط: Aref Ruqaa الموحّد للمكتبة بأكملها (جسم + عناوين)
  */
 
 :root {
@@ -148,9 +148,10 @@ html {
 
 body {
     margin: 0;
-    font-family: 'Tajawal', 'Cairo', 'Amiri', system-ui, -apple-system, sans-serif;
+    font-family: 'Aref Ruqaa', 'Amiri', serif;
     font-size: 16px;
-    line-height: 1.75;
+    line-height: 1.85;
+    letter-spacing: 0.01em;
     color: var(--text);
     background: var(--bg);
     background-image: var(--pattern-paper);
@@ -162,11 +163,31 @@ body {
 }
 
 /* ============================================================
-   === ✦ Aref Ruqaa — الخط الزخرفي الموحّد للعناوين ✦ ===
+   === ✦ Aref Ruqaa — الخط الموحّد للمكتبة بأكملها ✦ ===
    ============================================================
-   يُطبَّق على كل العناوين الزخرفية في الموقع.
-   النص العادي والأزرار والإدخالات تحتفظ بـ 'Tajawal' / 'Cairo'.
+   بناءً على طلب المستخدم: "اجعل خطوط المكتبة كلها خط الرقعة".
+   يُطبَّق Aref Ruqaa على كل النصوص — الجسم والعناوين والأزرار.
 */
+body, button, input, textarea, select,
+p, li, span, div, a {
+    font-family: 'Aref Ruqaa', 'Amiri', serif !important;
+    font-weight: 400;
+}
+
+h1, h2, h3, h4, h5,
+.hero-wordmark, .library-name, .section-title, .section-title h2,
+.card-title, .book-title, .compass-label, .cp-label {
+    font-family: 'Aref Ruqaa', serif !important;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+/* تكبير النصوص الطويلة لتحسين القراءة بخط الرقعة */
+.book-description, .review-text, .post-body, p {
+    font-size: 1.05em;
+    line-height: 1.95;
+}
+
 h1,
 h2,
 h3,
@@ -214,44 +235,14 @@ h3,
     font-weight: 400;
 }
 
-/* تأكيد: الجسم والأزرار والإدخالات تبقى Sans-serif مقروء */
-body,
-p,
-li,
-a,
-span,
-small,
-em,
-strong,
-input,
-textarea,
-select,
-button,
-.btn,
-.input,
-.search-box,
-.search-box input,
-.book-spine-author,
-.book-author,
-.book-detail-author,
-.category-tile-count,
-.book-meta,
-.book-meta-list,
-.section-subtitle,
-.section-sub,
-.hero-eyebrow,
-.hero-origin,
-.daily-quote-card .quote-author,
-.profile-status,
-.profile-note {
-    font-family: 'Tajawal', 'Cairo', 'Amiri', system-ui, -apple-system, sans-serif;
-}
+/* (Legacy Tajawal/Cairo body override removed — Aref Ruqaa is now applied
+   site-wide via the !important block above per user directive.) */
 
 /* === فئات الخط العربي === */
 .font-amiri { font-family: 'Amiri', 'Aref Ruqaa', serif; }
 .font-kufi { font-family: 'Reem Kufi', 'Aref Ruqaa', sans-serif; }
 .font-ruqaa { font-family: 'Aref Ruqaa', serif; }
-.font-cairo { font-family: 'Cairo', sans-serif; }
+.font-cairo { font-family: 'Aref Ruqaa', 'Amiri', serif; }
 
 .text-display {
     font-family: 'Aref Ruqaa', 'Reem Kufi', sans-serif;
@@ -376,7 +367,7 @@ button,
     justify-content: center;
     gap: var(--space-2);
     padding: var(--space-3) var(--space-5);
-    font-family: 'Tajawal', 'Cairo', sans-serif;
+    font-family: 'Aref Ruqaa', 'Amiri', serif;
     font-size: .95rem;
     font-weight: 600;
     color: var(--text);
@@ -441,7 +432,7 @@ button,
     background: var(--bg-subtle);
     color: var(--text-muted);
     border-radius: var(--radius-full);
-    font-family: 'Tajawal', 'Cairo', sans-serif;
+    font-family: 'Aref Ruqaa', 'Amiri', serif;
 }
 
 .badge-gold {
@@ -464,7 +455,7 @@ button,
 .input {
     width: 100%;
     padding: var(--space-3) var(--space-4);
-    font-family: 'Tajawal', 'Cairo', sans-serif;
+    font-family: 'Aref Ruqaa', 'Amiri', serif;
     font-size: 1rem;
     color: var(--text);
     background: var(--bg-elevated);
@@ -544,7 +535,7 @@ button,
     color: var(--text-muted);
     font-size: .95rem;
     font-weight: 500;
-    font-family: 'Tajawal', 'Cairo', sans-serif;
+    font-family: 'Aref Ruqaa', 'Amiri', serif;
 }
 
 /* ============================================================
