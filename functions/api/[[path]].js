@@ -11,7 +11,7 @@ const QUOTES = [
     { text: 'في التأنّي السلامة وفي العجلة الندامة', author: 'ثابت بن أوفى' },
     { text: 'وما لجرح إذا أرضاك من ألم', author: 'المتنبّي' },
     { text: 'إنّما الأمم الأخلاق ما بقيتْ', author: 'أحمد شوقي' },
-    { text: 'لو أنّ الحياة تبقى لحيٍّ لعددتُ فيها جميع الأحياء أمواتاً', author: 'أبو العلاء المعرّي' },
+    { text: 'لو أنّ الحياة تبقى لحيٍّ لعددتُ فيها جميع الأحياء أمواتاً', author: 'أبو العلاء المعرّي' },
     { text: 'خير جليس في الأنام كتاب', author: 'المتنبّي' },
     { text: 'إنّ أفضل الإخوان من إذا استغنيتَ عنه لم يزداد أنفة', author: 'علي بن أبي طالب' }
 ];
@@ -59,9 +59,10 @@ const json = (data, status = 200) => new Response(JSON.stringify(data), {
     }
 });
 
-export async function onRequest({ request, params }) {
+export async function onRequest({ request, params, env }) {
     const url = new URL(request.url);
     const path = Array.isArray(params.path) ? params.path.join('/') : (params.path || '');
+    const method = request.method.toUpperCase();
 
     if (path === 'health' || path === '') {
         return json({ status: 'ok', service: 'المكتبة الطيبة API', platform: 'Cloudflare Pages', timestamp: new Date().toISOString() });
@@ -148,6 +149,68 @@ export async function onRequest({ request, params }) {
         filtered.sort((a, b) => (b[sortBy] || 0) - (a[sortBy] || 0));
 
         return json({ total: filtered.length, offset, limit, books: filtered.slice(offset, offset + limit) });
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+     * Wave 3: Reviews API
+     * ══════════════════════════════════════════════════════════════
+     * Data shape: { id, bookId, userId, userName, rating:1-5, text, createdAt }
+     *
+     * TODO (KV upgrade):
+     *   - Bind KV namespace as env.REVIEWS_KV in wrangler.toml
+     *   - GET:  const raw = await env.REVIEWS_KV.get(`reviews:${bookId}`, 'json'); return raw || [];
+     *   - POST: const reviews = (await env.REVIEWS_KV.get(`reviews:${bookId}`, 'json')) || [];
+     *           reviews.push(body); await env.REVIEWS_KV.put(`reviews:${bookId}`, JSON.stringify(reviews));
+     */
+    if (path.startsWith('reviews/')) {
+        const bookId = path.replace('reviews/', '');
+        if (!bookId) return json({ error: 'bookId required' }, 400);
+
+        if (method === 'OPTIONS') {
+            return new Response(null, { status: 204, headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET,POST,OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type' } });
+        }
+
+        if (method === 'GET') {
+            // TODO (KV): read from env.REVIEWS_KV
+            // For now localStorage is the source of truth — return empty placeholder
+            return json({ bookId, reviews: [], source: 'placeholder', note: 'Client localStorage is authoritative until KV is connected.' });
+        }
+
+        if (method === 'POST') {
+            // TODO (KV): validate body, write to env.REVIEWS_KV
+            // Body shape: { id, bookId, userId, userName, rating, text, createdAt }
+            return json({ ok: true, note: 'Stored client-side only. KV write pending env setup.' }, 202);
+        }
+
+        return json({ error: 'Method not allowed' }, 405);
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+     * Wave 3: Reading Club API
+     * ══════════════════════════════════════════════════════════════
+     * Data shape: { id, userId, userName, text, createdAt, likes:[], replies:[] }
+     *
+     * TODO (KV upgrade):
+     *   - Bind KV namespace as env.CLUB_KV in wrangler.toml
+     *   - GET:  return await env.CLUB_KV.get('club:posts', 'json') || [];
+     *   - POST: push new post, write back to KV
+     */
+    if (path === 'club/posts') {
+        if (method === 'OPTIONS') {
+            return new Response(null, { status: 204, headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET,POST,OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type' } });
+        }
+
+        if (method === 'GET') {
+            // TODO (KV): return await env.CLUB_KV.get('club:posts', 'json') || []
+            return json({ posts: [], source: 'placeholder', note: 'Client localStorage is authoritative until KV is connected.' });
+        }
+
+        if (method === 'POST') {
+            // TODO (KV): validate + append + write
+            return json({ ok: true, note: 'Stored client-side only. KV write pending env setup.' }, 202);
+        }
+
+        return json({ error: 'Method not allowed' }, 405);
     }
 
     return json({ error: 'Not found', path }, 404);
