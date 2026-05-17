@@ -23,6 +23,43 @@ python -m http.server 8080
 
 ---
 
+## 🤖 إعداد ميزة "اسأل الكتاب" (Wave 4)
+
+تتيح هذه الميزة للقارئ إجراء محادثة ذكية مع الكتاب الذي يقرأه عبر نموذج Claude.
+
+### الخطوة 1: احصل على مفتاح API من Anthropic
+انتقل إلى: <https://console.anthropic.com/settings/keys>  
+اضغط **Create Key** — انسخ المفتاح فوراً (لن يُعرض مجدداً).
+
+### الخطوة 2: أضف المفتاح إلى Cloudflare Pages
+
+1. افتح لوحة تحكم مشروعك على: <https://dash.cloudflare.com>
+2. اختر **Workers & Pages** → اختر موقع المكتبة الطيبة
+3. انتقل إلى: **Settings → Environment Variables**
+4. اضغط **Add variable** وأدخل:
+
+| الحقل | القيمة |
+|-------|--------|
+| Variable name | `ANTHROPIC_API_KEY` |
+| Value | مفتاح API الذي نسخته |
+
+5. اختر **Production** (وكذلك **Preview** إن أردت)
+6. اضغط **Save**
+
+### الخطوة 3: أعد نشر الموقع
+بعد حفظ المتغير، اضغط **Retry deployment** أو ادفع commit جديداً لتفعيل المتغير.
+
+### ملاحظات أمنية مهمة
+- **لا تضع المفتاح أبداً** داخل الكود أو ملفات `js/` أو أي ملف يصل إليه المتصفح مباشرةً.
+- المفتاح يُقرأ فقط من الخادم (Cloudflare Pages Function) عبر `env.ANTHROPIC_API_KEY`.
+- إذا اشتبهت بتسريب المفتاح، ارجع إلى console.anthropic.com وأبطله فوراً ثم أنشئ مفتاحاً جديداً.
+
+### اختبار الميزة
+بعد النشر، افتح أي كتاب في القارئ وانقر على زر **🤖 اسأل** في شريط الأدوات.  
+إذا لم يعمل، افتح Developer Tools → Network وتحقق من استجابة `/api/ask-book`.
+
+---
+
 ## 🔐 لوحة الإدارة (الأدمن)
 
 ### كيف يدخل الأدمن؟
@@ -175,3 +212,5 @@ service firebase.storage {
 | الكتب التي أضفتها اختفت | فعّل Firebase — بدونه لا تُحفظ |
 | ملف Word لا يتحوّل | تأكد أنه `.docx` (ليس `.doc`) |
 | الصور لا تظهر | تأكد من تفعيل Firebase Storage |
+| زر "اسأل الكتاب" لا يرد | تأكد من إضافة `ANTHROPIC_API_KEY` في Cloudflare Pages → Settings → Environment Variables |
+| رسالة "مفتاح API غير صحيح" | أعد إنشاء المفتاح من console.anthropic.com وحدّثه في Cloudflare |
