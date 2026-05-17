@@ -3,224 +3,674 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#1a0f08">
-    <title>المكتبة الطيبة — أكبر مكتبة عربية أونلاين</title>
-    <meta name="description" content="دار نشر المكتبة الطيبة · واحة المعرفة.">
-    <link rel="stylesheet" href="css/style.css?v=11">
+    <meta name="theme-color" content="#FAF6EE">
+    <title>مكتبة ليبيا الطيبة — بيتُ كلّ قارئ</title>
+    <meta name="description" content="مكتبة ليبيا الطيبة — بيتُ كلّ قارئ. رحلات قرائيّة عبر ستّة مسارات: الرّيادة، الأدب، الفكر، الذات، العلوم، التاريخ. أكثر من 8,000 كتاب موثّق.">
+    <meta name="keywords" content="مكتبة عربية, كتب عربية, ريادة الأعمال, الأدب, الفلسفة, تطوير الذات, العلوم, التاريخ, التراث">
+    <meta property="og:title" content="مكتبة ليبيا الطيبة — بيتُ كلّ قارئ">
+    <meta name="twitter:title" content="مكتبة ليبيا الطيبة — بيتُ كلّ قارئ">
+
+    <link rel="stylesheet" href="css/design-system.css?v=28">
+    <link rel="stylesheet" href="css/homepage-v2.css?v=28">
+    <link rel="stylesheet" href="css/hero-compass.css?v=28">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:wght@700&family=Aref+Ruqaa:wght@700&display=swap" rel="stylesheet">
-    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('taybaa-theme') || 'dark');</script>
+    <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Tajawal:wght@400;500;700&family=Cairo:wght@400;600;700&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('taybaa-theme') || 'light');</script>
+
     <style>
-        .soon-badge { position: absolute; top: .65rem; left: .65rem; z-index: 4; background: linear-gradient(135deg, #b8941f, #d4af37); color: #2a1810; padding: .25rem .6rem; border-radius: 999px; font-size: .68rem; font-weight: 800; font-family: 'Aref Ruqaa', 'Cairo', serif; box-shadow: 0 3px 10px rgba(0,0,0,.35); letter-spacing: .03em; pointer-events: none; }
-        .book-card.coming-soon .book-cover-frame::before { content: ''; position: absolute; inset: 0; background: rgba(26,15,8,.30); z-index: 3; pointer-events: none; }
-        .book-card.coming-soon { opacity: .9; }
-        .book-card.coming-soon:hover { opacity: 1; }
+        /* Sanctuary nav link */
+        .snc-nav-link {
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+            font-family: 'Reem Kufi', sans-serif;
+            font-size: .88rem;
+            font-weight: 600;
+            color: #5a7a3a;
+            background: rgba(90,122,58,.08);
+            border: 1px solid rgba(90,122,58,.3);
+            padding: .5rem 1rem;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: all 280ms ease;
+            white-space: nowrap;
+        }
+        .snc-nav-link:hover {
+            background: rgba(90,122,58,.18);
+            border-color: #5a7a3a;
+            transform: translateY(-1px);
+        }
 
-        .fav-btn { position: absolute; top: .55rem; right: .55rem; z-index: 5; width: 36px; height: 36px; border-radius: 50%; border: 0; background: rgba(26,15,8,.6); backdrop-filter: blur(8px); color: #f5d76e; display: grid; place-items: center; cursor: pointer; transition: all .2s; font-size: 1.05rem; padding: 0; }
-        .fav-btn:hover { background: rgba(206,17,38,.85); color: #fff; transform: scale(1.1); }
-        .fav-btn.is-fav { background: linear-gradient(135deg, #ce1126, #8b1a1a); color: #fff; }
-        .fav-btn.is-fav:hover { background: rgba(206,17,38,.7); }
+        /* Community nav link */
+        .community-nav-link {
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+            font-family: 'Reem Kufi', sans-serif;
+            font-size: .88rem;
+            font-weight: 600;
+            color: #7a4a1e;
+            background: rgba(184,153,104,.08);
+            border: 1px solid rgba(184,153,104,.35);
+            padding: .5rem 1rem;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: all 280ms ease;
+            white-space: nowrap;
+        }
+        .community-nav-link:hover {
+            background: rgba(184,153,104,.18);
+            border-color: #B89968;
+            color: #B89968;
+            transform: translateY(-1px);
+        }
 
-        .profile-wrap { position: relative; flex-shrink: 0; }
-        .profile-btn { width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-subtle); color: var(--text); display: grid; place-items: center; transition: all .2s; cursor: pointer; }
-        .profile-btn:hover { border-color: var(--gold); background: var(--gold-soft); color: var(--gold); transform: translateY(-1px); }
-        .profile-menu { position: absolute; top: calc(100% + .65rem); left: 0; min-width: 300px; max-width: 360px; background: var(--bg-elevated); border: 1px solid var(--border-strong); border-radius: 16px; box-shadow: 0 25px 60px rgba(0,0,0,.4); overflow: hidden; z-index: 100; animation: profileFade .18s ease-out; }
-        @keyframes profileFade { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
-        .profile-header { padding: 1rem 1.25rem; background: linear-gradient(135deg, #3a2412, #1a0f08); color: #f5d76e; font-family: 'Aref Ruqaa', 'Cairo', serif; font-weight: 700; font-size: 1.05rem; display: flex; align-items: center; gap: .5rem; }
-        .profile-body { padding: 1.1rem 1.25rem; }
-        .profile-status { margin: 0 0 .25rem; color: var(--text); font-weight: 600; font-size: 1rem; }
-        .profile-tagline { margin: 0 0 .9rem; color: var(--text-muted); font-size: .85rem; font-family: 'Aref Ruqaa', 'Amiri', serif; }
-        .profile-note { margin: .8rem 0 0; font-size: .8rem; color: var(--text-soft); text-align: center; }
-        .profile-stats { display: grid; grid-template-columns: 1fr 1fr; gap: .65rem; margin: .85rem 0; }
-        .profile-stats div { background: var(--bg-subtle); padding: .7rem; border-radius: 10px; text-align: center; border: 1px solid var(--border); }
-        .profile-stats b { display: block; color: var(--gold); font-size: 1.4rem; font-family: 'Aref Ruqaa', serif; }
-        .profile-stats span { font-size: .75rem; color: var(--text-muted); }
-        .profile-section-title { margin: .9rem 0 .35rem; font-size: .82rem; font-weight: 700; color: var(--text-muted); font-family: 'Aref Ruqaa', 'Cairo', serif; }
-        .profile-last-read { list-style: none; padding: 0; margin: 0 0 .8rem; }
-        .profile-last-read li a { display: block; padding: .45rem .75rem; background: var(--bg-subtle); border-radius: 8px; margin-bottom: .35rem; color: var(--text); text-decoration: none; font-size: .85rem; transition: all .15s; }
-        .profile-last-read li a:hover { background: var(--gold-soft); color: var(--gold); }
-        .profile-body hr { border: 0; border-top: 1px solid var(--border); margin: .85rem 0; }
-        .login-form { display: flex; flex-direction: column; gap: .55rem; }
-        .login-form input { width: 100%; padding: .65rem .85rem; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-subtle); color: var(--text); font-family: inherit; font-size: .9rem; }
-        .login-form input:focus { outline: 0; border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-soft); }
-        .login-form button { padding: .7rem; background: var(--grad-gold); color: #2a1810; border: 0; border-radius: 10px; font-family: inherit; font-weight: 700; font-size: .95rem; cursor: pointer; }
-        .vip-indicator { margin: .25rem 0 .65rem; padding: .55rem .9rem; background: linear-gradient(135deg, rgba(90,122,58,.18), rgba(212,175,55,.18)); border: 1px solid rgba(212,175,55,.3); border-radius: 10px; text-align: center; color: var(--gold-glow); font-family: 'Aref Ruqaa', serif; font-size: .9rem; }
-        .vip-lock-btn { width: 100%; padding: .7rem 1rem; border: 1px solid var(--border-strong); border-radius: 10px; background: var(--bg-subtle); color: var(--text); font-family: inherit; font-weight: 700; cursor: pointer; transition: all .2s; font-size: .95rem; }
+        /* Profile nav link */
+        .profile-nav-link {
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+            font-family: 'Reem Kufi', sans-serif;
+            font-size: .88rem;
+            font-weight: 600;
+            color: var(--text-muted, #5a6a7a);
+            background: transparent;
+            border: 1px solid var(--border, rgba(184,153,104,.3));
+            padding: .5rem 1rem;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: all 280ms ease;
+            white-space: nowrap;
+        }
+        .profile-nav-link:hover {
+            border-color: #B89968;
+            color: #B89968;
+            background: rgba(184,153,104,.08);
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 480px) {
+            .snc-nav-link-label,
+            .community-nav-label,
+            .profile-nav-label { display: none; }
+        }
+
+        /* === Login button + modal (Aref Ruqaa) === */
+        .login-nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            font-family: 'Aref Ruqaa', 'Amiri', serif;
+            font-size: .92rem;
+            font-weight: 700;
+            color: #FAF6EE;
+            background: linear-gradient(135deg, #B89968, #d4af37);
+            border: 1px solid #B89968;
+            padding: .55rem 1.1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 280ms ease;
+            white-space: nowrap;
+        }
+        .login-nav-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(184,153,104,.35);
+        }
+
+        .auth-modal-backdrop {
+            position: fixed; inset: 0; z-index: 9999;
+            background: rgba(15,27,45,.55);
+            backdrop-filter: blur(6px);
+            display: none;
+            align-items: center; justify-content: center;
+            padding: 1rem;
+            animation: authFade .25s ease-out;
+        }
+        .auth-modal-backdrop.open { display: flex; }
+        @keyframes authFade { from { opacity: 0; } to { opacity: 1; } }
+
+        .auth-modal {
+            background: var(--bg-elevated, #FFFEFA);
+            border: 1px solid var(--border, rgba(184,153,104,.25));
+            border-radius: 20px;
+            box-shadow: 0 30px 80px rgba(15,27,45,.3);
+            max-width: 440px; width: 100%;
+            max-height: 92vh; overflow-y: auto;
+            padding: 2rem 1.75rem;
+            font-family: 'Aref Ruqaa', 'Amiri', serif;
+            position: relative;
+        }
+        .auth-modal-close {
+            position: absolute; top: .75rem; left: .75rem;
+            background: transparent; border: 0; cursor: pointer;
+            width: 36px; height: 36px; border-radius: 50%;
+            color: var(--text-muted, #5a6a7a);
+            font-size: 1.4rem; line-height: 1;
+            transition: all .2s;
+        }
+        .auth-modal-close:hover { background: rgba(184,153,104,.12); color: var(--text, #0F1B2D); }
+
+        .auth-title {
+            font-family: 'Aref Ruqaa', serif;
+            font-size: 1.6rem; font-weight: 700;
+            color: var(--text, #0F1B2D);
+            text-align: center; margin: 0 0 .35rem;
+        }
+        .auth-subtitle {
+            font-family: 'Amiri', serif;
+            font-size: .95rem; font-style: italic;
+            color: var(--text-muted, #5a6a7a);
+            text-align: center; margin: 0 0 1.5rem;
+        }
+
+        .auth-google-btn {
+            display: flex; align-items: center; justify-content: center;
+            gap: .6rem; width: 100%;
+            padding: .9rem;
+            background: #FFFFFF;
+            color: #1F1F1F;
+            border: 1px solid #DADCE0;
+            border-radius: 12px;
+            font-family: 'Aref Ruqaa', 'Amiri', serif;
+            font-size: 1rem; font-weight: 700;
+            cursor: pointer; transition: all .2s;
+        }
+        .auth-google-btn:hover { box-shadow: 0 4px 14px rgba(0,0,0,.12); transform: translateY(-1px); }
+        .auth-google-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+        .auth-divider {
+            display: flex; align-items: center;
+            margin: 1.25rem 0;
+            color: var(--text-muted, #5a6a7a);
+            font-size: .8rem; font-family: 'Cairo', sans-serif;
+        }
+        .auth-divider::before, .auth-divider::after {
+            content: ''; flex: 1; height: 1px;
+            background: var(--border, rgba(184,153,104,.25));
+        }
+        .auth-divider span { padding: 0 .85rem; }
+
+        .auth-field { margin-bottom: .85rem; }
+        .auth-field label {
+            display: block; margin-bottom: .35rem;
+            font-family: 'Aref Ruqaa', serif;
+            font-size: .9rem; font-weight: 700;
+            color: var(--text, #0F1B2D);
+        }
+        .auth-field input {
+            width: 100%;
+            padding: .7rem .9rem;
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+            color: var(--text, #0F1B2D);
+            background: var(--bg, #FAF6EE);
+            border: 1px solid var(--border, rgba(184,153,104,.25));
+            border-radius: 10px;
+            transition: all .2s;
+        }
+        .auth-field input:focus {
+            outline: 0;
+            border-color: #B89968;
+            box-shadow: 0 0 0 3px rgba(184,153,104,.18);
+        }
+
+        .auth-submit-btn {
+            width: 100%;
+            padding: .85rem;
+            background: linear-gradient(135deg, #0F1B2D, #2A3B57);
+            color: #FAF6EE;
+            border: 0;
+            border-radius: 12px;
+            font-family: 'Aref Ruqaa', 'Amiri', serif;
+            font-size: 1.05rem; font-weight: 700;
+            cursor: pointer; transition: all .2s;
+            margin-top: .35rem;
+        }
+        .auth-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(15,27,45,.25); }
+        .auth-submit-btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+        .auth-toggle {
+            margin-top: 1rem; text-align: center;
+            font-family: 'Cairo', sans-serif; font-size: .9rem;
+            color: var(--text-muted, #5a6a7a);
+        }
+        .auth-toggle button {
+            background: none; border: 0; cursor: pointer;
+            color: #B89968; font-weight: 700;
+            font-family: 'Aref Ruqaa', serif; font-size: .95rem;
+            padding: 0 .25rem;
+        }
+        .auth-toggle button:hover { text-decoration: underline; }
+
+        .auth-error {
+            margin: .5rem 0 .75rem;
+            padding: .65rem .85rem;
+            background: rgba(177,55,63,.08);
+            border: 1px solid rgba(177,55,63,.3);
+            border-radius: 10px;
+            color: #B1373F;
+            font-family: 'Cairo', sans-serif;
+            font-size: .88rem;
+            display: none;
+        }
+        .auth-error.show { display: block; }
+
+        .auth-info {
+            margin: .5rem 0 .75rem;
+            padding: .65rem .85rem;
+            background: rgba(74,107,58,.08);
+            border: 1px solid rgba(74,107,58,.3);
+            border-radius: 10px;
+            color: #4A6B3A;
+            font-family: 'Cairo', sans-serif;
+            font-size: .85rem;
+            display: none;
+        }
+        .auth-info.show { display: block; }
+
     </style>
 </head>
 <body>
-    <div class="flag-strip" aria-hidden="true"></div>
-    <header class="site-header" id="siteHeader">
-        <div class="container header-inner">
-            <a href="index.html" class="logo" aria-label="الصفحة الرئيسية">
-                <span class="logo-mark" aria-hidden="true">
-                    <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                        <defs><radialGradient id="sun" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#fff7d6"/><stop offset="100%" stop-color="#d4af37"/></radialGradient></defs>
-                        <circle cx="32" cy="14" r="6" fill="url(#sun)"/>
-                        <path d="M30.5 30 Q31.5 40 30.5 50" stroke="#3a2412" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-                        <path d="M31 30 Q22 25 16 30" stroke="#3d5a26" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-                        <path d="M31 30 Q40 25 46 30" stroke="#3d5a26" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-                        <path d="M31 30 Q23 23 20 18" stroke="#5a7a3a" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-                        <path d="M31 30 Q39 23 42 18" stroke="#5a7a3a" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-                        <path d="M31 30 Q31 23 31 18" stroke="#3d5a26" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-                        <circle cx="28" cy="30" r="1.2" fill="#3a2412"/><circle cx="34" cy="30" r="1.2" fill="#3a2412"/>
-                        <path d="M0 52 Q12 47 24 52 T48 52 T64 52 L64 64 L0 64 Z" fill="#8b5a2b"/>
-                        <path d="M0 56 Q14 52 28 56 T52 56 T64 56 L64 64 L0 64 Z" fill="#6b4423" opacity=".7"/>
-                    </svg>
-                </span>
-                <span class="logo-text"><span class="logo-title">المكتبة الطيبة</span><span class="logo-tag">TAYBAA · LIBRARY</span></span>
-            </a>
 
-            <form class="search-box" id="searchForm" role="search">
-                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-                <input type="search" id="searchInput" placeholder="ابحث عن كتاب، مؤلف، أو موضوع..." aria-label="بحث">
-                <kbd class="search-kbd" aria-hidden="true">⌘K</kbd>
-            </form>
-
-            <span class="vip-badge" id="vipBadge" hidden>✨ VIP</span>
-
-            <div class="profile-wrap">
-                <button class="profile-btn" id="profileBtn" aria-label="حسابي" type="button">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg>
-                </button>
-                <div class="profile-menu" id="profileMenu" hidden>
-                    <div class="profile-header"><span>👤</span> <span>حسابي</span></div>
-                    <div class="profile-body" id="profileMenuBody"></div>
+    <header style="position:sticky;top:0;z-index:50;backdrop-filter:blur(16px);background:color-mix(in srgb, var(--bg-elevated) 90%, transparent);border-bottom:1px solid var(--border);padding:1rem 0;">
+        <div class="container" style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;">
+            <a href="/" style="display:flex;align-items:center;gap:.75rem;text-decoration:none;color:var(--text);">
+                <span style="width:42px;height:42px;border-radius:10px;background:var(--ink-900);color:var(--parchment-100);display:grid;place-items:center;font-family:'Reem Kufi',sans-serif;font-weight:700;font-size:1.2rem;">ط</span>
+                <div style="line-height:1.1;">
+                    <div style="font-family:'Reem Kufi',sans-serif;font-weight:700;font-size:1.15rem;">مكتبة ليبيا الطيبة</div>
+                    <div style="font-size:.7rem;color:var(--text-muted);letter-spacing:.15em;">TAYBAA · TRIPOLI</div>
                 </div>
-            </div>
-
-            <button class="theme-toggle" id="themeToggle" aria-label="تبديل الوضع الليلي" type="button">
-                <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-                <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </a>
+            <div style="flex:1;"></div>
+            <input class="input input-search" type="search" placeholder="ابحث عن كتاب، مؤلف، أو موضوع..." style="max-width:280px;" id="searchInput">
+            <!-- 🌿 Sanctuary link -->
+            <a href="sanctuary.html" class="snc-nav-link" title="واحة القراءة — يومياتي وأهدافي">
+                🌿
+                <span class="snc-nav-link-label">واحتي</span>
+            </a>
+            <!-- 👥 Community link -->
+            <a href="reading-club.html" class="community-nav-link" title="نادي القراءة الشهري">
+                👥
+                <span class="community-nav-label">المجتمع</span>
+            </a>
+            <!-- Profile link (visible when logged in) -->
+            <a href="profile.html" class="profile-nav-link" id="profileNavLink" title="صفحتي الشخصية" hidden>
+                👤
+                <span class="profile-nav-label">صفحتي</span>
+            </a>
+            <!-- Login button (visible when NOT logged in) -->
+            <button class="login-nav-btn" id="loginBtn" type="button" title="تسجيل الدخول">
+                <span>تسجيل الدخول</span>
             </button>
+            <a href="favorites.html" class="btn btn-ghost" title="مفضّلتي">♥</a>
+            <button class="btn btn-ghost" id="themeBtn" type="button">🌙</button>
         </div>
     </header>
 
     <main>
-        <section class="hero">
-            <div class="hero-bg" aria-hidden="true">
-                <span class="hero-orb orb-1"></span><span class="hero-orb orb-2"></span><span class="hero-orb orb-3"></span>
+        <section class="hero-compass" aria-labelledby="library-name">
+            <div class="hero-compass-bg">
+                <img src="assets/marcus-arch-hero.jpg" alt="" aria-hidden="true">
             </div>
 
-            <div class="container hero-inner">
-                <svg class="hero-oasis" viewBox="0 0 240 220" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <linearGradient id="trunk" x1="0" x2="0" y1="0" y2="1">
-                            <stop offset="0" stop-color="#8b5a2b"/>
-                            <stop offset=".5" stop-color="#6b4423"/>
-                            <stop offset="1" stop-color="#3a2412"/>
-                        </linearGradient>
-                        <linearGradient id="frond" x1="0" x2="1" y1="0" y2="1">
-                            <stop offset="0" stop-color="#3d5a26"/>
-                            <stop offset=".5" stop-color="#5a7a3a"/>
-                            <stop offset="1" stop-color="#7a9648"/>
-                        </linearGradient>
-                        <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
-                            <stop offset="0%" stop-color="#fff7d6" stop-opacity=".9"/>
-                            <stop offset="60%" stop-color="#d4af37" stop-opacity=".25"/>
-                            <stop offset="100%" stop-color="#d4af37" stop-opacity="0"/>
-                        </radialGradient>
-                        <radialGradient id="pool" cx="50%" cy="50%">
-                            <stop offset="0" stop-color="#5fa9e0"/>
-                            <stop offset="1" stop-color="#2a6a98"/>
-                        </radialGradient>
-                    </defs>
-                    <circle cx="190" cy="38" r="42" fill="url(#sunGlow)"/>
-                    <ellipse cx="120" cy="207" rx="75" ry="8" fill="url(#pool)" opacity=".7"/>
-                    <ellipse cx="120" cy="204" rx="58" ry="3" fill="#ffffff" opacity=".3"/>
-                    <path d="M115 90 Q122 130 118 195 Q120 200 122 207" stroke="url(#trunk)" stroke-width="8.5" fill="none" stroke-linecap="round"/>
-                    <g stroke="#2a1810" stroke-width="1.4" stroke-linecap="round" opacity=".65" fill="none">
-                        <path d="M113 113 Q120 116 124 113"/>
-                        <path d="M114 132 Q120 135 123 132"/>
-                        <path d="M114 152 Q120 155 122 152"/>
-                        <path d="M114 172 Q120 175 121 172"/>
-                        <path d="M115 190 Q120 193 121 190"/>
-                    </g>
-                    <g>
-                        <circle cx="111" cy="94" r="2.2" fill="#d4af37"/>
-                        <circle cx="115" cy="91" r="2" fill="#b8941f"/>
-                        <circle cx="120" cy="92" r="2.3" fill="#d4af37"/>
-                        <circle cx="125" cy="91" r="2" fill="#b8941f"/>
-                        <circle cx="129" cy="94" r="2.2" fill="#d4af37"/>
-                        <circle cx="116" cy="96" r="1.8" fill="#8b5a2b"/>
-                        <circle cx="124" cy="96" r="1.8" fill="#8b5a2b"/>
-                    </g>
-                    <path d="M120 90 Q85 80 38 88 Q73 65 120 80" fill="url(#frond)"/>
-                    <path d="M120 90 Q155 80 202 88 Q167 65 120 80" fill="url(#frond)"/>
-                    <path d="M120 90 Q88 60 53 38 Q95 55 120 78" fill="url(#frond)"/>
-                    <path d="M120 90 Q152 60 187 38 Q145 55 120 78" fill="url(#frond)"/>
-                    <path d="M120 90 Q108 55 115 20 Q120 55 120 78" fill="url(#frond)"/>
-                    <path d="M120 90 Q132 55 125 20 Q120 55 120 78" fill="url(#frond)"/>
-                    <path d="M120 90 Q70 105 22 118 Q68 88 120 82" fill="url(#frond)" opacity=".88"/>
-                    <path d="M120 90 Q170 105 218 118 Q172 88 120 82" fill="url(#frond)" opacity=".88"/>
-                    <g stroke="#3d5a26" stroke-width="1.6" stroke-linecap="round" fill="none">
-                        <path d="M60 207 L58 196 M65 207 L67 195 M70 207 L73 198"/>
-                        <path d="M170 207 L168 196 M175 207 L177 195 M180 207 L183 198"/>
-                        <path d="M40 207 L39 200 M44 207 L46 199"/>
-                        <path d="M196 207 L197 200 M200 207 L202 199"/>
-                    </g>
-                </svg>
+            <div class="hero-compass-inner">
+                <h1 id="library-name" class="library-name">مكتبة ليبيا الطيبة</h1>
+                <p class="library-tagline">بيتُ كلّ قارئ — من الرّيادة إلى الأدب، من التاريخ إلى الفلسفة</p>
 
-                <span class="hero-badge"><span>🏵️</span> واحة المعرفة · من ليبيا إلى الوطن العربي</span>
-                <h1 class="hero-title">واحة العلم في صحراء الجهل<br><span class="hero-grad">أكبر مكتبة عربية أونلاين</span></h1>
-                <p class="hero-subtitle">تطوير الذات · التحفيز · ريادة الأعمال · القيادة · التسويق · علم النفس</p>
-                <p class="hero-tagline">دار نشر المكتبة الطيبة · علم بلا حدود</p>
-                <div class="hero-stats" id="heroStats">
-                    <div class="stat"><b id="statBooks">0</b><span>كتاب</span></div>
-                    <div class="stat"><b id="statReaders">0</b><span>قارئ</span></div>
-                    <div class="stat"><b id="statDownloads">0</b><span>تحميل</span></div>
+                <div class="compass" role="navigation" aria-label="رحلات المكتبة">
+                    <a class="compass-point cp-ne" href="category.html?cat=%D8%B1%D9%8A%D8%A7%D8%AF%D8%A9%20%D8%A7%D9%84%D8%A3%D8%B9%D9%85%D8%A7%D9%84">
+                        <span class="cp-icon">🚀</span>
+                        <span class="cp-label">رحلة الرّيادي</span>
+                        <span class="cp-quote">«ابدأ صغيراً، ثمّ انطلق»</span>
+                    </a>
+
+                    <a class="compass-point cp-e" href="category.html?cat=%D8%A7%D9%84%D8%A3%D8%AF%D8%A8%20%D9%88%D8%A7%D9%84%D8%B1%D9%88%D8%A7%D9%8A%D8%A7%D8%AA">
+                        <span class="cp-icon">📜</span>
+                        <span class="cp-label">رحلة الأديب</span>
+                        <span class="cp-quote">«الكتب بساتين العقلاء» — المتنبي</span>
+                    </a>
+
+                    <a class="compass-point cp-se" href="category.html?cat=%D8%A7%D9%84%D9%81%D9%84%D8%B3%D9%81%D8%A9%20%D9%88%D8%A7%D9%84%D9%81%D9%83%D8%B1">
+                        <span class="cp-icon">🌙</span>
+                        <span class="cp-label">رحلة الفكر</span>
+                        <span class="cp-quote">«التفكير سفر العقل» — ابن رشد</span>
+                    </a>
+
+                    <a class="compass-point cp-sw" href="category.html?cat=%D8%AA%D8%B7%D9%88%D9%8A%D8%B1%20%D8%A7%D9%84%D8%B0%D8%A7%D8%AA%20%D9%88%D8%A7%D9%84%D9%86%D8%AC%D8%A7%D8%AD">
+                        <span class="cp-icon">✨</span>
+                        <span class="cp-label">رحلة الذات</span>
+                        <span class="cp-quote">«من عرف نفسه عرف ربّه»</span>
+                    </a>
+
+                    <a class="compass-point cp-w" href="category.html?cat=%D8%A7%D9%84%D8%B9%D9%84%D9%88%D9%85%20%D9%88%D8%A7%D9%84%D9%85%D8%B9%D8%B1%D9%81%D8%A9">
+                        <span class="cp-icon">🔬</span>
+                        <span class="cp-label">رحلة العالِم</span>
+                        <span class="cp-quote">«اطلبوا العلم ولو في الصّين»</span>
+                    </a>
+
+                    <a class="compass-point cp-nw" href="category.html?cat=%D8%A7%D9%84%D8%AA%D8%A7%D8%B1%D9%8A%D8%AE%20%D9%88%D8%A7%D9%84%D8%AA%D8%B1%D8%A7%D8%AB">
+                        <span class="cp-icon">🏛️</span>
+                        <span class="cp-label">رحلة المؤرّخ</span>
+                        <span class="cp-quote">«من جهل تاريخه ضاع» — ابن خلدون</span>
+                    </a>
+
+                    <div class="compass-center" aria-hidden="true">
+                        <div class="compass-rose">
+                            <div class="rose-needle"></div>
+                        </div>
+                        <p class="compass-question">إلى أين<br>تسافر<br>اليوم؟</p>
+                    </div>
+                </div>
+
+                <form class="hero-search" action="/" method="get" role="search">
+                    <input type="search" name="q" placeholder="أو ابحث عن كتابٍ بعينه…" aria-label="ابحث في المكتبة">
+                    <button type="submit" aria-label="بحث">🔍</button>
+                </form>
+            </div>
+        </section>
+
+        <section style="padding:3rem 0;background:var(--bg-subtle);">
+            <div class="container">
+                <div class="stats-row" style="margin:0;">
+                    <div class="stat-item"><b id="statBooks">0</b><span>كتاباً موثّقاً</span></div>
+                    <div class="stat-item"><b id="statCategories">0</b><span>فرعاً علميّاً</span></div>
+                    <div class="stat-item"><b id="statReaders">0</b><span>قارئاً نشطاً</span></div>
                 </div>
             </div>
         </section>
 
-        <section class="section highlight" id="managementSection"><div class="container">
-            <header class="section-head"><div><h2><span class="gold-icon">🌱</span> تطوير الذات والإدارة</h2><p class="section-sub">أفضل كتب التحفيز، القيادة، وإدارة الأعمال</p></div></header>
-            <div class="books-grid" id="managementBooks"></div>
-        </div></section>
-        <section class="section" id="entrepreneurshipSection"><div class="container">
-            <header class="section-head"><div><h2><span class="gold-icon">🚀</span> ريادة الأعمال والتسويق</h2><p class="section-sub">سرّ البيع، فن التسويق، والاستثمار الذكي</p></div></header>
-            <div class="books-grid" id="entrepreneurshipBooks"></div>
-        </div></section>
-        <section class="section" aria-labelledby="categoriesTitle"><div class="container">
-            <header class="section-head"><div><h2 id="categoriesTitle"><span class="gold-icon">◆</span> الأقسام</h2><p class="section-sub">تصفّح الكتب حسب موضوعك المفضّل</p></div></header>
-            <div class="categories-grid" id="categoriesGrid"></div>
-        </div></section>
-        <section class="section" id="filteredSection" hidden><div class="container">
-            <header class="section-head"><h2 id="filteredTitle">النتائج</h2><button class="link-btn" id="clearFilter" type="button">إلغاء ✕</button></header>
-            <div class="books-grid" id="filteredBooks"></div>
-            <p class="empty-state" id="emptyState" hidden>لم يتم العثور على كتب مطابقة.</p>
-        </div></section>
-        <section class="section" id="popularSection"><div class="container">
-            <header class="section-head"><div><h2><span class="gold-icon">📈</span> الأكثر قراءة</h2><p class="section-sub">أحبّها القرّاء أكثر من غيرها</p></div></header>
-            <div class="books-grid" id="popularBooks"></div>
-        </div></section>
-        <section class="section" id="newSection"><div class="container">
-            <header class="section-head"><div><h2><span class="gold-icon">✨</span> الأحدث</h2><p class="section-sub">إضافات جديدة على رفوف المكتبة</p></div></header>
-            <div class="books-grid" id="newBooks"></div>
-        </div></section>
-        <section class="section" id="recommendedSection"><div class="container">
-            <header class="section-head"><div><h2><span class="gold-icon">⭐</span> موصى به</h2><p class="section-sub">اختيارات فريدة من الدار</p></div></header>
-            <div class="books-grid" id="recommendedBooks"></div>
-        </div></section>
+        <section style="padding:3rem 0;">
+            <div class="container"><div id="dailyQuote"></div></div>
+        </section>
+
+        <section class="section-luxury alt" id="journeys">
+            <div class="container">
+                <div class="section-title">
+                    <span class="gold-mark">✦</span>
+                    <div>
+                        <h2>رحلات قرائيّة منسّقة</h2>
+                        <p class="section-subtitle">مسارات مدروسة عبر عدّة كتب لتغوص في موضوع بعمق</p>
+                    </div>
+                </div>
+                <div class="journeys-grid" id="journeysGrid">
+                    <div class="journey-card"><div class="journey-icon">⏳</div><div>جارّيس التحميل...</div></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-luxury" id="shelves">
+            <div class="container">
+                <div class="section-title">
+                    <span class="gold-mark">✦</span>
+                    <div>
+                        <h2>أفضل كتب المكتبة</h2>
+                        <p class="section-subtitle">اختيارات توصّ بها قرّاء الأسبوع الماضي</p>
+                    </div>
+                </div>
+                <div class="featured-shelf" id="featuredBooks">
+                    <div class="book-spine"><div class="book-spine-cover"></div><div class="book-spine-info"><div class="book-spine-title">جارّيس التحميل...</div></div></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-luxury alt" id="categories">
+            <div class="container">
+                <div class="section-title">
+                    <span class="gold-mark">✦</span>
+                    <div>
+                        <h2>تصفّح حسب الفرع</h2>
+                        <p class="section-subtitle">14 فرعاً علميّاً وأدبيّاً</p>
+                    </div>
+                </div>
+                <div class="categories-luxury-grid" id="categoriesGrid"></div>
+            </div>
+        </section>
     </main>
 
-    <footer class="site-footer">
-        <div class="container footer-inner">
-            <div class="footer-brand">
-                <strong>دار نشر المكتبة الطيبة</strong>
-                <span>واحة المعرفة · مجاناً للجميع</span>
-                <span class="footer-identity">🇱🇾 من ليبيا · إلى كل قارئ في الوطن العربي</span>
+    <footer style="padding:3rem 0 2rem;border-top:1px solid var(--border);margin-top:4rem;background:var(--bg-elevated);text-align:center;">
+        <div class="container">
+            <div class="gold-divider-ornate" style="max-width:300px;margin:0 auto 1.5rem;">
+                <span class="gold-divider-ornate-symbol">✦</span>
             </div>
-            <p class="footer-copy">© <span id="year"></span> TAYBAA-LIBRARY · مشروع مفتوح للقرّاء</p>
+            <p class="font-amiri" style="color:var(--text-muted);margin:0 0 1rem;font-size:1.1rem;font-style:italic;">
+                "خير جليس في الأنام كتاب"
+            </p>
+            <p style="font-size:.85rem;color:var(--text-soft);margin:0;">
+                © <span id="year">2026</span> مكتبة ليبيا الطيبة · من ليبيا · لخدمة العلم والثقافة العربيّة
+            </p>
         </div>
     </footer>
 
-    <script src="js/config.js?v=11"></script>
-    <script src="js/cover-resolver.js?v=11"></script>
-    <script src="js/data.js?v=11"></script>
-    <script src="js/user-system.js?v=11"></script>
-    <script src="js/app.js?v=11"></script>
-    <script src="js/profile.js?v=11"></script>
+    <!-- ═══════ Auth Modal (login + signup) ═══════ -->
+    <div class="auth-modal-backdrop" id="authModalBackdrop" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+        <div class="auth-modal">
+            <button class="auth-modal-close" id="authCloseBtn" aria-label="إغلاق">✕</button>
+            <h2 class="auth-title" id="authTitle">تسجيل الدخول</h2>
+            <p class="auth-subtitle" id="authSubtitle">مرحباً بعودتك إلى المكتبة</p>
+
+            <button class="auth-google-btn" id="authGoogleBtn" type="button">
+                <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/>
+                    <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/>
+                    <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/>
+                    <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571.001-.001.002-.001.003-.002l6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/>
+                </svg>
+                <span>تسجيل الدخول بـGoogle</span>
+            </button>
+
+            <div class="auth-divider"><span>أو</span></div>
+
+            <div class="auth-error" id="authError"></div>
+            <div class="auth-info" id="authInfo"></div>
+
+            <form id="authForm">
+                <div class="auth-field" id="fieldDisplayName" style="display:none;">
+                    <label for="authDisplayName">اسم العرض</label>
+                    <input type="text" id="authDisplayName" autocomplete="name" placeholder="كيف ينادونك القرّاء؟">
+                </div>
+                <div class="auth-field">
+                    <label for="authEmail">البريد الإلكتروني أو اسم المستخدم</label>
+                    <input type="text" id="authEmail" autocomplete="username" required>
+                </div>
+                <div class="auth-field">
+                    <label for="authPassword">كلمة السرّ</label>
+                    <input type="password" id="authPassword" autocomplete="current-password" required minlength="4">
+                </div>
+                <button type="submit" class="auth-submit-btn" id="authSubmitBtn">دخول</button>
+            </form>
+
+            <div class="auth-toggle">
+                <span id="authToggleText">ليس لديك حساب؟</span>
+                <button type="button" id="authToggleBtn">إنشاء حساب جديد</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase auth (optional) -->
+    <script src="js/config.js?v=28"></script>
+    <script src="js/firebase-auth.js?v=28"></script>
+    <script src="js/user-system.js?v=28"></script>
+    <script src="js/achievements.js?v=28"></script>
+    <!-- Admin role detection + per-user hide list (Aref Ruqaa wave) -->
+    <script src="js/admin-role.js?v=28"></script>
+    <script src="js/homepage-v2.js?v=28"></script>
+    <script>
+        document.getElementById('themeBtn')?.addEventListener('click', () => {
+            const c = document.documentElement.getAttribute('data-theme') || 'light';
+            const n = c === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', n);
+            localStorage.setItem('taybaa-theme', n);
+        });
+        document.getElementById('searchInput')?.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && e.target.value.trim()) location.href = '/?q=' + encodeURIComponent(e.target.value);
+        });
+        document.getElementById('year').textContent = new Date().getFullYear();
+        document.querySelector('.arch-cta')?.addEventListener('click', e => {
+            const href = e.currentTarget.getAttribute('href');
+            if (href?.startsWith('#')) { e.preventDefault(); document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' }); }
+        });
+
+        /* ═══════ Auth Modal logic ═══════ */
+        (function () {
+            const u = typeof USER !== 'undefined' ? USER.current() : null;
+            const loginBtn = document.getElementById('loginBtn');
+            const profileLink = document.getElementById('profileNavLink');
+
+            if (u) {
+                // Logged-in state: show profile link, hide login
+                if (loginBtn) loginBtn.hidden = true;
+                if (profileLink) {
+                    profileLink.hidden = false;
+                    const lbl = profileLink.querySelector('.profile-nav-label');
+                    if (lbl) lbl.textContent = u.displayName || u.username;
+                }
+            } else {
+                // Guest state
+                if (loginBtn) loginBtn.hidden = false;
+                if (profileLink) profileLink.hidden = true;
+            }
+
+            const backdrop = document.getElementById('authModalBackdrop');
+            const closeBtn = document.getElementById('authCloseBtn');
+            const googleBtn = document.getElementById('authGoogleBtn');
+            const form = document.getElementById('authForm');
+            const titleEl = document.getElementById('authTitle');
+            const subEl = document.getElementById('authSubtitle');
+            const toggleText = document.getElementById('authToggleText');
+            const toggleBtn = document.getElementById('authToggleBtn');
+            const submitBtn = document.getElementById('authSubmitBtn');
+            const fieldDisplayName = document.getElementById('fieldDisplayName');
+            const errorEl = document.getElementById('authError');
+            const infoEl = document.getElementById('authInfo');
+
+            let mode = 'login'; // or 'signup'
+
+            function openModal() {
+                backdrop.classList.add('open');
+                document.getElementById('authEmail')?.focus();
+                showError('');
+                showInfo('');
+            }
+            function closeModal() {
+                backdrop.classList.remove('open');
+            }
+            function showError(msg) {
+                if (!msg) { errorEl.classList.remove('show'); errorEl.textContent = ''; return; }
+                errorEl.textContent = msg;
+                errorEl.classList.add('show');
+            }
+            function showInfo(msg) {
+                if (!msg) { infoEl.classList.remove('show'); infoEl.textContent = ''; return; }
+                infoEl.textContent = msg;
+                infoEl.classList.add('show');
+            }
+            function setMode(next) {
+                mode = next;
+                if (mode === 'signup') {
+                    titleEl.textContent = 'إنشاء حساب جديد';
+                    subEl.textContent = 'انضمّ إلى مجتمع القرّاء';
+                    submitBtn.textContent = 'إنشاء الحساب';
+                    fieldDisplayName.style.display = 'block';
+                    toggleText.textContent = 'لديك حساب بالفعل؟';
+                    toggleBtn.textContent = 'تسجيل الدخول';
+                    document.getElementById('authPassword').setAttribute('autocomplete', 'new-password');
+                } else {
+                    titleEl.textContent = 'تسجيل الدخول';
+                    subEl.textContent = 'مرحباً بعودتك إلى المكتبة';
+                    submitBtn.textContent = 'دخول';
+                    fieldDisplayName.style.display = 'none';
+                    toggleText.textContent = 'ليس لديك حساب؟';
+                    toggleBtn.textContent = 'إنشاء حساب جديد';
+                    document.getElementById('authPassword').setAttribute('autocomplete', 'current-password');
+                }
+                showError('');
+                showInfo('');
+            }
+
+            loginBtn?.addEventListener('click', openModal);
+            closeBtn?.addEventListener('click', closeModal);
+            backdrop?.addEventListener('click', e => { if (e.target === backdrop) closeModal(); });
+            document.addEventListener('keydown', e => { if (e.key === 'Escape' && backdrop.classList.contains('open')) closeModal(); });
+            toggleBtn?.addEventListener('click', () => setMode(mode === 'login' ? 'signup' : 'login'));
+
+            // Google sign-in
+            googleBtn?.addEventListener('click', async () => {
+                showError('');
+                if (typeof FBAUTH === 'undefined' || !FBAUTH.isConfigured()) {
+                    showError('دخول Google غير مفعّل حاليّاً. الرجاء استخدام اسم مستخدم وكلمة سرّ بدلاً من ذلك. (يحتاج المالك إلى ضبط Firebase في js/config.js)');
+                    return;
+                }
+                try {
+                    googleBtn.disabled = true;
+                    const session = await FBAUTH.signInGoogle();
+                    await USER.setSession(session);
+                    showInfo('تم تسجيل الدخول. جارٍ التحويل...');
+                    setTimeout(() => location.reload(), 400);
+                } catch (err) {
+                    showError('تعذّر تسجيل الدخول بـGoogle: ' + (err.message || err));
+                } finally {
+                    googleBtn.disabled = false;
+                }
+            });
+
+            // Email + password (or local username/password)
+            form?.addEventListener('submit', async e => {
+                e.preventDefault();
+                showError('');
+                const email = document.getElementById('authEmail').value.trim();
+                const password = document.getElementById('authPassword').value;
+                const displayName = document.getElementById('authDisplayName').value.trim();
+
+                if (!email || !password) { showError('املأ جميع الحقول'); return; }
+
+                submitBtn.disabled = true;
+                try {
+                    if (mode === 'signup') {
+                        // Try Firebase signup if configured
+                        if (typeof FBAUTH !== 'undefined' && FBAUTH.isConfigured()) {
+                            const session = await FBAUTH.signUpEmail(email, password, displayName || email.split('@')[0]);
+                            await USER.setSession(session);
+                            showInfo('تم إنشاء الحساب بنجاح. جارٍ التحويل...');
+                            setTimeout(() => location.reload(), 500);
+                        } else {
+                            showError('إنشاء الحسابات الجديدة يحتاج إلى Firebase. الرجاء استخدام اسم مستخدم محلّي للدخول، أو راجع المالك لتفعيل Firebase.');
+                        }
+                    } else {
+                        // Login — try Firebase email first (if looks like email + FB configured), else local username
+                        const looksLikeEmail = email.includes('@');
+                        if (looksLikeEmail && typeof FBAUTH !== 'undefined' && FBAUTH.isConfigured()) {
+                            const session = await FBAUTH.signInEmail(email, password);
+                            await USER.setSession(session);
+                        } else {
+                            // Local username/password
+                            const session = await USER.login(email, password);
+                            if (!session) {
+                                showError('اسم المستخدم أو كلمة السرّ غير صحيحة');
+                                submitBtn.disabled = false;
+                                return;
+                            }
+                        }
+                        showInfo('تم تسجيل الدخول. جارٍ التحويل...');
+                        // Honor returnUrl if set
+                        const returnUrl = sessionStorage.getItem('returnUrl');
+                        sessionStorage.removeItem('returnUrl');
+                        setTimeout(() => { location.href = returnUrl || location.href; }, 400);
+                    }
+                } catch (err) {
+                    showError(err.message || String(err));
+                } finally {
+                    submitBtn.disabled = false;
+                }
+            });
+
+            // Auto-open if URL contains ?login=1
+            if (/[?&]login=1\b/.test(location.search)) {
+                openModal();
+            }
+        })();
+    </script>
 </body>
 </html>
