@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#FAF6EE">
-  <title>قسم — المكتبة الطيبة</title>
-  <meta name="description" content="تصفّح كتب قسم معيّن في المكتبة الطيبة">
+  <title>قسم — مكتبة ليبيا الطيبة</title>
+  <meta name="description" content="تصفّح كتب قسم معيّن في مكتبة ليبيا الطيبة">
 
-  <link rel="stylesheet" href="css/design-system.css?v=27">
-  <link rel="stylesheet" href="css/homepage-v2.css?v=27">
+  <link rel="stylesheet" href="css/design-system.css?v=28">
+  <link rel="stylesheet" href="css/homepage-v2.css?v=28">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -55,7 +55,7 @@
       background: var(--bg-elevated);
       color: var(--text);
       text-decoration: none;
-      font-family: 'Tajawal', 'Cairo', sans-serif;
+      font-family: 'Aref Ruqaa', sans-serif;
       font-weight: 600;
       font-size: .92rem;
       transition: all 280ms ease;
@@ -107,7 +107,7 @@
       <a href="v2.html" style="display:flex;align-items:center;gap:.75rem;text-decoration:none;color:var(--text);">
         <span style="width:42px;height:42px;border-radius:10px;background:var(--ink-900);color:var(--parchment-100);display:grid;place-items:center;font-family:'Reem Kufi',sans-serif;font-weight:700;font-size:1.2rem;">ط</span>
         <div style="line-height:1.1;">
-          <div style="font-family:'Reem Kufi',sans-serif;font-weight:700;font-size:1.15rem;">المكتبة الطيبة</div>
+          <div style="font-family:'Reem Kufi',sans-serif;font-weight:700;font-size:1.15rem;">مكتبة ليبيا الطيبة</div>
           <div style="font-size:.7rem;color:var(--text-muted);letter-spacing:.15em;">TAYBAA · TRIPOLI</div>
         </div>
       </a>
@@ -120,7 +120,7 @@
   <main>
     <section class="cat-hero">
       <div class="container">
-        <p class="cat-eyebrow">المكتبة الطيبة · قسم</p>
+        <p class="cat-eyebrow">مكتبة ليبيا الطيبة · قسم</p>
         <h1 class="cat-title" id="catTitle">جارٍ التحميل...</h1>
         <p class="cat-count" id="catCount"></p>
         <a class="cat-back" href="v2.html">← العودة للرئيسية</a>
@@ -137,13 +137,13 @@
   <footer style="padding:3rem 0 2rem;border-top:1px solid var(--border);margin-top:2rem;background:var(--bg-elevated);text-align:center;">
     <div class="container">
       <p style="font-size:.85rem;color:var(--text-soft);margin:0;">
-        © <span id="year">2026</span> المكتبة الطيبة · من ليبيا · لخدمة العلم والثقافة العربيّة
+        © <span id="year">2026</span> مكتبة ليبيا الطيبة · من ليبيا · لخدمة العلم والثقافة العربيّة
       </p>
     </div>
   </footer>
 
-  <script src="js/user-system.js?v=27"></script>
-  <script src="js/admin-role.js?v=27"></script>
+  <script src="js/user-system.js?v=28"></script>
+  <script src="js/admin-role.js?v=28"></script>
   <script>
   (async function () {
     'use strict';
@@ -168,7 +168,7 @@
       gridEl.innerHTML = '<div class="cat-empty">يرجى تحديد قسم من الصفحة الرئيسيّة.</div>';
       return;
     }
-    document.title = `${requestedCat} — المكتبة الطيبة`;
+    document.title = `${requestedCat} — مكتبة ليبيا الطيبة`;
     titleEl.textContent = requestedCat;
 
     // Wait for admin-role module (ready promise) and then check gate
