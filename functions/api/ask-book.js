@@ -64,7 +64,7 @@ export async function onRequest({ request, env }) {
   }
 
   // ── Build system prompt ─────────────────────────────────────────────────────
-  const systemPrompt = `أنت مساعد قراءة ذكيّ في المكتبة الطيبة من ليبيا. تساعد القارئ على فهم الكتاب الذي يقرأه. أجِب بالعربية الفصحى المُسهّلة. كُنْ مُختصراً ودقيقاً. إذا لم تجد الإجابة في السياق المُعطى من الكتاب، اعترف بذلك. لا تختلق. السياق من الكتاب '${bookTitle}' للمؤلف '${bookAuthor}': ${pageContext}`;
+  const systemPrompt = `أنت مساعد قراءة ذكيّ في مكتبة ليبيا الطيبة من ليبيا. تساعد القارئ على فهم الكتاب الذي يقرأه. أجِب بالعربية الفصحى المُسهّلة. كُنْ مُختصراً ودقيقاً. إذا لم تجد الإجابة في السياق المُعطى من الكتاب، اعترف بذلك. لا تختلق. السياق من الكتاب '${bookTitle}' للمؤلف '${bookAuthor}': ${pageContext}`;
 
   // ── Sanitise history (keep last 10 turns to stay within context) ────────────
   const safeHistory = (Array.isArray(history) ? history : [])
