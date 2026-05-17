@@ -1,5 +1,5 @@
 /**
- * المكتبة الطيبة — Cloudflare Pages Function (Backend API)
+ * مكتبة ليبيا الطيبة — Cloudflare Pages Function (Backend API)
  * تعمل تلقائيّاً على https://taybaa-library.pages.dev/api/...
  */
 
@@ -65,7 +65,7 @@ export async function onRequest({ request, params, env }) {
     const method = request.method.toUpperCase();
 
     if (path === 'health' || path === '') {
-        return json({ status: 'ok', service: 'المكتبة الطيبة API', platform: 'Cloudflare Pages', timestamp: new Date().toISOString() });
+        return json({ status: 'ok', service: 'مكتبة ليبيا الطيبة API', platform: 'Cloudflare Pages', timestamp: new Date().toISOString() });
     }
 
     if (path === 'quote') {
