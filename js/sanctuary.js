@@ -1,5 +1,5 @@
 /**
- * sanctuary.js — واحة القراءة · المكتبة الطيبة
+ * sanctuary.js — واحة القراءة · مكتبة ليبيا الطيبة
  * Reading Sanctuary wellness layer · RTL Arabic · v=27
  *
  * Features:
