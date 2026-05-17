@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1a0f08">
-    <title>مفضّلتي — المكتبة الطيبة</title>
+    <title>مفضّلتي — مكتبة ليبيا الطيبة</title>
     <link rel="stylesheet" href="css/style.css?v=10">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,7 +12,7 @@
     <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('taybaa-theme') || 'dark');</script>
     <style>
         .fav-page-head { text-align: center; padding: 3rem 1rem 2rem; }
-        .fav-page-head h1 { font-family: 'Aref Ruqaa', 'Cairo', serif; font-size: clamp(2rem, 5vw, 2.8rem); color: var(--gold); margin: 0 0 .5rem; }
+        .fav-page-head h1 { font-family: 'Aref Ruqaa', serif; font-size: clamp(2rem, 5vw, 2.8rem); color: var(--gold); margin: 0 0 .5rem; }
         .fav-page-head p { color: var(--text-muted); margin: 0; }
         .fav-page-head .heart-icon { font-size: 3rem; display: block; margin-bottom: .5rem; }
         .fav-empty { text-align: center; padding: 3rem 1.5rem; background: var(--bg-elevated); border: 1px dashed var(--border-strong); border-radius: 16px; max-width: 600px; margin: 2rem auto; }
@@ -29,7 +29,7 @@
         .profile-btn { width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-subtle); color: var(--text); display: grid; place-items: center; transition: all .2s; cursor: pointer; }
         .profile-btn:hover { border-color: var(--gold); background: var(--gold-soft); color: var(--gold); }
         .profile-menu { position: absolute; top: calc(100% + .65rem); left: 0; min-width: 300px; max-width: 360px; background: var(--bg-elevated); border: 1px solid var(--border-strong); border-radius: 16px; box-shadow: 0 25px 60px rgba(0,0,0,.4); overflow: hidden; z-index: 100; }
-        .profile-header { padding: 1rem 1.25rem; background: linear-gradient(135deg, #3a2412, #1a0f08); color: #f5d76e; font-family: 'Aref Ruqaa', 'Cairo', serif; font-weight: 700; }
+        .profile-header { padding: 1rem 1.25rem; background: linear-gradient(135deg, #3a2412, #1a0f08); color: #f5d76e; font-family: 'Aref Ruqaa', serif; font-weight: 700; }
         .profile-body { padding: 1.1rem 1.25rem; }
     </style>
 </head>
@@ -46,7 +46,7 @@
                         <path d="M0 52 Q12 47 24 52 T48 52 T64 52 L64 64 L0 64 Z" fill="#8b5a2b"/>
                     </svg>
                 </span>
-                <span class="logo-text"><span class="logo-title">المكتبة الطيبة</span><span class="logo-tag">TAYBAA · LIBRARY</span></span>
+                <span class="logo-text"><span class="logo-title">مكتبة ليبيا الطيبة</span><span class="logo-tag">TAYBAA · LIBRARY</span></span>
             </a>
             <a href="index.html" class="link-btn">→ الرئيسية</a>
             <div class="profile-wrap">
@@ -99,10 +99,10 @@
     <footer class="site-footer">
         <div class="container footer-inner">
             <div class="footer-brand">
-                <strong>دار نشر المكتبة الطيبة</strong>
+                <strong>دار نشر مكتبة ليبيا الطيبة</strong>
                 <span>واحة المعرفة · مجاناً للجميع</span>
             </div>
-            <p class="footer-copy">© <span id="year"></span> TAYBAA-LIBRARY</p>
+            <p class="footer-copy">© <span id="year"></span> TAYBAA LIBYA LIBRARY</p>
         </div>
     </footer>
 
@@ -155,7 +155,7 @@
             function renderBooks(container, list, removable) {
                 container.innerHTML = list.map(book => {
                     const icon = CONFIG.categoryIcons[book.category] || '📚';
-                    const publisher = CONFIG.publisherShort || 'دار المكتبة الطيبة';
+                    const publisher = CONFIG.publisherShort || 'دار مكتبة ليبيا الطيبة';
                     const lastPage = READING.getPage(book.id);
                     return `<a class="book-card" href="book.html?id=${encodeURIComponent(book.id)}">
                         <div class="book-cover-frame">
