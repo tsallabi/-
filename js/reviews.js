@@ -1,5 +1,5 @@
 /**
- * نظام التقييمات — المكتبة الطيبة (Wave 3)
+ * نظام التقييمات — مكتبة ليبيا الطيبة (Wave 3)
  * =====================================================
  * المخزن الحالي: localStorage مفتاح taybaa-reviews-{bookId}
  * خطة الترقية: نقل إلى Cloudflare KV عند توفّر متغيّر البيئة
@@ -256,7 +256,9 @@ const REVIEWS = (function () {
         e.preventDefault();
         // Try to open the profile menu on the page if it exists
         const profileBtn = document.getElementById('profileBtn');
-        if (profileBtn) profileBtn.click();
+        if (profileBtn) { profileBtn.click(); return; }
+        // Otherwise redirect to profile page to log in
+        location.href = 'profile.html?login=1';
       });
     }
   }
