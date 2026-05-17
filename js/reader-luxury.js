@@ -1,6 +1,6 @@
 /**
  * reader-luxury.js — المكتبة الطيبة Wave 2
- * Luxury reading sanctuary features · RTL Arabic · v=23
+ * Luxury reading sanctuary features · RTL Arabic · v=25
  *
  * Features:
  *  1. 4-colour text highlights (localStorage)
@@ -13,6 +13,7 @@
  *  8. Reading time tracker
  *  9. Zoom control
  * 10. RTL Arabic typography
+ * 11. window.__taybaaReader bridge (Wave 4 — Ask the Book)
  */
 
 (function() {
@@ -792,6 +793,15 @@
   function onPdfLoaded(doc) {
     pdfDoc     = doc;
     totalPages = doc.numPages;
+
+    // ── Wave 4: expose reader state to ask-book.js ────────────────
+    window.__taybaaReader = {
+      get pdfDoc()     { return pdfDoc;      },
+      get currentPage(){ return currentPage; },
+      get bookId()     { return bookId;      },
+      get bookTitle()  { return bookTitle;   },
+      get bookAuthor() { return bookAuthor;  }
+    };
 
     // Show the canvas wrapper, hide loading message
     if (readerMessage) readerMessage.style.display = 'none';
