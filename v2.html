@@ -8,12 +8,12 @@
     <meta name="description" content="المكتبة الطيبة — أكبر مكتبة عربية متخصّصة في ريادة الأعمال وتطوير الذات. أكثر من 8,000 كتاب موثّق في الأعمال والقيادة والاستثمار.">
     <meta name="keywords" content="ريادة الأعمال, تطوير الذات, إدارة الأعمال, التسويق, القيادة, الاستثمار, كتب عربية, مكتبة عربية">
 
-    <link rel="stylesheet" href="css/design-system.css?v=26">
-    <link rel="stylesheet" href="css/homepage-v2.css?v=26">
+    <link rel="stylesheet" href="css/design-system.css?v=27">
+    <link rel="stylesheet" href="css/homepage-v2.css?v=27">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Cairo:wght@400;600;700&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Tajawal:wght@400;500;700&family=Cairo:wght@400;600;700&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('taybaa-theme') || 'light');</script>
 
@@ -568,32 +568,32 @@
                 <h2 id="ent-title">🚀 رحلة الريادي</h2>
                 <p class="ent-subtitle">خرائط طريق وأدلة عملية من رواد الأعمال</p>
                 <div class="ent-tracks">
-                    <a href="category.html?cat=ريادة%20الأعمال" class="ent-track">
+                    <a href="category.html?cat=%D8%B1%D9%8A%D8%A7%D8%AF%D8%A9%20%D8%A7%D9%84%D8%A3%D8%B9%D9%85%D8%A7%D9%84" class="ent-track">
                         <span class="ent-icon">💡</span>
                         <h3>ابتكر فكرتك</h3>
                         <p>ريادة الأعمال والابتكار</p>
                     </a>
-                    <a href="category.html?cat=إدارة%20الأعمال" class="ent-track">
+                    <a href="category.html?cat=%D8%A5%D8%AF%D8%A7%D8%B1%D8%A9%20%D8%A7%D9%84%D8%A3%D8%B9%D9%85%D8%A7%D9%84" class="ent-track">
                         <span class="ent-icon">⚙️</span>
                         <h3>ابنِ مشروعك</h3>
                         <p>إدارة الأعمال والقيادة</p>
                     </a>
-                    <a href="category.html?cat=التسويق" class="ent-track">
+                    <a href="category.html?cat=%D8%A7%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D9%82" class="ent-track">
                         <span class="ent-icon">📣</span>
                         <h3>سوّق نفسك</h3>
                         <p>التسويق وفن البيع</p>
                     </a>
-                    <a href="category.html?cat=الاستثمار%20والمال" class="ent-track">
+                    <a href="category.html?cat=%D8%A7%D9%84%D9%85%D8%A7%D9%84%20%D9%88%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D8%AB%D9%85%D8%A7%D8%B1" class="ent-track">
                         <span class="ent-icon">💰</span>
                         <h3>نمِّ رأسمالك</h3>
                         <p>الاستثمار والإدارة المالية</p>
                     </a>
-                    <a href="category.html?cat=تطوير%20الذات" class="ent-track">
+                    <a href="category.html?cat=%D8%AA%D8%B7%D9%88%D9%8A%D8%B1%20%D8%A7%D9%84%D8%B0%D8%A7%D8%AA%20%D9%88%D8%A7%D9%84%D9%86%D8%AC%D8%A7%D8%AD" class="ent-track">
                         <span class="ent-icon">🎯</span>
                         <h3>طوّر ذاتك</h3>
                         <p>تطوير الذات والمهارات</p>
                     </a>
-                    <a href="category.html?cat=القيادة" class="ent-track">
+                    <a href="category.html?cat=%D8%A7%D9%84%D9%82%D9%8A%D8%A7%D8%AF%D8%A9%20%D9%88%D8%A7%D9%84%D8%A5%D8%AF%D8%A7%D8%B1%D8%A9" class="ent-track">
                         <span class="ent-icon">👑</span>
                         <h3>قُد فريقك</h3>
                         <p>القيادة والإدارة</p>
@@ -674,9 +674,12 @@
         </div>
     </footer>
 
-    <script src="js/user-system.js?v=26"></script>
-    <script src="js/achievements.js?v=26"></script>
-    <script src="js/homepage-v2.js?v=26"></script>
+    <!-- Firebase auth (optional) -->
+    <script src="js/user-system.js?v=27"></script>
+    <script src="js/achievements.js?v=27"></script>
+    <!-- Admin role detection + per-user hide list (Aref Ruqaa wave) -->
+    <script src="js/admin-role.js?v=27"></script>
+    <script src="js/homepage-v2.js?v=27"></script>
     <script>
         document.getElementById('themeBtn')?.addEventListener('click', () => {
             const c = document.documentElement.getAttribute('data-theme') || 'light';
