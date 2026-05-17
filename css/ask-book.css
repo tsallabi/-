@@ -1,0 +1,382 @@
+/**
+ * css/ask-book.css  —  Wave 4 "اسأل الكتاب"
+ * Luxury RTL Arabic chat panel for المكتبة الطيبة
+ *
+ * Design tokens:
+ *   --parchment : #FAF6EE  (background)
+ *   --ink       : #0F1B2D  (text)
+ *   --crimson   : #B1373F  (Indian red accent)
+ *   --gold      : #B89968  (gold accent / borders)
+ *   --gold-light: #D4B483  (lighter gold)
+ */
+
+/* ── Overlay ──────────────────────────────────────────────────────────────── */
+#ask-book-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 27, 45, 0.35);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 1200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+#ask-book-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ── Panel ────────────────────────────────────────────────────────────────── */
+#ask-book-panel {
+  position: fixed;
+  top: 0;
+  right: 0;          /* slides in from the right (RTL natural side) */
+  height: 100dvh;
+  width: 420px;
+  max-width: 100vw;
+  background: #FAF6EE;
+  border-right: none;
+  border-left: 3px solid #B89968;
+  box-shadow: -6px 0 40px rgba(15, 27, 45, 0.25);
+  display: flex;
+  flex-direction: column;
+  z-index: 1201;
+  transform: translateX(100%);
+  transition: transform 380ms cubic-bezier(0.22, 1, 0.36, 1);
+  font-family: 'Amiri', 'Reem Kufi', serif;
+  color: #0F1B2D;
+  overflow: hidden;
+}
+
+#ask-book-panel.open {
+  transform: translateX(0);
+}
+
+/* ── Header ───────────────────────────────────────────────────────────────── */
+#ask-book-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: linear-gradient(135deg, #0F1B2D 0%, #1a2d47 100%);
+  border-bottom: 2px solid #B89968;
+  flex-shrink: 0;
+}
+
+#ask-book-header-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #FAF6EE;
+  font-family: 'Reem Kufi', 'Amiri', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.ask-book-icon {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+#ask-book-header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+#ask-book-header-actions button {
+  background: transparent;
+  border: 1px solid rgba(184, 153, 104, 0.4);
+  border-radius: 6px;
+  color: #D4B483;
+  cursor: pointer;
+  font-size: 0.95rem;
+  padding: 5px 10px;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  line-height: 1;
+}
+
+#ask-book-header-actions button:hover {
+  background: rgba(184, 153, 104, 0.15);
+  border-color: #B89968;
+  color: #FAF6EE;
+}
+
+/* ── Book info banner ─────────────────────────────────────────────────────── */
+#ask-book-book-info {
+  padding: 8px 18px;
+  background: rgba(184, 153, 104, 0.12);
+  border-bottom: 1px solid rgba(184, 153, 104, 0.3);
+  font-size: 0.82rem;
+  color: #5a4a30;
+  font-family: 'Amiri', serif;
+  min-height: 0;
+  transition: min-height 0.2s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+}
+
+#ask-book-book-info:empty {
+  display: none;
+}
+
+/* ── Messages area ────────────────────────────────────────────────────────── */
+#ask-book-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  scroll-behavior: smooth;
+}
+
+#ask-book-messages::-webkit-scrollbar {
+  width: 5px;
+}
+#ask-book-messages::-webkit-scrollbar-thumb {
+  background: rgba(184, 153, 104, 0.4);
+  border-radius: 10px;
+}
+
+/* ── Message bubbles ──────────────────────────────────────────────────────── */
+.ask-book-msg {
+  display: flex;
+  max-width: 88%;
+  animation: askBookFadeIn 0.25s ease;
+}
+
+@keyframes askBookFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+
+/* User: right-aligned, gold border */
+.ask-book-msg--user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.ask-book-msg--user .ask-book-bubble {
+  background: linear-gradient(135deg, #fff8ee 0%, #fdf3e0 100%);
+  border: 1.5px solid #B89968;
+  border-radius: 16px 4px 16px 16px;
+  color: #0F1B2D;
+  padding: 10px 14px;
+  font-size: 0.92rem;
+  line-height: 1.65;
+  text-align: right;
+  box-shadow: 0 2px 8px rgba(184, 153, 104, 0.2);
+}
+
+/* Assistant: left-aligned, parchment */
+.ask-book-msg--assistant {
+  align-self: flex-start;
+}
+
+.ask-book-msg--assistant .ask-book-bubble {
+  background: #FFFFFF;
+  border: 1px solid rgba(184, 153, 104, 0.35);
+  border-radius: 4px 16px 16px 16px;
+  color: #0F1B2D;
+  padding: 10px 14px;
+  font-size: 0.92rem;
+  line-height: 1.75;
+  text-align: right;
+  white-space: pre-wrap;
+  box-shadow: 0 2px 6px rgba(15, 27, 45, 0.06);
+}
+
+/* ── Typing indicator ─────────────────────────────────────────────────────── */
+.ask-book-typing {
+  display: flex !important;
+  align-items: center;
+  gap: 5px;
+  padding: 12px 16px;
+}
+
+.ask-book-typing span {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #B89968;
+  animation: askBookDot 1.3s infinite ease-in-out;
+}
+
+.ask-book-typing span:nth-child(1) { animation-delay: 0s;    }
+.ask-book-typing span:nth-child(2) { animation-delay: 0.2s;  }
+.ask-book-typing span:nth-child(3) { animation-delay: 0.4s;  }
+
+@keyframes askBookDot {
+  0%, 60%, 100% { transform: translateY(0);    opacity: 0.4; }
+  30%           { transform: translateY(-6px); opacity: 1;   }
+}
+
+/* ── Starter questions ────────────────────────────────────────────────────── */
+#ask-book-starters {
+  padding: 6px 14px 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  flex-shrink: 0;
+}
+
+.ask-book-starter {
+  background: rgba(184, 153, 104, 0.1);
+  border: 1px solid rgba(184, 153, 104, 0.4);
+  border-radius: 20px;
+  color: #5a4a30;
+  cursor: pointer;
+  font-family: 'Amiri', serif;
+  font-size: 0.8rem;
+  padding: 5px 13px;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  text-align: right;
+  line-height: 1.5;
+}
+
+.ask-book-starter:hover {
+  background: rgba(184, 153, 104, 0.22);
+  border-color: #B89968;
+  color: #0F1B2D;
+}
+
+/* ── Input area ───────────────────────────────────────────────────────────── */
+#ask-book-input-area {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  padding: 12px 14px 16px;
+  border-top: 1.5px solid rgba(184, 153, 104, 0.35);
+  background: rgba(250, 246, 238, 0.95);
+  flex-shrink: 0;
+}
+
+#ask-book-input-wrap {
+  flex: 1;
+  position: relative;
+}
+
+#ask-book-input {
+  width: 100%;
+  box-sizing: border-box;
+  resize: none;
+  background: #FFFFFF;
+  border: 1.5px solid rgba(184, 153, 104, 0.5);
+  border-radius: 12px;
+  color: #0F1B2D;
+  direction: rtl;
+  font-family: 'Amiri', serif;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  padding: 10px 14px 26px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#ask-book-input:focus {
+  border-color: #B89968;
+  box-shadow: 0 0 0 3px rgba(184, 153, 104, 0.15);
+}
+
+#ask-book-input::placeholder {
+  color: #aaa;
+  font-style: italic;
+}
+
+#ask-book-char-count {
+  position: absolute;
+  bottom: 8px;
+  left: 12px;
+  font-size: 0.7rem;
+  color: #b0a080;
+  pointer-events: none;
+  font-family: monospace;
+}
+
+#ask-book-send {
+  background: linear-gradient(135deg, #0F1B2D 0%, #1a2d47 100%);
+  border: 2px solid #B89968;
+  border-radius: 12px;
+  color: #B89968;
+  cursor: pointer;
+  font-size: 1.3rem;
+  height: 48px;
+  width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.2s, color 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+
+#ask-book-send:hover:not(:disabled) {
+  background: linear-gradient(135deg, #B89968 0%, #D4B483 100%);
+  color: #0F1B2D;
+  box-shadow: 0 4px 12px rgba(184, 153, 104, 0.35);
+}
+
+#ask-book-send:active:not(:disabled) {
+  transform: scale(0.93);
+}
+
+#ask-book-send:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.ask-book-send-icon {
+  line-height: 1;
+}
+
+/* ── Toolbar button (injected in reader.html) ─────────────────────────────── */
+#ask-book-btn {
+  align-items: center;
+  background: transparent;
+  border: 1px solid rgba(184, 153, 104, 0.45);
+  border-radius: 8px;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  font-family: 'Reem Kufi', 'Amiri', serif;
+  font-size: 0.82rem;
+  gap: 5px;
+  padding: 6px 11px;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
+  white-space: nowrap;
+}
+
+#ask-book-btn:hover {
+  background: rgba(184, 153, 104, 0.12);
+  border-color: #B89968;
+}
+
+#ask-book-btn.active {
+  background: rgba(184, 153, 104, 0.2);
+  border-color: #B89968;
+  box-shadow: 0 0 0 2px rgba(184, 153, 104, 0.25);
+}
+
+/* ── Responsive: full-screen on mobile ────────────────────────────────────── */
+@media (max-width: 640px) {
+  #ask-book-panel {
+    width: 100vw;
+    border-left: none;
+  }
+}
+
+/* ── Reduced motion ───────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  #ask-book-panel,
+  #ask-book-overlay,
+  .ask-book-msg,
+  .ask-book-typing span {
+    transition: none;
+    animation: none;
+  }
+}
